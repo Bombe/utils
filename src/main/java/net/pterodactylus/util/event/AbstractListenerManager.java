@@ -1,5 +1,5 @@
 /*
- * utils - AbstractListenerSupport.java - Copyright © 2009 David Roden
+ * utils - AbstractListenerManager.java - Copyright © 2009 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ import net.pterodactylus.util.thread.CurrentThreadExecutor;
  *            The type of the event listeners
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class AbstractListenerSupport<S, L extends EventListener> {
+public abstract class AbstractListenerManager<S, L extends EventListener> {
 
 	/** The source that emits the events. */
 	private final S source;
@@ -52,7 +52,7 @@ public abstract class AbstractListenerSupport<S, L extends EventListener> {
 	 * @param source
 	 *            The source of the events
 	 */
-	public AbstractListenerSupport(S source) {
+	public AbstractListenerManager(S source) {
 		this(source, new CurrentThreadExecutor());
 	}
 
@@ -64,7 +64,7 @@ public abstract class AbstractListenerSupport<S, L extends EventListener> {
 	 * @param executor
 	 *            The executor used to fire events
 	 */
-	public AbstractListenerSupport(S source, Executor executor) {
+	public AbstractListenerManager(S source, Executor executor) {
 		this.source = source;
 		this.executor = executor;
 	}
