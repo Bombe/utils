@@ -31,7 +31,7 @@ import net.pterodactylus.util.thread.CurrentThreadExecutor;
  *
  * @param <S>
  *            The type of the source
- *@param <L>
+ * @param <L>
  *            The type of the event listeners
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
