@@ -175,6 +175,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 * {@inheritDoc}
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public String getStateReason() {
 		synchronized (syncObject) {
 			return action;
