@@ -29,6 +29,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
+
 /**
  * Executes threads at specified times in the future.
  *
@@ -37,7 +39,7 @@ import java.util.logging.Logger;
 public class Ticker implements Runnable {
 
 	/** Logger. */
-	private static final Logger logger = Logger.getLogger(Ticker.class.getName());
+	private static final Logger logger = Logging.getLogger(Ticker.class.getName());
 
 	/** A global instance. */
 	private static final Ticker globalInstance = new Ticker();

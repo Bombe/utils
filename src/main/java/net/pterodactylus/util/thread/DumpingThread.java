@@ -20,6 +20,8 @@ package net.pterodactylus.util.thread;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
+
 /**
  * Wrapper around {@link Thread} that catches throws exceptions and dumps them
  * to the logfile.
@@ -29,7 +31,7 @@ import java.util.logging.Logger;
 public class DumpingThread extends Thread {
 
 	/** Logger. */
-	private static final Logger logger = Logger.getLogger(DumpingThread.class.getName());
+	private static final Logger logger = Logging.getLogger(DumpingThread.class.getName());
 
 	/** Thread counter. */
 	private static int counter = 0;

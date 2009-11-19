@@ -34,6 +34,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
+
 /**
  * Helper class that can close all kinds of resources without throwing exception
  * so that clean-up code can be written with less code. All methods check that
@@ -45,7 +47,7 @@ import java.util.logging.Logger;
 public class Closer {
 
 	/** The logger. */
-	private static final Logger logger = Logger.getLogger(Closer.class.getName());
+	private static final Logger logger = Logging.getLogger(Closer.class.getName());
 
 	/**
 	 * Closes the given result set.

@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 /**
@@ -36,7 +37,7 @@ import net.pterodactylus.util.service.AbstractService;
 public class TelnetControl extends AbstractService {
 
 	/** The logger. */
-	private static final Logger logger = Logger.getLogger(TelnetControl.class.getName());
+	private static final Logger logger = Logging.getLogger(TelnetControl.class.getName());
 
 	/** The server socket. */
 	private ServerSocket serverSocket;
