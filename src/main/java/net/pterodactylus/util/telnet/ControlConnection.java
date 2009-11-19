@@ -56,7 +56,7 @@ public class ControlConnection extends AbstractService {
 	public ControlConnection(InputStream clientInputStream, OutputStream clientOutputStream) {
 		this.clientInputStream = clientInputStream;
 		this.clientOutputStream = clientOutputStream;
-		internalCommands.put("quit", new QuitCommand());
+		addCommand(new QuitCommand());
 	}
 
 	/**
