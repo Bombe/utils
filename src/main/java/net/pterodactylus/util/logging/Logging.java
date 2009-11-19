@@ -91,7 +91,7 @@ public class Logging {
 			public synchronized String format(LogRecord record) {
 				recordBuffer.setLength(0);
 				String linePrefix = dateFormatter.format(new Date(record.getMillis())) + " [" + record.getLevel() + "] [" + Thread.currentThread().getName() + "] [" + record.getSourceClassName() + "." + record.getSourceMethodName() + "] ";
-				recordBuffer.append(linePrefix).append(record.getMessage()).append('\n');
+				recordBuffer.append(linePrefix).append(String.format(record.getMessage(), record.getParameters())).append('\n');
 				if (record.getThrown() != null) {
 					Throwable throwable = record.getThrown();
 					boolean causedBy = false;
