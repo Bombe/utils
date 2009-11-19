@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.thread.DumpingThreadFactory;
 import net.pterodactylus.util.validation.Validation;
 
@@ -32,7 +33,7 @@ import net.pterodactylus.util.validation.Validation;
 public abstract class AbstractService implements Service, Runnable {
 
 	/** Logger. */
-	private static final Logger logger = Logger.getLogger(AbstractService.class.getName());
+	private static final Logger logger = Logging.getLogger(AbstractService.class.getName());
 
 	/** Listener support. */
 	private final ServiceListenerManager serviceListenerSupport = new ServiceListenerManager(this);
