@@ -173,9 +173,6 @@ public abstract class AbstractService implements Service, Runnable {
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @see net.pterodactylus.util.service.Service#getStateReason()
-	 * @deprecated Use {@link #getAction()} instead
 	 */
 	@Deprecated
 	public String getStateReason() {
