@@ -25,7 +25,7 @@ import net.pterodactylus.util.text.TextException;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class ControlConnection extends AbstractService {
+public class ControlConnection extends AbstractService {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(ControlConnection.class.getName());
