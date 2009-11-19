@@ -74,7 +74,7 @@ public class ControlConnection extends AbstractService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void serviceRun() {
+	protected void serviceRun() {
 		InputStreamReader inputStreamReader = null;
 		BufferedReader bufferedReader = null;
 		PrintWriter printWriter = null;
