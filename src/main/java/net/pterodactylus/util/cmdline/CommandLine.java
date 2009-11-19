@@ -200,7 +200,7 @@ public class CommandLine {
 	 * @return The option, or <code>null</code> if no option could be found
 	 */
 	public Option getOption(String name) {
-		Validation.begin().isNotNull("name", (Object) name).check();
+		Validation.begin().isNotNull("name", name).check();
 		if ((name.length() > 1) && longNameOptions.containsKey(name)) {
 			return longNameOptions.get(name);
 		}
