@@ -5,6 +5,13 @@
 	<version>0.1.2</version>
 	<name>utils</name>
 	<description>Utility Library</description>
+	<distributionManagement>
+		<repository>
+			<id>pterodactylus</id>
+			<name>pterodactylus.net Maven Repository</name>
+			<url>scp://maven@maven.pterodactylus.net/home/maven/repository</url>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
