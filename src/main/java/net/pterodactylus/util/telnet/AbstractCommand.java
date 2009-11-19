@@ -63,8 +63,7 @@ public abstract class AbstractCommand implements Command {
 	protected AbstractCommand(String name, String briefDescription, String... detailedDescriptions) {
 		this.name = name;
 		this.briefDescription = briefDescription;
-		for (@SuppressWarnings("hiding")
-		String detailedDescription : detailedDescriptions) {
+		for (String detailedDescription : detailedDescriptions) {
 			this.detailedDescription.add(detailedDescription);
 		}
 	}
