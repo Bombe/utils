@@ -134,6 +134,17 @@ public class Logging {
 	}
 
 	/**
+	 * Sets the log level of the hierarchy’s root logger.
+	 *
+	 * @param rootLevel
+	 *            The log level for the root logger
+	 */
+	public static void setRootLevel(Level rootLevel) {
+		Logger rootLogger = Logger.getLogger(hierarchyRootName);
+		rootLogger.setLevel(rootLevel);
+	}
+
+	/**
 	 * The log handler simply forwards every log message it receives to all
 	 * registered listeners.
 	 *
