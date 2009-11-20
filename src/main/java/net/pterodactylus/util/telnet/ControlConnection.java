@@ -104,6 +104,7 @@ public class ControlConnection extends AbstractService {
 			for (String line : lines) {
 				outputStreamWriter.println(line);
 			}
+			outputStreamWriter.flush();
 		}
 	}
 
