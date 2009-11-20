@@ -1,3 +1,4 @@
+
 package net.pterodactylus.util.telnet;
 
 import java.io.BufferedReader;
@@ -59,6 +60,10 @@ public class ControlConnection extends AbstractService {
 		addCommand(new QuitCommand());
 	}
 
+	//
+	// ACCESSORS
+	//
+
 	/**
 	 * Adds the given command to this control.
 	 *
@@ -69,6 +74,10 @@ public class ControlConnection extends AbstractService {
 		commands.put(command.getName().toLowerCase(), command);
 		internalCommands.put("help", new HelpCommand(commands.values()));
 	}
+
+	//
+	// SERVICE METHODS
+	//
 
 	/**
 	 * {@inheritDoc}
