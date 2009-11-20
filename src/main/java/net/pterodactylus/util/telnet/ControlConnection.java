@@ -40,6 +40,9 @@ public class ControlConnection extends AbstractService {
 	/** The client’s output stream. */
 	private final OutputStream clientOutputStream;
 
+	/** The output stream writer. */
+	private final PrintWriter outputStreamWriter;
+
 	/** Mapping from command names to commands. */
 	Map<String, Command> commands = new HashMap<String, Command>();
 
@@ -57,6 +60,7 @@ public class ControlConnection extends AbstractService {
 	public ControlConnection(InputStream clientInputStream, OutputStream clientOutputStream) {
 		this.clientInputStream = clientInputStream;
 		this.clientOutputStream = clientOutputStream;
+		this.outputStreamWriter = new PrintWriter(clientOutputStream);
 		addCommand(new QuitCommand());
 	}
 
@@ -76,6 +80,32 @@ public class ControlConnection extends AbstractService {
 	}
 
 	//
+	// ACTIONS
+	//
+
+	/**
+	 * Prints the given line to the output stream.
+	 *
+	 * @param line
+	 *            The line to print
+	 */
+	public void addOutputLine(String line) {
+		addOutputLines(line);
+	}
+
+	/**
+	 * Prints the given lines to the output stream.
+	 *
+	 * @param lines
+	 *            The lines to print
+	 */
+	public void addOutputLines(String... lines) {
+		for (String line : lines) {
+			outputStreamWriter.println(line);
+		}
+	}
+
+	//
 	// SERVICE METHODS
 	//
 
@@ -86,11 +116,9 @@ public class ControlConnection extends AbstractService {
 	protected void serviceRun() {
 		InputStreamReader inputStreamReader = null;
 		BufferedReader bufferedReader = null;
-		PrintWriter printWriter = null;
 		try {
 			inputStreamReader = new InputStreamReader(clientInputStream);
 			bufferedReader = new BufferedReader(inputStreamReader);
-			printWriter = new PrintWriter(clientOutputStream);
 			String line;
 			boolean finished = false;
 			while (!finished && ((line = bufferedReader.readLine()) != null)) {
@@ -102,7 +130,7 @@ public class ControlConnection extends AbstractService {
 				try {
 					words = StringEscaper.parseLine(line);
 				} catch (TextException te1) {
-					writeReply(printWriter, new Reply(Reply.BAD_REQUEST).addLine("Syntax error."));
+					writeReply(new Reply(Reply.BAD_REQUEST).addLine("Syntax error."));
 					continue;
 				}
 				if (words.isEmpty()) {
@@ -111,16 +139,16 @@ public class ControlConnection extends AbstractService {
 				String commandName = words.remove(0).toLowerCase();
 				List<Command> foundCommands = findCommand(commandName);
 				if (foundCommands.isEmpty()) {
-					writeReply(printWriter, new Reply(Reply.NOT_FOUND).addLine("Command not found."));
+					writeReply(new Reply(Reply.NOT_FOUND).addLine("Command not found."));
 				} else if (foundCommands.size() == 1) {
 					Command command = foundCommands.get(0);
 					try {
 						Reply commandReply = command.execute(words);
-						writeReply(printWriter, commandReply);
+						writeReply(commandReply);
 					} catch (IOException ioe1) {
 						throw ioe1;
 					} catch (Throwable t1) {
-						writeReply(printWriter, new Reply(Reply.INTERNAL_SERVER_ERROR).addLine("Internal server error: " + t1.getMessage()));
+						writeReply(new Reply(Reply.INTERNAL_SERVER_ERROR).addLine("Internal server error: " + t1.getMessage()));
 					}
 					if (command instanceof QuitCommand) {
 						finished = true;
@@ -130,13 +158,13 @@ public class ControlConnection extends AbstractService {
 					for (Command command : foundCommands) {
 						reply.addLine(command.getName());
 					}
-					writeReply(printWriter, reply);
+					writeReply(reply);
 				}
 			}
 		} catch (IOException ioe1) {
 			logger.log(Level.INFO, "could not handle connection", ioe1);
 		} finally {
-			Closer.close(printWriter);
+			Closer.close(outputStreamWriter);
 			Closer.close(bufferedReader);
 			Closer.close(inputStreamReader);
 		}
@@ -190,21 +218,21 @@ public class ControlConnection extends AbstractService {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	private void writeReply(PrintWriter printWriter, Reply reply) throws IOException {
+	private void writeReply(Reply reply) throws IOException {
 		if (reply == null) {
-			printWriter.write("500 Internal server error." + LINEFEED);
-			printWriter.flush();
+			outputStreamWriter.write("500 Internal server error." + LINEFEED);
+			outputStreamWriter.flush();
 			return;
 		}
 		int status = reply.getStatus();
 		List<String> lines = reply.getLines();
 		for (int lineIndex = 0, lineCount = lines.size(); lineIndex < lineCount; lineIndex++) {
-			printWriter.write(status + ((lineIndex < (lineCount - 1)) ? "-" : " ") + lines.get(lineIndex) + LINEFEED);
+			outputStreamWriter.write(status + ((lineIndex < (lineCount - 1)) ? "-" : " ") + lines.get(lineIndex) + LINEFEED);
 		}
 		if (lines.size() == 0) {
-			printWriter.write("200 OK." + LINEFEED);
+			outputStreamWriter.write("200 OK." + LINEFEED);
 		}
-		printWriter.flush();
+		outputStreamWriter.flush();
 	}
 
 }
