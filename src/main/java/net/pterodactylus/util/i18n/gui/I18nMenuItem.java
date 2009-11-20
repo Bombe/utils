@@ -71,6 +71,17 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	}
 
 	/**
+	 * Creates a new i18nable menu item that used the properties of the given
+	 * {@link I18nAction}.
+	 *
+	 * @param i18nAction
+	 *            The action to copy
+	 */
+	public I18nMenuItem(I18nAction i18nAction) {
+		this(i18nAction.getI18nBasename(), i18nAction);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
