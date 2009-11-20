@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.pterodactylus.util.i18n.gui;
 
 import javax.swing.AbstractAction;
@@ -88,6 +89,14 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 		}
 		setEnabled(enabled);
 		updateI18n();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getI18nBasename() {
+		return i18nName;
 	}
 
 	/**
