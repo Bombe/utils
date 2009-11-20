@@ -100,8 +100,10 @@ public class ControlConnection extends AbstractService {
 	 *            The lines to print
 	 */
 	public void addOutputLines(String... lines) {
-		for (String line : lines) {
-			outputStreamWriter.println(line);
+		synchronized (outputStreamWriter) {
+			for (String line : lines) {
+				outputStreamWriter.println(line);
+			}
 		}
 	}
 
@@ -219,20 +221,22 @@ public class ControlConnection extends AbstractService {
 	 *             if an I/O error occurs
 	 */
 	private void writeReply(Reply reply) throws IOException {
-		if (reply == null) {
-			outputStreamWriter.write("500 Internal server error." + LINEFEED);
+		synchronized (outputStreamWriter) {
+			if (reply == null) {
+				outputStreamWriter.write("500 Internal server error." + LINEFEED);
+				outputStreamWriter.flush();
+				return;
+			}
+			int status = reply.getStatus();
+			List<String> lines = reply.getLines();
+			for (int lineIndex = 0, lineCount = lines.size(); lineIndex < lineCount; lineIndex++) {
+				outputStreamWriter.write(status + ((lineIndex < (lineCount - 1)) ? "-" : " ") + lines.get(lineIndex) + LINEFEED);
+			}
+			if (lines.size() == 0) {
+				outputStreamWriter.write("200 OK." + LINEFEED);
+			}
 			outputStreamWriter.flush();
-			return;
 		}
-		int status = reply.getStatus();
-		List<String> lines = reply.getLines();
-		for (int lineIndex = 0, lineCount = lines.size(); lineIndex < lineCount; lineIndex++) {
-			outputStreamWriter.write(status + ((lineIndex < (lineCount - 1)) ? "-" : " ") + lines.get(lineIndex) + LINEFEED);
-		}
-		if (lines.size() == 0) {
-			outputStreamWriter.write("200 OK." + LINEFEED);
-		}
-		outputStreamWriter.flush();
 	}
 
 }
