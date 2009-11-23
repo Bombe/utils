@@ -21,6 +21,8 @@ import java.awt.MenuItem;
 import java.awt.MenuShortcut;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
 
@@ -39,6 +41,9 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	/** The i18n basename of the menu item. */
 	private final String i18nBasename;
 
+	/** The action, if this menu item was derived from one. */
+	private final Action action;
+
 	/**
 	 * Creates a new i18nable menu item.
 	 *
@@ -46,8 +51,7 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 *            The i18n basename of the menu item
 	 */
 	public I18nMenuItem(String i18nBasename) {
-		this.i18nBasename = i18nBasename;
-		updateI18n();
+		this(i18nBasename, null);
 	}
 
 	/**
@@ -60,14 +64,27 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 *            The action to perform when selected
 	 */
 	public I18nMenuItem(String i18nBasename, final Action action) {
-		this(i18nBasename);
-		addActionListener(new ActionListener() {
+		this.i18nBasename = i18nBasename;
+		this.action = action;
+		if (action != null) {
+			addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent actionEvent) {
-				action.actionPerformed(actionEvent);
-			}
-		});
+				@Override
+				public void actionPerformed(ActionEvent actionEvent) {
+					action.actionPerformed(actionEvent);
+				}
+			});
+			action.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+					if ("enabled".equals(propertyChangeEvent.getPropertyName())) {
+						updateI18n();
+					}
+				}
+			});
+		}
+		updateI18n();
 	}
 
 	/**
@@ -96,6 +113,8 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	public void updateI18n() {
 		setLabel(I18n.get(i18nBasename + ".name"));
 		setShortcut(new MenuShortcut(I18n.getKey(i18nBasename + ".mnemonic"), false));
+		if (action != null) {
+			setEnabled(action.isEnabled());
+		}
 	}
-
 }
