@@ -214,8 +214,6 @@ public class ControlConnection extends AbstractService {
 	 * <code>reply</code> may be <code>null</code> in which case an appropriate
 	 * error message is written.
 	 *
-	 * @param printWriter
-	 *            The output stream writer
 	 * @param reply
 	 *            The reply to send
 	 * @throws IOException
