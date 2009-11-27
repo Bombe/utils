@@ -19,6 +19,7 @@ package net.pterodactylus.util.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -111,8 +112,11 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 			}
 			nodeCache.clear();
 			return SimpleXML.fromDocument(configurationDocument);
-		} catch (IOException ioe1) {
-			throw new ConfigurationException(ioe1);
+		} catch (FileNotFoundException fnfe1) {
+			if (!create) {
+				throw new ConfigurationException(fnfe1);
+			}
+			return new SimpleXML("config");
 		} finally {
 			Closer.close(configFileInputStream);
 		}
