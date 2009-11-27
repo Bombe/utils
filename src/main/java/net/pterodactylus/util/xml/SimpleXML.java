@@ -281,17 +281,9 @@ public class SimpleXML {
 	 * With this method you can create deep structures very fast.
 	 *
 	 * <pre>
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
-	 *
+	 * <code>
 	 * SimpleXML mouseNode = topNode.append(&quot;computer&quot;).append(&quot;bus&quot;).append(&quot;usb&quot;).append(&quot;mouse&quot;);
+	 * </code>
 	 * </pre>
 	 *
 	 * @param nodeName
