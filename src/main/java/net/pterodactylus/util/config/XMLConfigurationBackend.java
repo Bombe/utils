@@ -67,24 +67,47 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 *             if the XML can not be read or parsed
 	 */
 	public XMLConfigurationBackend(File configurationFile) throws ConfigurationException {
+		this(configurationFile, false);
+	}
+
+	/**
+	 * Creates a new backend backed by the given file.
+	 *
+	 * @param configurationFile
+	 *            The XML file to read the configuration from
+	 * @param create
+	 *            {@code true} to create a new configuration when loading the
+	 *            configuration from the given file fails, {@code false} to
+	 *            throw a {@link ConfigurationException}
+	 * @throws ConfigurationException
+	 *             if the XML can not be read or parsed
+	 */
+	public XMLConfigurationBackend(File configurationFile, boolean create) throws ConfigurationException {
 		this.configurationFile = configurationFile;
-		rootNode = readConfigurationFile();
+		rootNode = readConfigurationFile(create);
 	}
 
 	/**
 	 * Reads and parses the configuration file.
 	 *
+	 * @param create
+	 *            {@code true} to create a new configuration if loading the
+	 *            configuration file fails, {@code false} to throw a
+	 *            {@link ConfigurationException}
 	 * @return The created root node
 	 * @throws ConfigurationException
 	 *             if the file can not be read or parsed
 	 */
-	private synchronized SimpleXML readConfigurationFile() throws ConfigurationException {
+	private synchronized SimpleXML readConfigurationFile(boolean create) throws ConfigurationException {
 		FileInputStream configFileInputStream = null;
 		try {
 			configFileInputStream = new FileInputStream(configurationFile);
 			Document configurationDocument = XML.transformToDocument(configFileInputStream);
 			if (configurationDocument == null) {
-				throw new ConfigurationException("can not parse XML document");
+				if (!create) {
+					throw new ConfigurationException("can not parse XML document");
+				}
+				configurationDocument = new SimpleXML("config").getDocument();
 			}
 			nodeCache.clear();
 			return SimpleXML.fromDocument(configurationDocument);
@@ -129,7 +152,7 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	public String getValue(String attribute) throws ConfigurationException {
 		if (configurationFile.lastModified() > lastModified) {
 			logger.info("reloading configuration file " + configurationFile.getAbsolutePath());
-			readConfigurationFile();
+			readConfigurationFile(false);
 			lastModified = configurationFile.lastModified();
 		}
 		SimpleXML node = getNode(attribute);
