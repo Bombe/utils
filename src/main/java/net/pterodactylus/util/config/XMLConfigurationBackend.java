@@ -30,11 +30,10 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.xml.DOMUtil;
+import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * Configuration backend that reads and writes its configuration from/to an XML
@@ -48,7 +47,7 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	private static final Logger logger = Logging.getLogger(XMLConfigurationBackend.class.getName());
 
 	/** The node cache. */
-	private final Map<String, Node> nodeCache = new HashMap<String, Node>();
+	private final Map<String, SimpleXML> nodeCache = new HashMap<String, SimpleXML>();
 
 	/** The configuration file. */
 	private final File configurationFile;
@@ -56,11 +55,8 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	/** The last modification time of the configuration file. */
 	private long lastModified;
 
-	/** The configuration document. */
-	private Document configurationDocument;
-
 	/** The root node of the document. */
-	private final Node rootNode;
+	private final SimpleXML rootNode;
 
 	/**
 	 * Creates a new backend backed by the given file.
@@ -82,17 +78,16 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 * @throws ConfigurationException
 	 *             if the file can not be read or parsed
 	 */
-	private synchronized Node readConfigurationFile() throws ConfigurationException {
+	private synchronized SimpleXML readConfigurationFile() throws ConfigurationException {
 		FileInputStream configFileInputStream = null;
 		try {
 			configFileInputStream = new FileInputStream(configurationFile);
-			configurationDocument = XML.transformToDocument(configFileInputStream);
+			Document configurationDocument = XML.transformToDocument(configFileInputStream);
 			if (configurationDocument == null) {
 				throw new ConfigurationException("can not parse XML document");
 			}
-			Node rootNode = configurationDocument.getDocumentElement();
 			nodeCache.clear();
-			return rootNode;
+			return SimpleXML.fromDocument(configurationDocument);
 		} catch (IOException ioe1) {
 			throw new ConfigurationException(ioe1);
 		} finally {
@@ -113,7 +108,7 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 		try {
 			configurationFileOutputStream = new FileOutputStream(configurationFile);
 			configurationOutputStreamWriter = new OutputStreamWriter(configurationFileOutputStream, "UTF-8");
-			XML.writeToOutputStream(configurationDocument, configurationOutputStreamWriter);
+			XML.writeToOutputStream(rootNode.getDocument(), configurationOutputStreamWriter);
 		} catch (IOException ioe1) {
 			throw new ConfigurationException(ioe1.getMessage(), ioe1);
 		} finally {
@@ -137,8 +132,8 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 			readConfigurationFile();
 			lastModified = configurationFile.lastModified();
 		}
-		Node node = getNode(attribute);
-		String value = node.getTextContent();
+		SimpleXML node = getNode(attribute);
+		String value = node.getValue();
 		logger.log(Level.FINEST, "attribute: “%1$s”, value: “%2$s”", new Object[] { attribute, value });
 		return value;
 	}
@@ -150,8 +145,8 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 *      java.lang.String)
 	 */
 	public void putValue(String attribute, String value) throws ConfigurationException {
-		Node node = getNode(attribute);
-		node.setTextContent(value);
+		SimpleXML node = getNode(attribute, true);
+		node.setValue(value);
 		writeConfigurationFile();
 	}
 
@@ -170,17 +165,40 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 * @throws ConfigurationException
 	 *             if the node could not be found
 	 */
-	private Node getNode(String attribute) throws ConfigurationException {
+	private SimpleXML getNode(String attribute) throws ConfigurationException {
+		return getNode(attribute, false);
+	}
+
+	/**
+	 * Searches for the node with the given name and returns it. The given
+	 * attribute may contain several nodes, separated by a pipe character (“|”),
+	 * that describe where in the document hierarchy the node can be found.
+	 *
+	 * @param attribute
+	 *            The complete name of the node
+	 * @param create
+	 *            {@code true} to create the node if it doesn’t exist, {@code
+	 *            false} to throw a {@link ConfigurationException} if it doesn’t
+	 *            exist
+	 * @return The node, if found
+	 * @throws ConfigurationException
+	 *             if the node could not be found
+	 */
+	private SimpleXML getNode(String attribute, boolean create) throws ConfigurationException {
 		if (nodeCache.containsKey(attribute)) {
 			return nodeCache.get(attribute);
 		}
 		StringTokenizer attributes = new StringTokenizer(attribute, "|/");
-		Node node = rootNode;
+		SimpleXML node = rootNode;
 		while (attributes.hasMoreTokens()) {
 			String nodeName = attributes.nextToken();
-			node = DOMUtil.getChildNode(node, nodeName);
-			if (node == null) {
-				throw new AttributeNotFoundException(attribute);
+			if (node.hasNode(nodeName)) {
+				node = node.getNode(nodeName);
+			} else {
+				if (!create) {
+					throw new AttributeNotFoundException(attribute);
+				}
+				node = node.append(nodeName);
 			}
 		}
 		nodeCache.put(attribute, node);
