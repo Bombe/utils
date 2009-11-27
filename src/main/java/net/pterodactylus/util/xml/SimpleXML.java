@@ -29,6 +29,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.pterodactylus.util.logging.Logging;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -46,7 +48,7 @@ import org.w3c.dom.Text;
 public class SimpleXML {
 
 	/** Logger. */
-	private static final Logger logger = Logger.getLogger(SimpleXML.class.getName());
+	private static final Logger logger = Logging.getLogger(SimpleXML.class.getName());
 
 	/**
 	 * A {@link List} containing all child nodes of this node.

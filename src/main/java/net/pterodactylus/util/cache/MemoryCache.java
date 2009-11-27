@@ -24,6 +24,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
+
 /**
  * Memory-based {@link Cache} implementation.
  *
@@ -36,7 +38,7 @@ import java.util.logging.Logger;
 public class MemoryCache<K, V> extends AbstractCache<K, V> {
 
 	/** The logger. */
-	private static Logger logger = Logger.getLogger(MemoryCache.class.getName());
+	private static Logger logger = Logging.getLogger(MemoryCache.class.getName());
 
 	/** The number of values to cache. */
 	private volatile int cacheSize;
