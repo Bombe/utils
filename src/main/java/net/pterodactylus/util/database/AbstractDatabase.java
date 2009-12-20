@@ -73,6 +73,15 @@ public abstract class AbstractDatabase implements Database {
 		return new UpdateDatabaseWorker(query).work();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see net.pterodactylus.util.database.Database#process(Query, ResultProcessor)
+	 */
+	public void process(Query query, ResultProcessor resultProcessor) throws DatabaseException {
+		new ProcessWorker(query, resultProcessor).work();
+	}
+
 	//
 	// STATIC METHODS
 	//
@@ -383,6 +392,44 @@ public abstract class AbstractDatabase implements Database {
 		@Override
 		protected Integer run(PreparedStatement preparedStatement) throws SQLException {
 			return preparedStatement.executeUpdate();
+		}
+
+	}
+
+	/**
+	 * A database worker that processes all result rows with an
+	 * {@link ObjectCreator} instance which does not need to return meaningful
+	 * values.
+	 *
+	 * @author <a href="mailto:david.roden@sysart.de">David Roden</a>
+	 */
+	private class ProcessWorker extends AbstractDatabaseWorker<Void> {
+
+		/** The object creator used as result processor. */
+		private final ResultProcessor resultProcessor;
+
+		/**
+		 * Creates a new process worker.
+		 *
+		 * @param query
+		 *            The query to execute
+		 * @param resultProcessor
+		 *            The result processor
+		 */
+		public ProcessWorker(Query query, ResultProcessor resultProcessor) {
+			super(query);
+			this.resultProcessor = resultProcessor;
+		}
+
+		/**
+		 * @see net.pterodactylus.util.database.AbstractDatabase.AbstractDatabaseWorker#run(java.sql.ResultSet)
+		 */
+		@Override
+		protected Void run(ResultSet resultSet) throws SQLException {
+			while (resultSet.next()) {
+				resultProcessor.processResult(resultSet);
+			}
+			return null;
 		}
 
 	}

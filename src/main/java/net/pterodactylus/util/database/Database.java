@@ -82,4 +82,16 @@ public interface Database {
 	 */
 	public int update(Query query) throws DatabaseException;
 
+	/**
+	 * Processes the results of the given query with the given result processor.
+	 *
+	 * @param query
+	 *            The query to execute
+	 * @param resultProcessor
+	 *            The result processor used to process the result set
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public void process(Query query, ResultProcessor resultProcessor) throws DatabaseException;
+
 }
