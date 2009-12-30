@@ -278,12 +278,6 @@ public class I18n {
 		InputStream inputStream = null;
 		try {
 			currentLanguage = new Properties(defaultLanguage);
-			if (newLocale == Locale.ENGLISH) {
-				if (notify) {
-					notifyI18nables();
-				}
-				return;
-			}
 			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + newLocale.getLanguage() + ".properties");
 			if (inputStream != null) {
 				currentLanguage.load(inputStream);
