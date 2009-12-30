@@ -272,6 +272,8 @@ public class I18n {
 		if (applicationName == null) {
 			throw new IllegalStateException("applicationName has not been set");
 		}
+		Locale previousLocale = currentLocale;
+		Properties previousLanguage = currentLanguage;
 		currentLocale = newLocale;
 		InputStream inputStream = null;
 		try {
@@ -290,9 +292,11 @@ public class I18n {
 				}
 			}
 		} catch (MissingResourceException mre1) {
-			currentLocale = Locale.ENGLISH;
+			currentLocale = previousLocale;
+			currentLanguage = previousLanguage;
 		} catch (IOException ioe1) {
-			currentLocale = Locale.ENGLISH;
+			currentLocale = previousLocale;
+			currentLanguage = previousLanguage;
 		} finally {
 			Closer.close(inputStream);
 		}
