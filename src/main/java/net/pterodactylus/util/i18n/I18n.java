@@ -57,6 +57,9 @@ public class I18n {
 	/** The base name for the properties. */
 	private static String applicationName;
 
+	/** The application’s default language. */
+	private static String applicationDefaultLanguage;
+
 	/** The path of the i18n properties. */
 	private static String propertiesPath;
 
@@ -83,30 +86,50 @@ public class I18n {
 	 *            a trailing slash)
 	 */
 	public static void setApplicationName(String applicationName, String propertiesPath) {
+		setApplicationName(applicationName, propertiesPath, null);
+	}
+
+	/**
+	 * Sets the name of the application. The name is used as base name for the
+	 * properties files.
+	 *
+	 * @param applicationName
+	 *            The name of the application
+	 * @param propertiesPath
+	 *            The path of the properties (including a leading slash but not
+	 *            a trailing slash)
+	 * @param applicationDefaultLanguage
+	 *            The default language of the application, or {@code null} to
+	 *            use the system default
+	 */
+	public static void setApplicationName(String applicationName, String propertiesPath, String applicationDefaultLanguage) {
 		I18n.applicationName = applicationName;
+		I18n.propertiesPath = propertiesPath;
+		if (applicationDefaultLanguage !=null) {
+			I18n.applicationDefaultLanguage = applicationDefaultLanguage;
+		}
 		defaultLanguage = new Properties();
 		availableLanguages.clear();
 		for (String language : Locale.getISOLanguages()) {
-			if (I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + language + ".properties") != null) {
+			if (I18n.class.getResource(propertiesPath + "/" + applicationName + "_" + language + ".properties") != null) {
 				availableLanguages.add(language);
 			}
 		}
 		InputStream inputStream = null;
-		String currentLanguage;
-		if (currentLocale != null) {
-			currentLanguage = currentLocale.getLanguage();
-		} else {
-			currentLanguage = Locale.getDefault().getLanguage();
+		String defaultLanguage = I18n.applicationDefaultLanguage;
+		if (defaultLanguage == null) {
+			defaultLanguage = Locale.getDefault().getLanguage();
+			I18n.applicationDefaultLanguage = defaultLanguage;
 		}
 		try {
-			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + currentLanguage + ".properties");
+			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + defaultLanguage + ".properties");
 			if (inputStream != null) {
-				defaultLanguage.load(inputStream);
+				I18n.defaultLanguage.load(inputStream);
 			}
 		} catch (IOException e) {
 			/* something is fucked. */
 		}
-		setLocale(Locale.getDefault(), false);
+		setLocale(new Locale(defaultLanguage), false);
 	}
 
 	/**
