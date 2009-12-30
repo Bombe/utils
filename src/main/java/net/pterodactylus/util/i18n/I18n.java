@@ -24,10 +24,14 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +69,9 @@ public class I18n {
 	/** The current language. */
 	private static Properties currentLanguage;
 
+	/** All currently available langues. */
+	private static Set<String> availableLanguages = new HashSet<String>();
+
 	/**
 	 * Sets the name of the application. The name is used as base name for the
 	 * properties files.
@@ -78,6 +85,12 @@ public class I18n {
 	public static void setApplicationName(String applicationName, String propertiesPath) {
 		I18n.applicationName = applicationName;
 		defaultLanguage = new Properties();
+		availableLanguages.clear();
+		for (String language : Locale.getISOLanguages()) {
+			if (I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + language + ".properties") != null) {
+				availableLanguages.add(language);
+			}
+		}
 		InputStream inputStream = null;
 		String currentLanguage;
 		if (currentLocale != null) {
@@ -94,6 +107,17 @@ public class I18n {
 			/* something is fucked. */
 		}
 		setLocale(Locale.getDefault(), false);
+	}
+
+	/**
+	 * Returns all currently available languages. This set can change when
+	 * {@link #setApplicationName(String, String)} is used to set a new path for
+	 * the properties files.
+	 *
+	 * @return All currently available languages
+	 */
+	public static Collection<String> getAvailableLanguages() {
+		return Collections.unmodifiableSet(availableLanguages);
 	}
 
 	/**
