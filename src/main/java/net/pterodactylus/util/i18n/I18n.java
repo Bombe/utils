@@ -79,8 +79,14 @@ public class I18n {
 		I18n.applicationName = applicationName;
 		defaultLanguage = new Properties();
 		InputStream inputStream = null;
+		String currentLanguage;
+		if (currentLocale != null) {
+			currentLanguage = currentLocale.getLanguage();
+		} else {
+			currentLanguage = Locale.getDefault().getLanguage();
+		}
 		try {
-			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + ".properties");
+			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + currentLanguage + ".properties");
 			if (inputStream != null) {
 				defaultLanguage.load(inputStream);
 			}
