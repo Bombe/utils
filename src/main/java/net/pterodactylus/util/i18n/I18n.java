@@ -124,7 +124,7 @@ public class I18n {
 		String value = null;
 		value = currentLanguage.getProperty(key);
 		if (value == null) {
-			logger.log(Level.WARNING, "please fix “" + key + "”!", new Throwable());
+			logger.log(Level.WARNING, "please fix “" + key + "” for “" + getLocale().getLanguage() + "”!", new Throwable());
 			/* TODO - replace with value when done! */
 			return null;
 		}
