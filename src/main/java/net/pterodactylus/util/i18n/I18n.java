@@ -308,18 +308,6 @@ public class I18n {
 	}
 
 	/**
-	 * Finds all available locales.
-	 *
-	 * @return All available locales
-	 */
-	public static List<Locale> findAvailableLanguages() {
-		List<Locale> availableLanguages = new ArrayList<Locale>();
-		availableLanguages.add(Locale.ENGLISH);
-		availableLanguages.add(Locale.GERMAN);
-		return availableLanguages;
-	}
-
-	/**
 	 * Registers the given I18nable to be updated when the language is changed.
 	 *
 	 * @param i18nable
