@@ -39,6 +39,7 @@ public class I18nMenu extends JMenu implements I18nable {
 	 *            The basename of the {@link I18n} properties
 	 */
 	public I18nMenu(String i18nBasename) {
+		I18n.registerI18nable(this);
 		this.i18nBasename = i18nBasename;
 		updateI18n();
 	}

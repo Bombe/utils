@@ -83,6 +83,7 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 *            The icon for the action
 	 */
 	public I18nAction(String i18nName, boolean enabled, Icon icon) {
+		I18n.registerI18nable(this);
 		this.i18nName = i18nName;
 		if (icon != null) {
 			putValue(Action.SMALL_ICON, icon);

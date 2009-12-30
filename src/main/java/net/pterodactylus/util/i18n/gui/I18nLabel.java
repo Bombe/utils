@@ -92,6 +92,7 @@ public class I18nLabel extends JLabel implements I18nable {
 	 */
 	public I18nLabel(String i18nBasename, Component component, Object... arguments) {
 		super();
+		I18n.registerI18nable(this);
 		this.i18nBasename = i18nBasename;
 		this.arguments = arguments;
 		if (component != null) {

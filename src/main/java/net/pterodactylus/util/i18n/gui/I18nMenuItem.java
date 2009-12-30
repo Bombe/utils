@@ -64,6 +64,7 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 *            The action to perform when selected
 	 */
 	public I18nMenuItem(String i18nBasename, final Action action) {
+		I18n.registerI18nable(this);
 		this.i18nBasename = i18nBasename;
 		this.action = action;
 		if (action != null) {
