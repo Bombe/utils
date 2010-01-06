@@ -134,6 +134,17 @@ public class Logging {
 	}
 
 	/**
+	 * Returns a named logger from the logger hierarchy.
+	 *
+	 * @param loggerClass
+	 *            The class of the logger
+	 * @return The logger
+	 */
+	public static Logger getLogger(Class<?> loggerClass) {
+		return getLogger(loggerClass.getName());
+	}
+
+	/**
 	 * Sets the log level of the hierarchy’s root logger.
 	 *
 	 * @param rootLevel
