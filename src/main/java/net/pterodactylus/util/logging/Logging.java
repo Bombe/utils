@@ -122,7 +122,7 @@ public class Logging {
 	}
 
 	/**
-	 * Returns a named logger from the jSite hierarchy.
+	 * Returns a named logger from the logger hierarchy.
 	 *
 	 * @param name
 	 *            The name of the logger
