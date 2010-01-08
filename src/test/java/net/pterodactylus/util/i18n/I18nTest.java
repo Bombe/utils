@@ -31,6 +31,10 @@ import junit.framework.TestCase;
  */
 public class I18nTest extends TestCase {
 
+	static {
+		I18n.LOG_UNKNOWN_KEYS = false;
+	}
+
 	/**
 	 * Tests basic {@link I18n} functionality by using three different
 	 * properties files.
@@ -66,7 +70,6 @@ public class I18nTest extends TestCase {
 		assertEquals("Backup", i18n.get("Text.Backup"));
 
 		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("de"), urlClassLoader), Locale.GERMAN);
-		I18n.LOG_UNKNOWN_KEYS = false;
 		assertEquals("Text.Backup", i18n.get("Text.Backup"));
 
 		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), new Locale("en", "GB"));
