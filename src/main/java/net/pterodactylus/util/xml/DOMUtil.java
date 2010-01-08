@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Contains various helper methods that let you more easily work with
- * {@link org.w3c.dom} objects.
+ * {@code org.w3c.dom} objects.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
