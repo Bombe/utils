@@ -38,6 +38,9 @@ import net.pterodactylus.util.i18n.I18nable;
  */
 public class I18nMenuItem extends MenuItem implements I18nable {
 
+	/** The i18n handler. */
+	private final I18n i18n;
+
 	/** The i18n basename of the menu item. */
 	private final String i18nBasename;
 
@@ -47,25 +50,30 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	/**
 	 * Creates a new i18nable menu item.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The i18n basename of the menu item
 	 */
-	public I18nMenuItem(String i18nBasename) {
-		this(i18nBasename, null);
+	public I18nMenuItem(I18n i18n, String i18nBasename) {
+		this(i18n, i18nBasename, null);
 	}
 
 	/**
 	 * Creates a new i18nable menu item that will perform the given action when
 	 * selected.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The i18n base name of the menu item
 	 * @param action
 	 *            The action to perform when selected
 	 */
-	public I18nMenuItem(String i18nBasename, final Action action) {
-		I18n.registerI18nable(this);
+	public I18nMenuItem(I18n i18n, String i18nBasename, final Action action) {
+		this.i18n = i18n;
 		this.i18nBasename = i18nBasename;
+		i18n.addI18nable(this);
 		this.action = action;
 		if (action != null) {
 			addActionListener(new ActionListener() {
@@ -92,11 +100,13 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 * Creates a new i18nable menu item that used the properties of the given
 	 * {@link I18nAction}.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nAction
 	 *            The action to copy
 	 */
-	public I18nMenuItem(I18nAction i18nAction) {
-		this(i18nAction.getI18nBasename(), i18nAction);
+	public I18nMenuItem(I18n i18n, I18nAction i18nAction) {
+		this(i18n, i18nAction.getI18nBasename(), i18nAction);
 	}
 
 	/**
@@ -112,8 +122,8 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 */
 	@Override
 	public void updateI18n() {
-		setLabel(I18n.get(i18nBasename + ".name"));
-		setShortcut(new MenuShortcut(I18n.getKey(i18nBasename + ".mnemonic"), false));
+		setLabel(i18n.get(i18nBasename + ".name"));
+		setShortcut(new MenuShortcut(i18n.getKey(i18nBasename + ".mnemonic"), false));
 		if (action != null) {
 			setEnabled(action.isEnabled());
 		}

@@ -1,5 +1,5 @@
 /*
- * utils - I18n.java - Copyright © 2009 David Roden
+ * utils - I18n.java - Copyright © 2006-2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,167 +22,208 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.MissingResourceException;
+import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 
 /**
- * Class that handles i18n.
+ * Handles internationalization.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class I18n {
 
-	/** Logger. */
-	private static final Logger logger = Logging.getLogger(I18n.class.getName());
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(I18n.class);
 
-	/** List of I18nables that are notified when the language changes. */
-	private static final List<I18nable> i18nables = new ArrayList<I18nable>();
+	/** Whether to log access to unknown keys. */
+	public static boolean LOG_UNKNOWN_KEYS = true;
 
-	/** The base name for the properties. */
-	private static String applicationName;
+	/** The main source for l10n. */
+	private final Source mainSource;
 
-	/** The application’s default language. */
-	private static String applicationDefaultLanguage;
+	/** Additional l10n sources. */
+	private final List<Source> additionalSources = Collections.synchronizedList(new ArrayList<Source>());
 
-	/** The path of the i18n properties. */
-	private static String propertiesPath;
+	/** List of I18nable listeners. */
+	private final List<I18nable> i18nables = new ArrayList<I18nable>();
 
 	/** The current locale. */
-	private static Locale currentLocale;
+	private Locale locale;
 
-	/** The default language. */
-	private static Properties defaultLanguage;
-
-	/** The current language. */
-	private static Properties currentLanguage;
-
-	/** All currently available langues. */
-	private static Set<String> availableLanguages = new HashSet<String>();
+	/** The current translation values. */
+	private Map<String, String> values = new HashMap<String, String>();
 
 	/**
-	 * Sets the name of the application. The name is used as base name for the
-	 * properties files.
+	 * Creates a new i18n handler.
 	 *
-	 * @param applicationName
+	 * @param name
 	 *            The name of the application
 	 * @param propertiesPath
-	 *            The path of the properties (including a leading slash but not
-	 *            a trailing slash)
+	 *            The path of the properties
+	 * @param defaultLocale
+	 *            The default locale of the application
 	 */
-	public static void setApplicationName(String applicationName, String propertiesPath) {
-		setApplicationName(applicationName, propertiesPath, null);
+	public I18n(String name, String propertiesPath, Locale defaultLocale) {
+		this(name, propertiesPath, defaultLocale, Thread.currentThread().getContextClassLoader(), Locale.getDefault());
 	}
 
 	/**
-	 * Sets the name of the application. The name is used as base name for the
-	 * properties files.
+	 * Creates a new i18n handler.
 	 *
-	 * @param applicationName
+	 * @param name
 	 *            The name of the application
 	 * @param propertiesPath
-	 *            The path of the properties (including a leading slash but not
-	 *            a trailing slash)
-	 * @param applicationDefaultLanguage
-	 *            The default language of the application, or {@code null} to
-	 *            use the system default
+	 *            The path of the properties
+	 * @param defaultLocale
+	 *            The default locale of the application
+	 * @param classLoader
+	 *            The class loader used to load the properties
+	 * @param currentLocale
+	 *            The current locale
 	 */
-	public static void setApplicationName(String applicationName, String propertiesPath, String applicationDefaultLanguage) {
-		I18n.applicationName = applicationName;
-		I18n.propertiesPath = propertiesPath;
-		if (applicationDefaultLanguage !=null) {
-			I18n.applicationDefaultLanguage = applicationDefaultLanguage;
-		}
-		defaultLanguage = new Properties();
-		availableLanguages.clear();
-		for (String language : Locale.getISOLanguages()) {
-			if (I18n.class.getResource(propertiesPath + "/" + applicationName + "_" + language + ".properties") != null) {
-				availableLanguages.add(language);
-			}
-		}
-		InputStream inputStream = null;
-		String defaultLanguage = I18n.applicationDefaultLanguage;
-		if (defaultLanguage == null) {
-			defaultLanguage = Locale.getDefault().getLanguage();
-			I18n.applicationDefaultLanguage = defaultLanguage;
-		}
-		try {
-			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + defaultLanguage + ".properties");
-			if (inputStream != null) {
-				I18n.defaultLanguage.load(inputStream);
-			}
-		} catch (IOException e) {
-			/* something is fucked. */
-		}
-		setLocale(new Locale(defaultLanguage), false);
+	public I18n(String name, String propertiesPath, Locale defaultLocale, ClassLoader classLoader, Locale currentLocale) {
+		this(new Source(name, propertiesPath, defaultLocale, classLoader), currentLocale);
 	}
 
 	/**
-	 * Returns all currently available languages. This set can change when
-	 * {@link #setApplicationName(String, String)} is used to set a new path for
-	 * the properties files.
+	 * Creates a new i18n handler.
 	 *
-	 * @return All currently available languages
+	 * @param source
+	 *            The l10n source
 	 */
-	public static Collection<String> getAvailableLanguages() {
-		return Collections.unmodifiableSet(availableLanguages);
+	public I18n(Source source) {
+		this(source, Locale.getDefault());
 	}
 
 	/**
-	 * Returns whether the given key exists.
+	 * Creates a new i18n handler.
+	 *
+	 * @param source
+	 *            The l10n source
+	 * @param currentLocale
+	 *            The current locale
+	 */
+	public I18n(Source source, Locale currentLocale) {
+		mainSource = source;
+		locale = currentLocale;
+		reload();
+	}
+
+	//
+	// LISTENER MANAGEMENT
+	//
+
+	/**
+	 * Adds an i18n listener that is notified when the language is changed or
+	 * additional sources add added or removed.
+	 *
+	 * @param i18nable
+	 *            The i18n listener to add
+	 */
+	public void addI18nable(I18nable i18nable) {
+		i18nables.add(i18nable);
+	}
+
+	/**
+	 * Removes an i18n listener.
+	 *
+	 * @param i18nable
+	 *            The i18n listener to remove
+	 */
+	public void removeI18nable(I18nable i18nable) {
+		i18nables.remove(i18nable);
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Sets the current locale.
+	 *
+	 * @param locale
+	 *            The new locale
+	 */
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+		reload();
+	}
+
+	/**
+	 * Adds an additional l10n source.
+	 *
+	 * @param source
+	 *            The l10n source to add
+	 */
+	public void addSource(Source source) {
+		additionalSources.add(source);
+		reload();
+	}
+
+	/**
+	 * Removes an additional l10n source.
+	 *
+	 * @param source
+	 *            The l10n source to remove
+	 */
+	public void removeSource(Source source) {
+		if (additionalSources.remove(source)) {
+			reload();
+		}
+	}
+
+	/**
+	 * Returns whether the current translation contains the given key.
 	 *
 	 * @param key
 	 *            The key to check for
-	 * @return {@code true} if the key exists, {@code false} otherwise
+	 * @return {@code true} if there is a translation for the given key, {@code
+	 *         false} otherwise
 	 */
-	public static boolean has(String key) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
+	public boolean has(String key) {
+		synchronized (values) {
+			return values.containsKey(key);
 		}
-		return currentLanguage.containsKey(key);
 	}
 
 	/**
-	 * Returns the translated value for a key. The translated values may contain
-	 * placeholders that are replaced with the given parameters.
+	 * Returns the translated value for the given key. If no translation is
+	 * found, the name of the key is returned.
 	 *
-	 * @see MessageFormat
+	 * @see Formatter
 	 * @param key
-	 *            The key to get
+	 *            The key to get the translation for
 	 * @param parameters
-	 *            The parameters in case the translated value contains
-	 *            placeholders
-	 * @return The translated message, or the key itself if no translation could
-	 *         be found
+	 *            Parameters to substitute in the value of the key
+	 * @return The translated value, or the key
 	 */
-	public static String get(String key, Object... parameters) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
+	public String get(String key, Object... parameters) {
+		String value;
+		synchronized (values) {
+			value = values.get(key);
 		}
-		String value = null;
-		value = currentLanguage.getProperty(key);
 		if (value == null) {
-			logger.log(Level.WARNING, "please fix “" + key + "” for “" + getLocale().getLanguage() + "”!", new Throwable());
-			/* TODO - replace with value when done! */
-			return null;
+			if (LOG_UNKNOWN_KEYS) {
+				logger.log(Level.WARNING, String.format("Please supply a value for “%1$s”!", key), new Exception());
+			}
+			return key;
 		}
 		if ((parameters != null) && (parameters.length > 0)) {
-			return MessageFormat.format(value, parameters);
+			return String.format(value, parameters);
 		}
 		return value;
 	}
@@ -196,11 +237,11 @@ public class I18n {
 	 *            The key under which the keycode is stored
 	 * @return The keycode
 	 */
-	public static int getKey(String key) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
+	public int getKey(String key) {
+		String value;
+		synchronized (values) {
+			value = values.get(key);
 		}
-		String value = currentLanguage.getProperty(key);
 		if ((value != null) && value.startsWith("VK_")) {
 			try {
 				Field field = KeyEvent.class.getField(value);
@@ -215,7 +256,9 @@ public class I18n {
 				/* ignore. */
 			}
 		}
-		logger.log(Level.WARNING, "please fix “" + key + "”!", new Throwable());
+		if (LOG_UNKNOWN_KEYS) {
+			logger.log(Level.WARNING, "please fix “" + key + "”!", new Throwable());
+		}
 		return KeyEvent.VK_UNDEFINED;
 	}
 
@@ -227,11 +270,11 @@ public class I18n {
 	 * @return The key stroke, or <code>null</code> if no key stroke could be
 	 *         created from the translated value
 	 */
-	public static KeyStroke getKeyStroke(String key) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
+	public KeyStroke getKeyStroke(String key) {
+		String value;
+		synchronized (values) {
+			value = values.get(key);
 		}
-		String value = currentLanguage.getProperty(key);
 		if (value == null) {
 			return null;
 		}
@@ -269,97 +312,173 @@ public class I18n {
 		return null;
 	}
 
-	/**
-	 * Sets the current locale.
-	 *
-	 * @param newLocale
-	 *            The new locale to use
-	 */
-	public static void setLocale(Locale newLocale) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
-		}
-		setLocale(newLocale, true);
-	}
-
-	/**
-	 * Sets the current locale.
-	 *
-	 * @param newLocale
-	 *            The new locale to use
-	 * @param notify
-	 *            <code>true</code> to notify registered {@link I18nable}s after
-	 *            the language was changed
-	 */
-	private static void setLocale(Locale newLocale, boolean notify) {
-		if (applicationName == null) {
-			throw new IllegalStateException("applicationName has not been set");
-		}
-		Locale previousLocale = currentLocale;
-		Properties previousLanguage = currentLanguage;
-		currentLocale = newLocale;
-		InputStream inputStream = null;
-		try {
-			currentLanguage = new Properties(defaultLanguage);
-			inputStream = I18n.class.getResourceAsStream(propertiesPath + "/" + applicationName + "_" + newLocale.getLanguage() + ".properties");
-			if (inputStream != null) {
-				currentLanguage.load(inputStream);
-				if (notify) {
-					notifyI18nables();
-				}
-			}
-		} catch (MissingResourceException mre1) {
-			currentLocale = previousLocale;
-			currentLanguage = previousLanguage;
-		} catch (IOException ioe1) {
-			currentLocale = previousLocale;
-			currentLanguage = previousLanguage;
-		} finally {
-			Closer.close(inputStream);
-		}
-	}
-
-	/**
-	 * Returns the current locale.
-	 *
-	 * @return The current locale
-	 */
-	public static Locale getLocale() {
-		return currentLocale;
-	}
-
-	/**
-	 * Registers the given I18nable to be updated when the language is changed.
-	 *
-	 * @param i18nable
-	 *            The i18nable to register
-	 */
-	public static void registerI18nable(I18nable i18nable) {
-		i18nables.add(i18nable);
-	}
-
-	/**
-	 * Deregisters the given I18nable to be updated when the language is
-	 * changed.
-	 *
-	 * @param i18nable
-	 *            The i18nable to register
-	 */
-	public static void deregisterI18nable(I18nable i18nable) {
-		i18nables.remove(i18nable);
-	}
-
 	//
 	// PRIVATE METHODS
 	//
 
 	/**
-	 * Notifies all registered {@link I18nable}s that the language was changed.
+	 * Reloads translation values for the current locale and l10n sources.
 	 */
-	private static void notifyI18nables() {
+	private void reload() {
+		Properties currentValues = new Properties();
+		loadSource(currentValues, mainSource, mainSource.getDefaultLocale());
+		loadSource(currentValues, mainSource, locale);
+		for (Source additionalSource : additionalSources) {
+			loadSource(currentValues, additionalSource, additionalSource.getDefaultLocale());
+			loadSource(currentValues, additionalSource, locale);
+		}
+		synchronized (values) {
+			values.clear();
+			for (Entry<Object, Object> valueEntry : currentValues.entrySet()) {
+				values.put((String) valueEntry.getKey(), (String) valueEntry.getValue());
+			}
+		}
 		for (I18nable i18nable : i18nables) {
 			i18nable.updateI18n();
 		}
+	}
+
+	/**
+	 * Loads the translation values from a given source.
+	 *
+	 * @param currentValues
+	 *            The current translation values
+	 * @param source
+	 *            The l10n source to load
+	 * @param locale
+	 *            The locale to load from the source
+	 */
+	private void loadSource(Properties currentValues, Source source, Locale locale) {
+		for (String variant : buildResourceNames(locale)) {
+			loadResource(currentValues, source.getClassLoader(), source.getPropertiesPath() + "/" + source.getName() + "_" + variant + ".properties");
+		}
+	}
+
+	/**
+	 * Builds up to three resource names. The first resource name is always the
+	 * language (“en”), the (optional) second one consists of the language and
+	 * the country (“en_GB”) and the (optional) third one includes a variant
+	 * (“en_GB_MAC”).
+	 *
+	 * @param locale
+	 *            The locale to build variant names from
+	 * @return The variant names
+	 */
+	private String[] buildResourceNames(Locale locale) {
+		List<String> variants = new ArrayList<String>();
+		String currentVariant = locale.getLanguage();
+		variants.add(currentVariant);
+		if (!locale.getCountry().equals("")) {
+			currentVariant += "_" + locale.getCountry();
+			variants.add(currentVariant);
+		}
+		if ((locale.getVariant() != null) && (!locale.getVariant().equals(""))) {
+			if (locale.getCountry().equals("")) {
+				currentVariant += "_";
+			}
+			currentVariant += "_" + locale.getVariant();
+			variants.add(locale.getVariant());
+		}
+		return variants.toArray(new String[variants.size()]);
+	}
+
+	/**
+	 * Loads a resource from the given class loader.
+	 *
+	 * @param currentValues
+	 *            The current translation values to load the resource into
+	 * @param classLoader
+	 *            The class loader used to load the resource
+	 * @param resourceName
+	 *            The name of the resource
+	 */
+	private void loadResource(Properties currentValues, ClassLoader classLoader, String resourceName) {
+		InputStream inputStream = classLoader.getResourceAsStream(resourceName);
+		if (inputStream != null) {
+			try {
+				currentValues.load(inputStream);
+			} catch (IOException ioe1) {
+				logger.log(Level.WARNING, String.format("Could not read properties from “%1$s”.", resourceName), ioe1);
+			} catch (IllegalArgumentException iae1) {
+				logger.log(Level.WARNING, String.format("Could not parse properties from “%1$s”.", resourceName), iae1);
+			}
+		}
+	}
+
+	/**
+	 * A localization (l10n) source.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class Source {
+
+		/** The name of the application. */
+		private final String name;
+
+		/** The path of the properties. */
+		private final String propertiesPath;
+
+		/** The default locale of the application. */
+		private final Locale defaultLocale;
+
+		/** The class loader for loading resources. */
+		private final ClassLoader classLoader;
+
+		/**
+		 * Creates a new l10n source.
+		 *
+		 * @param name
+		 *            The name of the application
+		 * @param propertiesPath
+		 *            The path of the properties
+		 * @param defaultLocale
+		 *            The default locale of the source
+		 * @param classLoader
+		 *            The class loader for the source’s resources
+		 */
+		public Source(String name, String propertiesPath, Locale defaultLocale, ClassLoader classLoader) {
+			this.name = name;
+			this.propertiesPath = propertiesPath;
+			this.defaultLocale = defaultLocale;
+			this.classLoader = classLoader;
+		}
+
+		/**
+		 * Returns the name of the application.
+		 *
+		 * @return The name of the application
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * Returns the path of the properties.
+		 *
+		 * @return The path of the properties
+		 */
+		public String getPropertiesPath() {
+			return propertiesPath;
+		}
+
+		/**
+		 * Returns the default locale of the source.
+		 *
+		 * @return The default locale of the source
+		 */
+		public Locale getDefaultLocale() {
+			return defaultLocale;
+		}
+
+		/**
+		 * Returns the source’s class loader.
+		 *
+		 * @return The class loader of the source
+		 */
+		public ClassLoader getClassLoader() {
+			return classLoader;
+		}
+
 	}
 
 }

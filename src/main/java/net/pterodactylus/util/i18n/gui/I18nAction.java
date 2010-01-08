@@ -31,6 +31,9 @@ import net.pterodactylus.util.i18n.I18nable;
  */
 public abstract class I18nAction extends AbstractAction implements I18nable {
 
+	/** The i18n handler. */
+	private final I18n i18n;
+
 	/** The I18n basename. */
 	private final String i18nName;
 
@@ -38,43 +41,51 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 * Creates a new action that uses the given name as base name to get values
 	 * from {@link I18n}.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nName
 	 *            The base name of the action
 	 */
-	public I18nAction(String i18nName) {
-		this(i18nName, null);
+	public I18nAction(I18n i18n, String i18nName) {
+		this(i18n, i18nName, null);
 	}
 
 	/**
 	 * Creates a new action that uses the given name as base name to get values
 	 * from {@link I18n} and the given icon.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nName
 	 *            The base name of the action
 	 * @param icon
 	 *            The icon for the action
 	 */
-	public I18nAction(String i18nName, Icon icon) {
-		this(i18nName, true, icon);
+	public I18nAction(I18n i18n, String i18nName, Icon icon) {
+		this(i18n, i18nName, true, icon);
 	}
 
 	/**
 	 * Creates a new action that uses the given name as base name to get values
 	 * from {@link I18n}.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nName
 	 *            The base name of the action
 	 * @param enabled
 	 *            Whether the action should be enabled
 	 */
-	public I18nAction(String i18nName, boolean enabled) {
-		this(i18nName, enabled, null);
+	public I18nAction(I18n i18n, String i18nName, boolean enabled) {
+		this(i18n, i18nName, enabled, null);
 	}
 
 	/**
 	 * Creates a new action that uses the given name as base name to get values
 	 * from {@link I18n} and the given icon.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nName
 	 *            The base name of the action
 	 * @param enabled
@@ -82,13 +93,14 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 * @param icon
 	 *            The icon for the action
 	 */
-	public I18nAction(String i18nName, boolean enabled, Icon icon) {
-		I18n.registerI18nable(this);
+	public I18nAction(I18n i18n, String i18nName, boolean enabled, Icon icon) {
+		this.i18n = i18n;
 		this.i18nName = i18nName;
 		if (icon != null) {
 			putValue(Action.SMALL_ICON, icon);
 		}
 		setEnabled(enabled);
+		i18n.addI18nable(this);
 		updateI18n();
 	}
 
@@ -104,14 +116,14 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 * {@inheritDoc}
 	 */
 	public void updateI18n() {
-		putValue(Action.NAME, I18n.get(i18nName + ".name"));
-		putValue(Action.MNEMONIC_KEY, I18n.getKey(i18nName + ".mnemonic"));
-		putValue(Action.ACCELERATOR_KEY, I18n.getKeyStroke(i18nName + ".accelerator"));
-		putValue(Action.SHORT_DESCRIPTION, I18n.get(i18nName + ".shortDescription"));
-		if (I18n.has(i18nName + ".longDescription")) {
-			putValue(Action.LONG_DESCRIPTION, I18n.get(i18nName + ".longDescription"));
+		putValue(Action.NAME, i18n.get(i18nName + ".name"));
+		putValue(Action.MNEMONIC_KEY, i18n.getKey(i18nName + ".mnemonic"));
+		putValue(Action.ACCELERATOR_KEY, i18n.getKeyStroke(i18nName + ".accelerator"));
+		putValue(Action.SHORT_DESCRIPTION, i18n.get(i18nName + ".shortDescription"));
+		if (i18n.has(i18nName + ".longDescription")) {
+			putValue(Action.LONG_DESCRIPTION, i18n.get(i18nName + ".longDescription"));
 		} else {
-			putValue(Action.LONG_DESCRIPTION, I18n.get(i18nName + ".shortDescription"));
+			putValue(Action.LONG_DESCRIPTION, i18n.get(i18nName + ".shortDescription"));
 		}
 	}
 

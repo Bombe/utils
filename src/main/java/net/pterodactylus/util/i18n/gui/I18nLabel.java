@@ -31,6 +31,9 @@ import net.pterodactylus.util.i18n.I18nable;
  */
 public class I18nLabel extends JLabel implements I18nable {
 
+	/** The i18n handler. */
+	private final I18n i18n;
+
 	/** The I18n basename of the label. */
 	private final String i18nBasename;
 
@@ -40,17 +43,21 @@ public class I18nLabel extends JLabel implements I18nable {
 	/**
 	 * Creates a new label with the given I18n basename.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The I18n basename of the label
 	 */
-	public I18nLabel(String i18nBasename) {
-		this(i18nBasename, (Component) null);
+	public I18nLabel(I18n i18n, String i18nBasename) {
+		this(i18n, i18nBasename, (Component) null);
 	}
 
 	/**
 	 * Creates a new label with the given I18n basename that optionally is a
 	 * label for the given component.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The I18n basename of the label
 	 * @param component
@@ -58,28 +65,32 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            <code>null</code> if this label should not activate a
 	 *            component
 	 */
-	public I18nLabel(String i18nBasename, Component component) {
-		this(i18nBasename, component, (Object[]) null);
+	public I18nLabel(I18n i18n, String i18nBasename, Component component) {
+		this(i18n, i18nBasename, component, (Object[]) null);
 	}
 
 	/**
 	 * Creates a new label with the given I18n basename that optionally is a
 	 * label for the given component.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The I18n basename of the label
 	 * @param arguments
 	 *            Optional arguments that are handed in to
 	 *            {@link I18n#get(String, Object...)}
 	 */
-	public I18nLabel(String i18nBasename, Object... arguments) {
-		this(i18nBasename, null, arguments);
+	public I18nLabel(I18n i18n, String i18nBasename, Object... arguments) {
+		this(i18n, i18nBasename, null, arguments);
 	}
 
 	/**
 	 * Creates a new label with the given I18n basename that optionally is a
 	 * label for the given component.
 	 *
+	 * @param i18n
+	 *            The i18n handler
 	 * @param i18nBasename
 	 *            The I18n basename of the label
 	 * @param component
@@ -90,10 +101,11 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            Optional arguments that are handed in to
 	 *            {@link I18n#get(String, Object...)}
 	 */
-	public I18nLabel(String i18nBasename, Component component, Object... arguments) {
+	public I18nLabel(I18n i18n, String i18nBasename, Component component, Object... arguments) {
 		super();
-		I18n.registerI18nable(this);
+		this.i18n = i18n;
 		this.i18nBasename = i18nBasename;
+		i18n.addI18nable(this);
 		this.arguments = arguments;
 		if (component != null) {
 			setLabelFor(component);
@@ -113,9 +125,9 @@ public class I18nLabel extends JLabel implements I18nable {
 	 * {@inheritDoc}
 	 */
 	public void updateI18n() {
-		setText(I18n.get(i18nBasename + ".name", arguments));
+		setText(i18n.get(i18nBasename + ".name", arguments));
 		if (getLabelFor() != null) {
-			setDisplayedMnemonic(I18n.getKey(i18nBasename + ".mnemonic"));
+			setDisplayedMnemonic(i18n.getKey(i18nBasename + ".mnemonic"));
 		}
 	}
 
