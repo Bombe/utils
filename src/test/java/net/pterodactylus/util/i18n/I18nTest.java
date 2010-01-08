@@ -17,9 +17,6 @@
 
 package net.pterodactylus.util.i18n;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Locale;
 
 import junit.framework.TestCase;
@@ -43,16 +40,16 @@ public class I18nTest extends TestCase {
 	 *             if an exception occurs
 	 */
 	public void testBasicFunctionality() throws Throwable {
-		URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File("/home/bombe/workspace/utils/target/test-classes").toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+		ClassLoader classLoader = I18nTest.class.getClassLoader();
 		I18n i18n;
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), Locale.ENGLISH);
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), classLoader), Locale.ENGLISH);
 		assertEquals("Color", i18n.get("Text.Color"));
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), new Locale("en", "GB"));
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), classLoader), new Locale("en", "GB"));
 		assertEquals("Colour", i18n.get("Text.Color"));
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), Locale.GERMAN);
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), classLoader), Locale.GERMAN);
 		assertEquals("Farbe", i18n.get("Text.Color"));
 	}
 
@@ -63,16 +60,16 @@ public class I18nTest extends TestCase {
 	 *             if an exception occurs
 	 */
 	public void testDefaultLanguage() throws Throwable {
-		URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File("/home/bombe/workspace/utils/target/test-classes").toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+		ClassLoader classLoader = I18n.class.getClassLoader();
 		I18n i18n;
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), Locale.GERMAN);
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), classLoader), Locale.GERMAN);
 		assertEquals("Backup", i18n.get("Text.Backup"));
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("de"), urlClassLoader), Locale.GERMAN);
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("de"), classLoader), Locale.GERMAN);
 		assertEquals("Text.Backup", i18n.get("Text.Backup"));
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), urlClassLoader), new Locale("en", "GB"));
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", new Locale("en"), classLoader), new Locale("en", "GB"));
 		assertEquals("Backup", i18n.get("Text.Backup"));
 	}
 
@@ -84,10 +81,10 @@ public class I18nTest extends TestCase {
 	 *             if an exception occurs
 	 */
 	public void testSwitchLanguage() throws Throwable {
-		URLClassLoader urlClassLoader = new URLClassLoader(new URL[] { new File("/home/bombe/workspace/utils/target/test-classes").toURI().toURL() }, Thread.currentThread().getContextClassLoader());
+		ClassLoader classLoader = I18n.class.getClassLoader();
 		I18n i18n;
 
-		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", Locale.GERMAN, urlClassLoader), Locale.GERMAN);
+		i18n = new I18n(new I18n.Source("I18n", "net/pterodactylus/util/i18n", Locale.GERMAN, classLoader), Locale.GERMAN);
 		assertEquals("Text.Backup", i18n.get("Text.Backup"));
 		i18n.setLocale(Locale.ENGLISH);
 		assertEquals("Backup", i18n.get("Text.Backup"));
