@@ -25,13 +25,6 @@ package net.pterodactylus.util.i18n;
 public interface I18nable {
 
 	/**
-	 * Returns the i18n basename used by the component.
-	 *
-	 * @return The i18n basename of the component
-	 */
-	public String getI18nBasename();
-
-	/**
 	 * Notifies the object that the language in {@link I18n} was changed.
 	 */
 	public void updateI18n();

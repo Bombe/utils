@@ -113,14 +113,6 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getI18nBasename() {
-		return i18nBasename;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public void updateI18n() {
 		setLabel(i18n.get(i18nBasename + ".name"));
 		setShortcut(new MenuShortcut(i18n.getKey(i18nBasename + ".mnemonic"), false));

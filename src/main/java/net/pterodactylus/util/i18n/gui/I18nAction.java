@@ -105,10 +105,11 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the i18n basename of this action.
+	 *
+	 * @return This action’s i18n basename
 	 */
-	@Override
-	public String getI18nBasename() {
+	String getI18nBasename() {
 		return i18nName;
 	}
 

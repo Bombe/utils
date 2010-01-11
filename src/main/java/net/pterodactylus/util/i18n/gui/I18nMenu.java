@@ -57,14 +57,6 @@ public class I18nMenu extends JMenu implements I18nable {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public String getI18nBasename() {
-		return i18nBasename;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public void updateI18n() {
 		setText(i18n.get(i18nBasename + ".name"));
 		setMnemonic(i18n.getKey(i18nBasename + ".mnemonic"));
