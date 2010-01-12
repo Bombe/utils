@@ -62,7 +62,7 @@ public class I18n {
 	private final List<I18nable> i18nables = new ArrayList<I18nable>();
 
 	/** Mapping from remove reference to list of I18nables. */
-	private final Map<Object, List<I18nable>> removalReferenceI18nables = new HashMap<Object, List<I18nable>>();
+	private final Map<RemovalReference, List<I18nable>> removalReferenceI18nables = new HashMap<RemovalReference, List<I18nable>>();
 
 	/** The current locale. */
 	private Locale locale;
@@ -150,7 +150,7 @@ public class I18n {
 	 * @param removalReference
 	 *            Removal reference (optional)
 	 */
-	public void addI18nable(I18nable i18nable, Object removalReference) {
+	public void addI18nable(I18nable i18nable, RemovalReference removalReference) {
 		i18nables.add(i18nable);
 		if (removalReference != null) {
 			List<I18nable> i18nableList = removalReferenceI18nables.get(removalReference);
@@ -174,13 +174,13 @@ public class I18n {
 
 	/**
 	 * Removes all i18n listeners that have been
-	 * {@link #addI18nable(I18nable, Object)} using the given object as removal
-	 * reference.
+	 * {@link #addI18nable(I18nable, RemovalReference)} using the given object
+	 * as removal reference.
 	 *
 	 * @param removalReference
 	 *            The removal reference
 	 */
-	public void removeI18nables(Object removalReference) {
+	public void removeI18nables(RemovalReference removalReference) {
 		List<I18nable> i18nableList = removalReferenceI18nables.remove(removalReference);
 		if (i18nableList != null) {
 			for (I18nable i18nable : i18nableList) {
@@ -519,6 +519,17 @@ public class I18n {
 		public ClassLoader getClassLoader() {
 			return classLoader;
 		}
+
+	}
+
+	/**
+	 * Identifying container for a removal reference.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class RemovalReference {
+
+		/* nothing here. */
 
 	}
 
