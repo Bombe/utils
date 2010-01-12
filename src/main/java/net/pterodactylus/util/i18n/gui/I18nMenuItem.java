@@ -28,6 +28,7 @@ import javax.swing.Action;
 
 import net.pterodactylus.util.i18n.I18n;
 import net.pterodactylus.util.i18n.I18nable;
+import net.pterodactylus.util.i18n.I18n.RemovalReference;
 
 /**
  * {@link I18nable} wrapper around an AWT {@link MenuItem} that can also use an
@@ -56,7 +57,21 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 *            The i18n basename of the menu item
 	 */
 	public I18nMenuItem(I18n i18n, String i18nBasename) {
-		this(i18n, i18nBasename, null);
+		this(i18n, null, i18nBasename);
+	}
+
+	/**
+	 * Creates a new i18nable menu item.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The i18n basename of the menu item
+	 */
+	public I18nMenuItem(I18n i18n, RemovalReference removalReference, String i18nBasename) {
+		this(i18n, removalReference, i18nBasename, null);
 	}
 
 	/**
@@ -70,10 +85,27 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 * @param action
 	 *            The action to perform when selected
 	 */
-	public I18nMenuItem(I18n i18n, String i18nBasename, final Action action) {
+	public I18nMenuItem(I18n i18n, String i18nBasename, Action action) {
+		this(i18n, null, i18nBasename, action);
+	}
+
+	/**
+	 * Creates a new i18nable menu item that will perform the given action when
+	 * selected.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The i18n base name of the menu item
+	 * @param action
+	 *            The action to perform when selected
+	 */
+	public I18nMenuItem(I18n i18n, RemovalReference removalReference, String i18nBasename, final Action action) {
 		this.i18n = i18n;
 		this.i18nBasename = i18nBasename;
-		i18n.addI18nable(this);
+		i18n.addI18nable(this, removalReference);
 		this.action = action;
 		if (action != null) {
 			addActionListener(new ActionListener() {
@@ -106,7 +138,22 @@ public class I18nMenuItem extends MenuItem implements I18nable {
 	 *            The action to copy
 	 */
 	public I18nMenuItem(I18n i18n, I18nAction i18nAction) {
-		this(i18n, i18nAction.getI18nBasename(), i18nAction);
+		this(i18n, (RemovalReference) null, i18nAction);
+	}
+
+	/**
+	 * Creates a new i18nable menu item that used the properties of the given
+	 * {@link I18nAction}.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nAction
+	 *            The action to copy
+	 */
+	public I18nMenuItem(I18n i18n, RemovalReference removalReference, I18nAction i18nAction) {
+		this(i18n, removalReference, i18nAction.getI18nBasename(), i18nAction);
 	}
 
 	/**

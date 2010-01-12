@@ -21,6 +21,7 @@ import javax.swing.JMenu;
 
 import net.pterodactylus.util.i18n.I18n;
 import net.pterodactylus.util.i18n.I18nable;
+import net.pterodactylus.util.i18n.I18n.RemovalReference;
 
 /**
  * Menu that receives its properties from {@link I18n}.
@@ -44,9 +45,23 @@ public class I18nMenu extends JMenu implements I18nable {
 	 *            The basename of the {@link I18n} properties
 	 */
 	public I18nMenu(I18n i18n, String i18nBasename) {
+		this(i18n, null, i18nBasename);
+	}
+
+	/**
+	 * Creates a new menu with the given {@link I18n} basename.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The basename of the {@link I18n} properties
+	 */
+	public I18nMenu(I18n i18n, RemovalReference removalReference, String i18nBasename) {
 		this.i18n = i18n;
 		this.i18nBasename = i18nBasename;
-		i18n.addI18nable(this);
+		i18n.addI18nable(this, removalReference);
 		updateI18n();
 	}
 

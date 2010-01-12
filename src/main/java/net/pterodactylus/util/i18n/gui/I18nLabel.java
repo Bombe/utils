@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 
 import net.pterodactylus.util.i18n.I18n;
 import net.pterodactylus.util.i18n.I18nable;
+import net.pterodactylus.util.i18n.I18n.RemovalReference;
 
 /**
  * Label that can update itself from {@link I18n}.
@@ -49,7 +50,21 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            The I18n basename of the label
 	 */
 	public I18nLabel(I18n i18n, String i18nBasename) {
-		this(i18n, i18nBasename, (Component) null);
+		this(i18n, null, i18nBasename);
+	}
+
+	/**
+	 * Creates a new label with the given I18n basename.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The I18n basename of the label
+	 */
+	public I18nLabel(I18n i18n, RemovalReference removalReference, String i18nBasename) {
+		this(i18n, removalReference, i18nBasename, (Component) null);
 	}
 
 	/**
@@ -66,7 +81,26 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            component
 	 */
 	public I18nLabel(I18n i18n, String i18nBasename, Component component) {
-		this(i18n, i18nBasename, component, (Object[]) null);
+		this(i18n, null, i18nBasename, component);
+	}
+
+	/**
+	 * Creates a new label with the given I18n basename that optionally is a
+	 * label for the given component.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The I18n basename of the label
+	 * @param component
+	 *            The component that is activated by the label, or
+	 *            <code>null</code> if this label should not activate a
+	 *            component
+	 */
+	public I18nLabel(I18n i18n, RemovalReference removalReference, String i18nBasename, Component component) {
+		this(i18n, removalReference, i18nBasename, component, (Object[]) null);
 	}
 
 	/**
@@ -82,7 +116,25 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            {@link I18n#get(String, Object...)}
 	 */
 	public I18nLabel(I18n i18n, String i18nBasename, Object... arguments) {
-		this(i18n, i18nBasename, null, arguments);
+		this(i18n, (RemovalReference) null, i18nBasename, arguments);
+	}
+
+	/**
+	 * Creates a new label with the given I18n basename that optionally is a
+	 * label for the given component.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The I18n basename of the label
+	 * @param arguments
+	 *            Optional arguments that are handed in to
+	 *            {@link I18n#get(String, Object...)}
+	 */
+	public I18nLabel(I18n i18n, RemovalReference removalReference, String i18nBasename, Object... arguments) {
+		this(i18n, removalReference, i18nBasename, (Component) null, arguments);
 	}
 
 	/**
@@ -102,10 +154,32 @@ public class I18nLabel extends JLabel implements I18nable {
 	 *            {@link I18n#get(String, Object...)}
 	 */
 	public I18nLabel(I18n i18n, String i18nBasename, Component component, Object... arguments) {
+		this(i18n, null, i18nBasename, component, arguments);
+	}
+
+	/**
+	 * Creates a new label with the given I18n basename that optionally is a
+	 * label for the given component.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nBasename
+	 *            The I18n basename of the label
+	 * @param component
+	 *            The component that is activated by the label, or
+	 *            <code>null</code> if this label should not activate a
+	 *            component
+	 * @param arguments
+	 *            Optional arguments that are handed in to
+	 *            {@link I18n#get(String, Object...)}
+	 */
+	public I18nLabel(I18n i18n, RemovalReference removalReference, String i18nBasename, Component component, Object... arguments) {
 		super();
 		this.i18n = i18n;
 		this.i18nBasename = i18nBasename;
-		i18n.addI18nable(this);
+		i18n.addI18nable(this, removalReference);
 		this.arguments = arguments;
 		if (component != null) {
 			setLabelFor(component);

@@ -23,6 +23,7 @@ import javax.swing.Icon;
 
 import net.pterodactylus.util.i18n.I18n;
 import net.pterodactylus.util.i18n.I18nable;
+import net.pterodactylus.util.i18n.I18n.RemovalReference;
 
 /**
  * Helper class that initializes actions with values from {@link I18n}.
@@ -47,7 +48,22 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 *            The base name of the action
 	 */
 	public I18nAction(I18n i18n, String i18nName) {
-		this(i18n, i18nName, null);
+		this(i18n, null, i18nName);
+	}
+
+	/**
+	 * Creates a new action that uses the given name as base name to get values
+	 * from {@link I18n}.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nName
+	 *            The base name of the action
+	 */
+	public I18nAction(I18n i18n, RemovalReference removalReference, String i18nName) {
+		this(i18n, removalReference, i18nName, null);
 	}
 
 	/**
@@ -62,7 +78,24 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 *            The icon for the action
 	 */
 	public I18nAction(I18n i18n, String i18nName, Icon icon) {
-		this(i18n, i18nName, true, icon);
+		this(i18n, null, i18nName, icon);
+	}
+
+	/**
+	 * Creates a new action that uses the given name as base name to get values
+	 * from {@link I18n} and the given icon.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nName
+	 *            The base name of the action
+	 * @param icon
+	 *            The icon for the action
+	 */
+	public I18nAction(I18n i18n, RemovalReference removalReference, String i18nName, Icon icon) {
+		this(i18n, removalReference, i18nName, true, icon);
 	}
 
 	/**
@@ -77,7 +110,24 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 *            Whether the action should be enabled
 	 */
 	public I18nAction(I18n i18n, String i18nName, boolean enabled) {
-		this(i18n, i18nName, enabled, null);
+		this(i18n, null, i18nName, enabled);
+	}
+
+	/**
+	 * Creates a new action that uses the given name as base name to get values
+	 * from {@link I18n}.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nName
+	 *            The base name of the action
+	 * @param enabled
+	 *            Whether the action should be enabled
+	 */
+	public I18nAction(I18n i18n, RemovalReference removalReference, String i18nName, boolean enabled) {
+		this(i18n, removalReference, i18nName, enabled, null);
 	}
 
 	/**
@@ -94,13 +144,32 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	 *            The icon for the action
 	 */
 	public I18nAction(I18n i18n, String i18nName, boolean enabled, Icon icon) {
+		this(i18n, null, i18nName, enabled, icon);
+	}
+
+	/**
+	 * Creates a new action that uses the given name as base name to get values
+	 * from {@link I18n} and the given icon.
+	 *
+	 * @param i18n
+	 *            The i18n handler
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 * @param i18nName
+	 *            The base name of the action
+	 * @param enabled
+	 *            Whether the action should be enabled
+	 * @param icon
+	 *            The icon for the action
+	 */
+	public I18nAction(I18n i18n, RemovalReference removalReference, String i18nName, boolean enabled, Icon icon) {
 		this.i18n = i18n;
 		this.i18nName = i18nName;
 		if (icon != null) {
 			putValue(Action.SMALL_ICON, icon);
 		}
 		setEnabled(enabled);
-		i18n.addI18nable(this);
+		i18n.addI18nable(this, removalReference);
 		updateI18n();
 	}
 
