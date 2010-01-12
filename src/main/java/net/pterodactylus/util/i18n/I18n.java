@@ -61,6 +61,9 @@ public class I18n {
 	/** List of I18nable listeners. */
 	private final List<I18nable> i18nables = new ArrayList<I18nable>();
 
+	/** Mapping from remove reference to list of I18nables. */
+	private final Map<Object, List<I18nable>> removalReferenceI18nables = new HashMap<Object, List<I18nable>>();
+
 	/** The current locale. */
 	private Locale locale;
 
@@ -135,7 +138,28 @@ public class I18n {
 	 *            The i18n listener to add
 	 */
 	public void addI18nable(I18nable i18nable) {
+		addI18nable(i18nable, null);
+	}
+
+	/**
+	 * Adds an i18n listener that is notified when the language is changed or
+	 * additional sources add added or removed.
+	 *
+	 * @param i18nable
+	 *            The i18n listener to add
+	 * @param removalReference
+	 *            Removal reference (optional)
+	 */
+	public void addI18nable(I18nable i18nable, Object removalReference) {
 		i18nables.add(i18nable);
+		if (removalReference != null) {
+			List<I18nable> i18nableList = removalReferenceI18nables.get(removalReference);
+			if (i18nableList == null) {
+				i18nableList = new ArrayList<I18nable>();
+				removalReferenceI18nables.put(removalReference, i18nableList);
+			}
+			i18nableList.add(i18nable);
+		}
 	}
 
 	/**
