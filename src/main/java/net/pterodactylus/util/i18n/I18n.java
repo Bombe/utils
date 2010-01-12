@@ -172,6 +172,23 @@ public class I18n {
 		i18nables.remove(i18nable);
 	}
 
+	/**
+	 * Removes all i18n listeners that have been
+	 * {@link #addI18nable(I18nable, Object)} using the given object as removal
+	 * reference.
+	 *
+	 * @param removalReference
+	 *            The removal reference
+	 */
+	public void removeI18nables(Object removalReference) {
+		List<I18nable> i18nableList = removalReferenceI18nables.remove(removalReference);
+		if (i18nableList != null) {
+			for (I18nable i18nable : i18nableList) {
+				i18nables.remove(i18nable);
+			}
+		}
+	}
+
 	//
 	// ACCESSORS
 	//
