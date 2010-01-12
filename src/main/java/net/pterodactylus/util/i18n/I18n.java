@@ -194,6 +194,15 @@ public class I18n {
 	//
 
 	/**
+	 * Returns the current locale.
+	 *
+	 * @return The current locale
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
+
+	/**
 	 * Sets the current locale.
 	 *
 	 * @param locale
