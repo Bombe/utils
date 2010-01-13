@@ -192,6 +192,16 @@ public class SimpleXML {
 	}
 
 	/**
+	 * Returns whether this node has any child nodes.
+	 *
+	 * @return {@code true} if this node has child nodes, {@code false}
+	 *         otherwise
+	 */
+	public boolean hasNodes() {
+		return !children.isEmpty();
+	}
+
+	/**
 	 * Checks if this object has a child with the specified name.
 	 *
 	 * @param nodeName
