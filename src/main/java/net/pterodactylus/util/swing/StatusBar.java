@@ -28,6 +28,8 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 /**
@@ -53,7 +55,7 @@ public class StatusBar extends JPanel {
 	 */
 	public StatusBar() {
 		setLayout(layout);
-		statusLabel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+		statusLabel.setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(0, 3, 0, 0)));
 		add(statusLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.LINE_START, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 	}
 
