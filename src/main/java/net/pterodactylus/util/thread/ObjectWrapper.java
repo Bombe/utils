@@ -39,8 +39,14 @@ package net.pterodactylus.util.thread;
  */
 public class ObjectWrapper<T> {
 
+	/** Object used for synchronization. */
+	private final Object syncObject = new Object();
+
 	/** The wrapped object. */
-	private volatile T wrappedObject;
+	private T wrappedObject;
+
+	/** Whether the wrapped object has been set. */
+	private boolean set;
 
 	/**
 	 * Returns the wrapped object.
@@ -48,7 +54,16 @@ public class ObjectWrapper<T> {
 	 * @return The wrapped object
 	 */
 	public T get() {
-		return wrappedObject;
+		synchronized (syncObject) {
+			while (!set) {
+				try {
+					syncObject.wait();
+				} catch (InterruptedException ie1) {
+					/* ignore. */
+				}
+			}
+			return wrappedObject;
+		}
 	}
 
 	/**
@@ -58,7 +73,11 @@ public class ObjectWrapper<T> {
 	 *            The wrapped object
 	 */
 	public void set(T wrappedObject) {
-		this.wrappedObject = wrappedObject;
+		synchronized (syncObject) {
+			this.wrappedObject = wrappedObject;
+			set = true;
+			syncObject.notifyAll();
+		}
 	}
 
 }
