@@ -17,8 +17,10 @@
 
 package net.pterodactylus.util.template;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 /**
  * Interface for objects that need to supply data to a {@link Template}.
@@ -26,6 +28,50 @@ import java.util.StringTokenizer;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class DataProvider {
+
+	/** Accessors. */
+	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
+
+	/**
+	 * Creates a new data provider.
+	 */
+	protected DataProvider() {
+		classAccessors.put(Map.class, Accessor.MAP_ACCESSOR);
+	}
+
+	/**
+	 * Adds an accessor for objects of the given class.
+	 *
+	 * @param clazz
+	 *            The class of the objects to handle with the accessor
+	 * @param accessor
+	 *            The accessor to handle the objects with
+	 */
+	public void addAccessor(Class<?> clazz, Accessor accessor) {
+		classAccessors.put(clazz, accessor);
+	}
+
+	/**
+	 * Finds an accessor that can handle the given class. If
+	 * {@link #classAccessors} does not contain a perfect match, a match to a
+	 * superclass or superinterface is searched.
+	 *
+	 * @param clazz
+	 *            The class to get an accessor for
+	 * @return The accessor for the given class, or {@code null} if no accessor
+	 *         could be found
+	 */
+	private Accessor findAccessor(Class<?> clazz) {
+		if (classAccessors.containsKey(clazz)) {
+			return classAccessors.get(clazz);
+		}
+		for (Entry<Class<?>, Accessor> classAccessor : classAccessors.entrySet()) {
+			if (classAccessor.getKey().isAssignableFrom(clazz)) {
+				return classAccessor.getValue();
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Returns the object stored under the given name. The name can contain
@@ -38,7 +84,6 @@ public abstract class DataProvider {
 	 * @throws TemplateException
 	 *             if the name or some objects can not be parsed or evaluated
 	 */
-	@SuppressWarnings("unchecked")
 	public Object getData(String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
 			return retrieveData(name);
@@ -50,11 +95,15 @@ public abstract class DataProvider {
 			if (object == null) {
 				object = retrieveData(nameToken);
 			} else {
-				if (object instanceof Map) {
-					object = ((Map<String, Object>) object).get(nameToken);
+				Accessor accessor = findAccessor(object.getClass());
+				if (accessor != null) {
+					object = accessor.get(object, nameToken);
 				} else {
-					throw new TemplateException("object is not a map");
+					throw new TemplateException("no accessor found for " + object.getClass());
 				}
+			}
+			if ((object == null) && nameTokens.hasMoreTokens()) {
+				throw new TemplateException("can not access " + nameTokens.nextToken() + " on null");
 			}
 		}
 		return object;
