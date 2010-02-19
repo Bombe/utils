@@ -122,6 +122,7 @@ public class Template extends DataProvider {
 		}
 		Stack<String> commandStack = new Stack<String>();
 		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
+		Stack<String> lastCollectionName = new Stack<String>();
 		DataProvider dataProvider = new DynamicDataProvider();
 		ContainerPart parts = new ContainerPart(dataProvider);
 		StringBuilder currentTextPart = new StringBuilder();
@@ -138,11 +139,6 @@ public class Template extends DataProvider {
 					String objectName = currentTextPart.toString().trim();
 					currentTextPart.setLength(0);
 					StringTokenizer objectNameTokens = new StringTokenizer(objectName);
-					if ((objectNameTokens.countTokens() == 1) && !objectName.startsWith("/")) {
-						parts.add(new DataProviderPart(dataProvider, objectName));
-						currentTextPart.setLength(0);
-						continue;
-					}
 					String function = objectNameTokens.nextToken();
 					if (function.startsWith("/")) {
 						String lastFunction = commandStack.pop();
@@ -152,6 +148,7 @@ public class Template extends DataProvider {
 						if (lastFunction.equals("foreach")) {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
+							lastCollectionName.pop();
 							parts.add(innerParts);
 						}
 					} else if (function.equals("foreach")) {
@@ -170,6 +167,16 @@ public class Template extends DataProvider {
 						partsStack.push(parts);
 						parts = new LoopPart(dataProvider, collectionName, itemName, loopName);
 						commandStack.push("foreach");
+						lastCollectionName.push(collectionName);
+					} else if (function.equals("foreachelse")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("foreachelse is only allowed in foreach");
+						}
+						partsStack.peek().add(parts);
+						parts = new EmptyLoopPart(dataProvider, lastCollectionName.peek());
+					} else if (objectNameTokens.countTokens() == 0) {
+						parts.add(new DataProviderPart(dataProvider, objectName));
+						currentTextPart.setLength(0);
 					} else {
 						throw new TemplateException("unknown directive: " + function);
 					}
