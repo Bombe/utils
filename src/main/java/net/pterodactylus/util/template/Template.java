@@ -120,6 +120,7 @@ public class Template extends DataProvider {
 		} else {
 			bufferedInputReader = new BufferedReader(input);
 		}
+		Stack<String> commandStack = new Stack<String>();
 		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
 		DataProvider dataProvider = new DynamicDataProvider();
 		ContainerPart parts = new ContainerPart(dataProvider);
@@ -143,7 +144,17 @@ public class Template extends DataProvider {
 						continue;
 					}
 					String function = objectNameTokens.nextToken();
-					if (function.equals("foreach")) {
+					if (function.startsWith("/")) {
+						String lastFunction = commandStack.pop();
+						if (!("/" + lastFunction).equals(function)) {
+							throw new TemplateException("unbalanced template, /" + lastFunction + " expected, " + function + " found");
+						}
+						if (lastFunction.equals("foreach")) {
+							ContainerPart innerParts = parts;
+							parts = partsStack.pop();
+							parts.add(innerParts);
+						}
+					} else if (function.equals("foreach")) {
 						if (!objectNameTokens.hasMoreTokens()) {
 							throw new TemplateException("foreach requires at least one parameter");
 						}
@@ -158,10 +169,9 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						parts = new LoopPart(dataProvider, collectionName, itemName, loopName);
-					} else if (function.equals("/foreach")) {
-						ContainerPart innerParts = parts;
-						parts = partsStack.pop();
-						parts.add(innerParts);
+						commandStack.push("foreach");
+					} else {
+						throw new TemplateException("unknown directive: " + function);
 					}
 				} else {
 					currentTextPart.append((char) nextCharacter);
