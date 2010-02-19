@@ -1,5 +1,5 @@
 /*
- * utils - SingleObjectDataProvider.java - Copyright © 2010 David Roden
+ * utils - OverrideDataProvider.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,25 @@
 
 package net.pterodactylus.util.template;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * {@link DataProvider} implementation that uses a parent data provider but can
- * override a single object.
+ * override objects.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class SingleObjectDataProvider implements DataProvider {
+class OverrideDataProvider implements DataProvider {
 
 	/** The parent data provider. */
 	private final DataProvider parentDataProvider;
 
-	/** The name of the object to override. */
-	private final String name;
-
-	/** The object. */
-	private final Object object;
+	/** Map with override objects. */
+	private final Map<String, Object> overrideObjects = new HashMap<String, Object>();
 
 	/**
-	 * Creates a new single object data provider.
+	 * Creates a new override data provider.
 	 *
 	 * @param parentDataProvider
 	 *            The parent data provider
@@ -44,10 +44,22 @@ class SingleObjectDataProvider implements DataProvider {
 	 * @param object
 	 *            The object
 	 */
-	public SingleObjectDataProvider(DataProvider parentDataProvider, String name, Object object) {
+	public OverrideDataProvider(DataProvider parentDataProvider, String name, Object object) {
 		this.parentDataProvider = parentDataProvider;
-		this.name = name;
-		this.object = object;
+		overrideObjects.put(name, object);
+	}
+
+	/**
+	 * Creates a new override data provider.
+	 *
+	 * @param parentDataProvider
+	 *            The parent data provider
+	 * @param overrideObjects
+	 *            The override objects
+	 */
+	public OverrideDataProvider(DataProvider parentDataProvider, Map<String, Object> overrideObjects) {
+		this.parentDataProvider = parentDataProvider;
+		this.overrideObjects.putAll(overrideObjects);
 	}
 
 	/**
@@ -55,9 +67,10 @@ class SingleObjectDataProvider implements DataProvider {
 	 */
 	@Override
 	public Object getData(String name) {
-		if (name.equals(this.name)) {
-			return object;
+		if (overrideObjects.containsKey(name)) {
+			return overrideObjects.get(name);
 		}
 		return parentDataProvider.getData(name);
 	}
+
 }
