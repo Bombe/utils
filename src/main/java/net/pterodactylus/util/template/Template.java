@@ -123,6 +123,7 @@ public class Template extends DataProvider {
 		Stack<String> commandStack = new Stack<String>();
 		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
 		Stack<String> lastCollectionName = new Stack<String>();
+		Stack<String> lastLoopName = new Stack<String>();
 		DataProvider dataProvider = new DynamicDataProvider();
 		ContainerPart parts = new ContainerPart(dataProvider);
 		StringBuilder currentTextPart = new StringBuilder();
@@ -149,6 +150,11 @@ public class Template extends DataProvider {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
 							lastCollectionName.pop();
+							lastLoopName.pop();
+							parts.add(innerParts);
+						} else if (lastFunction.equals("first") || lastFunction.equals("last")) {
+							ContainerPart innerParts = parts;
+							parts = partsStack.pop();
 							parts.add(innerParts);
 						}
 					} else if (function.equals("foreach")) {
@@ -168,12 +174,41 @@ public class Template extends DataProvider {
 						parts = new LoopPart(dataProvider, collectionName, itemName, loopName);
 						commandStack.push("foreach");
 						lastCollectionName.push(collectionName);
+						lastLoopName.push(loopName);
 					} else if (function.equals("foreachelse")) {
 						if (!"foreach".equals(commandStack.peek())) {
 							throw new TemplateException("foreachelse is only allowed in foreach");
 						}
 						partsStack.peek().add(parts);
 						parts = new EmptyLoopPart(dataProvider, lastCollectionName.peek());
+					} else if (function.equals("first")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("first is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return (Boolean) (dataProvider.getData(loopName + ".first"));
+							}
+						});
+						commandStack.push("first");
+					} else if (function.equals("last")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("last is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return (Boolean) (dataProvider.getData(loopName + ".last"));
+							}
+						});
+						commandStack.push("last");
 					} else if (objectNameTokens.countTokens() == 0) {
 						parts.add(new DataProviderPart(dataProvider, objectName));
 						currentTextPart.setLength(0);
