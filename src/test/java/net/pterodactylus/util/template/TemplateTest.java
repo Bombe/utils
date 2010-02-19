@@ -186,4 +186,64 @@ public class TemplateTest extends TestCase {
 		assertEquals("This template repeats: 1 2 3 4 5 6 ", output);
 	}
 
+	/**
+	 * Tests for string templates that loop over collections.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithCollectionAndLoopStructure() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Collection<Object> innerCollection;
+
+		templateString = "This template repeats: <% foreach items item>item: <% loop.count> - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add("first");
+		collection.add("second");
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: 0 - item: 1 - ", output);
+
+		templateString = "This template repeats: <% foreach items item itemLoop>item: <% itemLoop.count> - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add("first");
+		collection.add("second");
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: 0 - item: 1 - ", output);
+
+		templateString = "This template repeats: <% foreach items item><% loop.count> <%foreach item inner><% loop.count> <%inner> <%/foreach><% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		innerCollection = new ArrayList<Object>();
+		innerCollection.add("1");
+		innerCollection.add("2");
+		innerCollection.add("3");
+		collection.add(innerCollection);
+		innerCollection = new ArrayList<Object>();
+		innerCollection.add("4");
+		innerCollection.add("5");
+		innerCollection.add("6");
+		collection.add(innerCollection);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: 0 0 1 1 2 2 3 1 0 4 1 5 2 6 ", output);
+	}
+
 }
