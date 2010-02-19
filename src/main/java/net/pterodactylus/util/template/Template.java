@@ -73,8 +73,10 @@ public class Template implements DataProvider {
 	 *            The write to render the template to
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 *             if the template can not be parsed
 	 */
-	public void render(Writer writer) throws IOException {
+	public void render(Writer writer) throws IOException, TemplateException {
 		extractParts().render(writer);
 	}
 
@@ -100,9 +102,11 @@ public class Template implements DataProvider {
 	 *         {@link #setInput(Reader) input}
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 *             if the template can not be parsed correctly
 	 */
 	@SuppressWarnings("synthetic-access")
-	private Part extractParts() throws IOException {
+	private Part extractParts() throws IOException, TemplateException {
 		BufferedReader bufferedInputReader;
 		if (input instanceof BufferedReader) {
 			bufferedInputReader = (BufferedReader) input;
@@ -168,7 +172,9 @@ public class Template implements DataProvider {
 		if (currentTextPart.length() > 0) {
 			parts.add(new TextPart(currentTextPart.toString()));
 		}
-		assert (partsStack.isEmpty());
+		if (!partsStack.isEmpty()) {
+			throw new TemplateException("Unbalanced template.");
+		}
 		return parts;
 	}
 

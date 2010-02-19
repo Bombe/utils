@@ -1,4 +1,3 @@
-
 package net.pterodactylus.util.template;
 
 import java.io.IOException;
@@ -38,8 +37,9 @@ public class TemplateTest extends TestCase {
 	 *
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
 	 */
-	public void testStringTemplatesWithoutParameters() throws IOException {
+	public void testStringTemplatesWithoutParameters() throws IOException, TemplateException {
 		Template template;
 		String templateString;
 		StringWriter outputWriter;
@@ -83,8 +83,9 @@ public class TemplateTest extends TestCase {
 	 *
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
 	 */
-	public void testStringTemplatesWithParameters() throws IOException {
+	public void testStringTemplatesWithParameters() throws IOException, TemplateException {
 		Template template;
 		String templateString;
 		StringWriter outputWriter;
@@ -125,8 +126,9 @@ public class TemplateTest extends TestCase {
 	 *
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
 	 */
-	public void testStringTemplatesWithCollection() throws IOException {
+	public void testStringTemplatesWithCollection() throws IOException, TemplateException {
 		Template template;
 		String templateString;
 		StringWriter outputWriter;
