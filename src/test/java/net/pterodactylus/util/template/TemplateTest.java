@@ -47,32 +47,28 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This is a template without parameters.";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals(templateString, output);
 
 		templateString = "This is a template without parameters but with a CR character in it.\r";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals(templateString, output);
 
 		templateString = "This is a template without parameters but with an LF character in it.\n";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals(templateString, output);
 
 		templateString = "This is a template without parameters but with a CR/LF character combination in it.\r\n";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals(templateString, output);
@@ -93,8 +89,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This is a template with <%one> parameter.";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.set("one", "two");
 		template.render(outputWriter);
 		output = outputWriter.toString();
@@ -102,8 +97,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This is a template with <% one > parameter.";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.set("one", "two");
 		template.render(outputWriter);
 		output = outputWriter.toString();
@@ -111,8 +105,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This is a template with <%one> parameter, one <% left > and one <% right>.";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		template.set("one", "two");
 		template.set("left", "on top");
 		template.set("right", "below");
@@ -138,8 +131,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item>item: <% item> - <% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		collection.add("first");
 		collection.add("second");
@@ -150,8 +142,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item>item: <% item> (<%foreach inners inner>[<%item>: <%inner>]<%/foreach>) - <% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		collection.add("first");
 		collection.add("second");
@@ -167,8 +158,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item><%foreach item inner><%inner> <%/foreach><% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		innerCollection = new ArrayList<Object>();
 		innerCollection.add("1");
@@ -203,8 +193,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item>item: <% loop.count> - <% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		collection.add("first");
 		collection.add("second");
@@ -215,8 +204,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item itemLoop>item: <% itemLoop.count> - <% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		collection.add("first");
 		collection.add("second");
@@ -227,8 +215,7 @@ public class TemplateTest extends TestCase {
 
 		templateString = "This template repeats: <% foreach items item><% loop.count> <%foreach item inner><% loop.count> <%inner> <%/foreach><% /foreach>";
 		outputWriter = new StringWriter();
-		template = new Template();
-		template.setInput(new StringReader(templateString));
+		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
 		innerCollection = new ArrayList<Object>();
 		innerCollection.add("1");

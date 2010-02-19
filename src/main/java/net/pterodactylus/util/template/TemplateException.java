@@ -19,7 +19,8 @@ package net.pterodactylus.util.template;
 
 /**
  * Exception that is thrown when a {@link Template} can not be rendered because
- * its {@link Template#setInput(java.io.Reader)} can not be parsed correctly.
+ * its input can not be parsed correctly, or when its template variables can not
+ * be parsed or evaluated.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
