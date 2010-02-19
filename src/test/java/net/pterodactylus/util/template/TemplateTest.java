@@ -258,4 +258,58 @@ public class TemplateTest extends TestCase {
 		assertEquals("This template repeats: nothing!", output);
 	}
 
+	/**
+	 * Tests for string templates that loop over collections.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithCollectionsFirst() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Collection<Object> innerCollection;
+
+		templateString = "This template repeats: <% foreach items item><%first>first <%/first>item: <% loop.count> - <%foreachelse>nothing!<% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add(1);
+		collection.add(2);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: first item: 0 - item: 1 - ", output);
+	}
+
+	/**
+	 * Tests for string templates that loop over collections.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithCollectionsLast() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Collection<Object> innerCollection;
+
+		templateString = "This template repeats: <% foreach items item><%first>first <%/first>item: <% loop.count> - <%last>end<%/last><%foreachelse>nothing!<% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add(1);
+		collection.add(2);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: first item: 0 - item: 1 - end", output);
+	}
+
 }
