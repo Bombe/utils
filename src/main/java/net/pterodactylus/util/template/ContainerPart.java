@@ -40,7 +40,7 @@ class ContainerPart extends Part implements Iterable<Part> {
 	 *            The part’s data provider
 	 */
 	public ContainerPart(DataProvider dataProvider) {
-		super(null);
+		super(dataProvider);
 	}
 
 	/**
