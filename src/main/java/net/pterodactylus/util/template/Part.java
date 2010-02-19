@@ -58,7 +58,9 @@ abstract class Part {
 	 *            The writer to render the part to
 	 * @throws IOException
 	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 *             if a template variable can not be parsed
 	 */
-	public abstract void render(Writer writer) throws IOException;
+	public abstract void render(Writer writer) throws IOException, TemplateException;
 
 }
