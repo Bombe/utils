@@ -137,7 +137,9 @@ public class Template implements DataProvider {
 					}
 					String function = objectNameTokens.nextToken();
 					if (function.equals("foreach")) {
-
+						if (!objectNameTokens.hasMoreTokens()) {
+							throw new TemplateException("foreach requires at least one parameter");
+						}
 						String collectionName = objectNameTokens.nextToken();
 						String itemName = objectNameTokens.nextToken();
 						partsStack.push(parts);
