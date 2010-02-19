@@ -19,6 +19,7 @@ package net.pterodactylus.util.template;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * {@link DataProvider} implementation that uses a parent data provider but can
@@ -30,6 +31,9 @@ class OverrideDataProvider extends DataProvider {
 
 	/** The parent data provider. */
 	private final DataProvider parentDataProvider;
+
+	/** Accessors. */
+	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
 
 	/** Map with override objects. */
 	private final Map<String, Object> overrideObjects = new HashMap<String, Object>();
@@ -60,6 +64,30 @@ class OverrideDataProvider extends DataProvider {
 	public OverrideDataProvider(DataProvider parentDataProvider, Map<String, Object> overrideObjects) {
 		this.parentDataProvider = parentDataProvider;
 		this.overrideObjects.putAll(overrideObjects);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addAccessor(Class<?> clazz, Accessor accessor) {
+		classAccessors.put(clazz, accessor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Accessor findAccessor(Class<?> clazz) {
+		if (classAccessors.containsKey(clazz)) {
+			return classAccessors.get(clazz);
+		}
+		for (Entry<Class<?>, Accessor> classAccessor : classAccessors.entrySet()) {
+			if (classAccessor.getKey().isAssignableFrom(clazz)) {
+				return classAccessor.getValue();
+			}
+		}
+		return parentDataProvider.findAccessor(clazz);
 	}
 
 	/**
