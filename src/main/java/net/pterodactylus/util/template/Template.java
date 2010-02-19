@@ -98,7 +98,7 @@ public class Template implements DataProvider {
 	 * Parses the template and creates {@link Part}s of the input.
 	 *
 	 * @return The list of parts created from the template’s
-	 *         {@link #setInputSource(TemplateInput) input source}
+	 *         {@link #setInput(Reader) input}
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
