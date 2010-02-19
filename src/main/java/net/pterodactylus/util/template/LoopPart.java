@@ -57,8 +57,9 @@ class LoopPart extends ContainerPart {
 	public void render(Writer writer) throws IOException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		for (Object object : collection) {
+			DataProvider loopDataProvider = new SingleObjectDataProvider(dataProvider, itemName, object);
 			for (Part part : parts) {
-				part.setDataProvider(new SingleObjectDataProvider(dataProvider, itemName, object));
+				part.setDataProvider(loopDataProvider);
 				part.render(writer);
 			}
 		}
