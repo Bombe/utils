@@ -30,6 +30,10 @@ import java.util.Map;
  */
 class LoopPart extends ContainerPart {
 
+	/** Accessor for {@link LoopStructure}s. */
+	@SuppressWarnings("synthetic-access")
+	private final Accessor LOOP_STRUCTURE_ACCESSOR = new LoopStructureAccessor();
+
 	/** The name of the collection to loop over. */
 	private final String collectionName;
 
@@ -80,23 +84,118 @@ class LoopPart extends ContainerPart {
 	@Override
 	public void render(Writer writer) throws IOException, TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
-		int loopCounter = 0;
-		int loopSize = collection.size();
-		Map<String, Object> loopStructure = new HashMap<String, Object>();
-		loopStructure.put("size", loopSize);
+		LoopStructure loopStructure = new LoopStructure(collection.size());
 		Map<String, Object> overrideObjects = new HashMap<String, Object>();
 		overrideObjects.put(loopName, loopStructure);
 		for (Object object : collection) {
-			loopStructure.put("first", loopCounter == 0);
-			loopStructure.put("last", loopCounter == (loopSize - 1));
-			loopStructure.put("count", loopCounter++);
 			overrideObjects.put(itemName, object);
 			DataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
+			loopDataProvider.addAccessor(LoopStructure.class, LOOP_STRUCTURE_ACCESSOR);
 			for (Part part : parts) {
 				part.setDataProvider(loopDataProvider);
 				part.render(writer);
 			}
+			loopStructure.incCount();
 		}
+	}
+
+	/**
+	 * Container for information about a loop.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class LoopStructure {
+
+		/** The size of the loop. */
+		private final int size;
+
+		/** The current counter of the loop. */
+		private int count;
+
+		/**
+		 * Creates a new loop structure for a loop with the given size.
+		 *
+		 * @param size
+		 *            The size of the loop
+		 */
+		public LoopStructure(int size) {
+			this.size = size;
+		}
+
+		/**
+		 * Returns the size of the loop.
+		 *
+		 * @return The size of the loop
+		 */
+		public int getSize() {
+			return size;
+		}
+
+		/**
+		 * Returns the current counter of the loop.
+		 *
+		 * @return The current counter of the loop, in the range from {@code 0}
+		 *         to {@link #getSize() getSize() - 1}
+		 */
+		public int getCount() {
+			return count;
+		}
+
+		/**
+		 * Increments the current counter of the loop.
+		 */
+		public void incCount() {
+			++count;
+		}
+
+		/**
+		 * Returns whether the current iteration if the first one.
+		 *
+		 * @return {@code true} if the curren iteration is the first one,
+		 *         {@code false} otherwise
+		 */
+		public boolean isFirst() {
+			return count == 0;
+		}
+
+		/**
+		 * Returns whether the current iteration if the last one.
+		 *
+		 * @return {@code true} if the curren iteration is the last one, {@code
+		 *         false} otherwise
+		 */
+		public boolean isLast() {
+			return count == (size - 1);
+		}
+
+	}
+
+	/**
+	 * {@link Accessor} implementation that handles a {@link LoopStructure},
+	 * allowing access via the members “size”, “count”, “first”, and “last”.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class LoopStructureAccessor implements Accessor {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object get(Object object, String member) {
+			LoopStructure loopStructure = (LoopStructure) object;
+			if ("size".equals(member)) {
+				return loopStructure.getSize();
+			} else if ("count".equals(member)) {
+				return loopStructure.getCount();
+			} else if ("first".equals(member)) {
+				return loopStructure.isFirst();
+			} else if ("last".equals(member)) {
+				return loopStructure.isLast();
+			}
+			return null;
+		}
+
 	}
 
 }
