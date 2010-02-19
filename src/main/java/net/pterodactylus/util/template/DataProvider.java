@@ -17,12 +17,48 @@
 
 package net.pterodactylus.util.template;
 
+import java.util.Map;
+import java.util.StringTokenizer;
+
 /**
  * Interface for objects that need to supply data to a {@link Template}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface DataProvider {
+public abstract class DataProvider {
+
+	/**
+	 * Returns the object stored under the given name. The name can contain
+	 * hierarchical structures separated by a dot (“.”), such as “loop.count” in
+	 * which case a {@link Map} must be stored under “loop”.
+	 *
+	 * @param name
+	 *            The name of the object to get
+	 * @return The object
+	 * @throws TemplateException
+	 *             if the name or some objects can not be parsed or evaluated
+	 */
+	@SuppressWarnings("unchecked")
+	public Object getData(String name) throws TemplateException {
+		if (name.indexOf('.') == -1) {
+			return retrieveData(name);
+		}
+		StringTokenizer nameTokens = new StringTokenizer(name, ".");
+		Object object = null;
+		while (nameTokens.hasMoreTokens()) {
+			String nameToken = nameTokens.nextToken();
+			if (object == null) {
+				object = retrieveData(nameToken);
+			} else {
+				if (object instanceof Map) {
+					object = ((Map<String, Object>) object).get(nameToken);
+				} else {
+					throw new TemplateException("object is not a map");
+				}
+			}
+		}
+		return object;
+	}
 
 	/**
 	 * Returns the object with the given name.
@@ -32,6 +68,6 @@ public interface DataProvider {
 	 * @return The object, or {@code null} if an object with the given name does
 	 *         not exist
 	 */
-	public Object getData(String name);
+	protected abstract Object retrieveData(String name);
 
 }

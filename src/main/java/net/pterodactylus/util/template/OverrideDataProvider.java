@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class OverrideDataProvider implements DataProvider {
+class OverrideDataProvider extends DataProvider {
 
 	/** The parent data provider. */
 	private final DataProvider parentDataProvider;
@@ -66,11 +66,11 @@ class OverrideDataProvider implements DataProvider {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object getData(String name) {
+	protected Object retrieveData(String name) {
 		if (overrideObjects.containsKey(name)) {
 			return overrideObjects.get(name);
 		}
-		return parentDataProvider.getData(name);
+		return parentDataProvider.retrieveData(name);
 	}
 
 }

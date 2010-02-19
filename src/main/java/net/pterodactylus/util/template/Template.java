@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Template implements DataProvider {
+public class Template extends DataProvider {
 
 	/** Objects stored in the template. */
 	private final Map<String, Object> templateObjects = new HashMap<String, Object>();
@@ -87,7 +87,8 @@ public class Template implements DataProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Object getData(String name) {
+	@Override
+	public Object retrieveData(String name) {
 		return templateObjects.get(name);
 	}
 
@@ -190,15 +191,15 @@ public class Template implements DataProvider {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class DynamicDataProvider implements DataProvider {
+	private class DynamicDataProvider extends DataProvider {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public Object getData(String name) {
-			return dataProvider.getData(name);
+		public Object retrieveData(String name) {
+			return dataProvider.retrieveData(name);
 		}
 
 	}
