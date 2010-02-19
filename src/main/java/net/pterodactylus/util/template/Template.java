@@ -21,10 +21,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
 /**
  * Simple template system that is geared towards easy of use and high
@@ -63,6 +63,7 @@ public class Template implements DataProvider {
 	 *            The object to store in the template
 	 */
 	public void set(String name, Object object) {
+		System.out.println("storing " + object + " as " + name);
 		templateObjects.put(name, object);
 	}
 
@@ -75,9 +76,7 @@ public class Template implements DataProvider {
 	 *             if an I/O error occurs
 	 */
 	public void render(Writer writer) throws IOException {
-		for (Part part : extractParts()) {
-			part.render(writer);
-		}
+		extractParts().render(writer);
 	}
 
 	//
@@ -87,8 +86,8 @@ public class Template implements DataProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getData(String name) {
-		return String.valueOf(templateObjects.get(name));
+	public Object getData(String name) {
+		return templateObjects.get(name);
 	}
 
 	//
@@ -103,14 +102,17 @@ public class Template implements DataProvider {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	private List<Part> extractParts() throws IOException {
+	@SuppressWarnings("synthetic-access")
+	private Part extractParts() throws IOException {
 		BufferedReader bufferedInputReader;
 		if (input instanceof BufferedReader) {
 			bufferedInputReader = (BufferedReader) input;
 		} else {
 			bufferedInputReader = new BufferedReader(input);
 		}
-		List<Part> parts = new ArrayList<Part>();
+		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
+		DataProvider dataProvider = new DynamicDataProvider();
+		ContainerPart parts = new ContainerPart(dataProvider);
 		StringBuilder currentTextPart = new StringBuilder();
 		boolean gotLeftAngleBracket = false;
 		boolean inAngleBracket = false;
@@ -119,116 +121,77 @@ public class Template implements DataProvider {
 			if (nextCharacter == -1) {
 				break;
 			}
+			System.out.print("(" + (char) nextCharacter + ")");
 			if (inAngleBracket) {
 				if (nextCharacter == '>') {
 					inAngleBracket = false;
-					parts.add(new ObjectPart(currentTextPart.toString().trim()));
+					String objectName = currentTextPart.toString().trim();
 					currentTextPart.setLength(0);
-					continue;
-				}
-			} else {
-				if (gotLeftAngleBracket) {
-					if (nextCharacter == '%') {
-						inAngleBracket = true;
-						parts.add(new TextPart(currentTextPart.toString()));
+					System.out.println("object name: " + objectName);
+					StringTokenizer objectNameTokens = new StringTokenizer(objectName);
+					if ((objectNameTokens.countTokens() == 1) && !objectName.startsWith("/")) {
+						parts.add(new DataProviderPart(dataProvider, objectName));
 						currentTextPart.setLength(0);
-					} else {
-						currentTextPart.append('<').append((char) nextCharacter);
+						continue;
 					}
-					gotLeftAngleBracket = false;
-					continue;
+					String function = objectNameTokens.nextToken();
+					if (function.equals("foreach")) {
+						/* TODO: check if there is a next token */
+						String collectionName = objectNameTokens.nextToken();
+						String itemName = objectNameTokens.nextToken();
+						partsStack.push(parts);
+						parts = new LoopPart(dataProvider, collectionName, itemName);
+					} else if (function.equals("/foreach")) {
+						System.out.println("/foreach");
+						ContainerPart innerParts = parts;
+						parts = partsStack.pop();
+						parts.add(innerParts);
+					}
+				} else {
+					currentTextPart.append((char) nextCharacter);
 				}
-				if (nextCharacter == '<') {
-					gotLeftAngleBracket = true;
-					continue;
+				continue;
+			}
+			if (gotLeftAngleBracket) {
+				if (nextCharacter == '%') {
+					inAngleBracket = true;
+					parts.add(new TextPart(currentTextPart.toString()));
+					currentTextPart.setLength(0);
+				} else {
+					currentTextPart.append('<').append((char) nextCharacter);
 				}
+				gotLeftAngleBracket = false;
+				continue;
+			}
+			if (nextCharacter == '<') {
+				gotLeftAngleBracket = true;
+				continue;
 			}
 			currentTextPart.append((char) nextCharacter);
 		}
 		if (currentTextPart.length() > 0) {
 			parts.add(new TextPart(currentTextPart.toString()));
 		}
+		assert (partsStack.isEmpty());
 		return parts;
 	}
 
 	/**
-	 * Interface for a part of a template that can be render without further
-	 * parsing.
+	 * {@link DataProvider} implementation that always uses the {@link Template}
+	 * ’s current {@link Template#dataProvider} to allow rendering a template
+	 * multiple times after changing the data provider.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private interface Part {
-
-		/**
-		 * Renders this part.
-		 *
-		 * @param writer
-		 *            The writer to render the part to
-		 * @throws IOException
-		 *             if an I/O error occurs
-		 */
-		public void render(Writer writer) throws IOException;
-
-	}
-
-	/**
-	 * A {@link Part} that contains only text.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private static class TextPart implements Part {
-
-		/** The text of the part. */
-		private final String text;
-
-		/**
-		 * Creates a new text part.
-		 *
-		 * @param text
-		 *            The text of the part
-		 */
-		public TextPart(String text) {
-			this.text = text;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void render(Writer writer) throws IOException {
-			writer.write(text);
-		}
-
-	}
-
-	/**
-	 * A {@link Part} whose content is dynamically fetched from the
-	 * {@link Template}’s {@link DataProvider}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class ObjectPart implements Part {
-
-		/** The name of the object to get. */
-		private final String name;
-
-		/**
-		 * Creates a new object part.
-		 *
-		 * @param name
-		 *            The name of the object
-		 */
-		public ObjectPart(String name) {
-			this.name = name;
-		}
+	private class DynamicDataProvider implements DataProvider {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public void render(Writer writer) throws IOException {
-			writer.write(String.valueOf(dataProvider.getData(name)));
+		public Object getData(String name) {
+			return dataProvider.getData(name);
 		}
 
 	}

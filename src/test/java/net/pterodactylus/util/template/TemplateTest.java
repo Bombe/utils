@@ -4,6 +4,8 @@ package net.pterodactylus.util.template;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import junit.framework.TestCase;
 
@@ -116,7 +118,50 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("This is a template with two parameter, one on top and one below.", output);
+	}
 
+	/**
+	 * Tests for string templates that loop over collections.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public void testStringTemplatesWithCollection() throws IOException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Collection<Object> innerCollection;
+
+		templateString = "This template repeats: <% foreach items item>item: <% item> - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add("first");
+		collection.add("second");
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: first - item: second - ", output);
+
+		templateString = "This template repeats: <% foreach items item>item: <% item> (<%foreach inners inner>[<%item>: <%inner>]<%/foreach>) - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add("first");
+		collection.add("second");
+		template.set("items", collection);
+		innerCollection = new ArrayList<Object>();
+		innerCollection.add("1");
+		innerCollection.add("2");
+		innerCollection.add("3");
+		template.set("inners", innerCollection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: first ([first: 1][first: 2][first: 3]) - item: second ([second: 1][second: 2][second: 3]) - ", output);
 	}
 
 }
