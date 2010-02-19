@@ -233,4 +233,29 @@ public class TemplateTest extends TestCase {
 		assertEquals("This template repeats: 0 0 1 1 2 2 3 1 0 4 1 5 2 6 ", output);
 	}
 
+	/**
+	 * Tests for string templates that loop over collections.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithEmptyCollections() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Collection<Object> innerCollection;
+
+		templateString = "This template repeats: <% foreach items item>item: <% loop.count> - <%foreachelse>nothing!<% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: nothing!", output);
+	}
+
 }
