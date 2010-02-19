@@ -16,6 +16,8 @@
  */
 
 /**
+ * Light-weight template system.
+ *
  * <h1>Usage</h1>
  *
  * <p>
