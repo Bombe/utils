@@ -63,7 +63,6 @@ public class Template implements DataProvider {
 	 *            The object to store in the template
 	 */
 	public void set(String name, Object object) {
-		System.out.println("storing " + object + " as " + name);
 		templateObjects.put(name, object);
 	}
 
@@ -121,13 +120,11 @@ public class Template implements DataProvider {
 			if (nextCharacter == -1) {
 				break;
 			}
-			System.out.print("(" + (char) nextCharacter + ")");
 			if (inAngleBracket) {
 				if (nextCharacter == '>') {
 					inAngleBracket = false;
 					String objectName = currentTextPart.toString().trim();
 					currentTextPart.setLength(0);
-					System.out.println("object name: " + objectName);
 					StringTokenizer objectNameTokens = new StringTokenizer(objectName);
 					if ((objectNameTokens.countTokens() == 1) && !objectName.startsWith("/")) {
 						parts.add(new DataProviderPart(dataProvider, objectName));
@@ -136,13 +133,12 @@ public class Template implements DataProvider {
 					}
 					String function = objectNameTokens.nextToken();
 					if (function.equals("foreach")) {
-						/* TODO: check if there is a next token */
+
 						String collectionName = objectNameTokens.nextToken();
 						String itemName = objectNameTokens.nextToken();
 						partsStack.push(parts);
 						parts = new LoopPart(dataProvider, collectionName, itemName);
 					} else if (function.equals("/foreach")) {
-						System.out.println("/foreach");
 						ContainerPart innerParts = parts;
 						parts = partsStack.pop();
 						parts.add(innerParts);

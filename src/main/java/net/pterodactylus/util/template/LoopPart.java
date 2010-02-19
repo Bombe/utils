@@ -55,7 +55,6 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(Writer writer) throws IOException {
-		System.out.println("collectionName: " + collectionName + ", collection: " + dataProvider.getData(collectionName));
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		for (Object object : collection) {
 			for (Part part : parts) {
