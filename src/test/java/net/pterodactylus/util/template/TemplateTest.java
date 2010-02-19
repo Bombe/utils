@@ -162,6 +162,26 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("This template repeats: item: first ([first: 1][first: 2][first: 3]) - item: second ([second: 1][second: 2][second: 3]) - ", output);
+
+		templateString = "This template repeats: <% foreach items item><%foreach item inner><%inner> <%/foreach><% /foreach>";
+		outputWriter = new StringWriter();
+		template = new Template();
+		template.setInput(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		innerCollection = new ArrayList<Object>();
+		innerCollection.add("1");
+		innerCollection.add("2");
+		innerCollection.add("3");
+		collection.add(innerCollection);
+		innerCollection = new ArrayList<Object>();
+		innerCollection.add("4");
+		innerCollection.add("5");
+		innerCollection.add("6");
+		collection.add(innerCollection);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: 1 2 3 4 5 6 ", output);
 	}
 
 }
