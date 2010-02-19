@@ -84,6 +84,9 @@ class LoopPart extends ContainerPart {
 	@Override
 	public void render(Writer writer) throws IOException, TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
+		if (collection.isEmpty()) {
+			return;
+		}
 		LoopStructure loopStructure = new LoopStructure(collection.size());
 		Map<String, Object> overrideObjects = new HashMap<String, Object>();
 		overrideObjects.put(loopName, loopStructure);
