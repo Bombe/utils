@@ -146,8 +146,12 @@ public class Template extends DataProvider {
 						if (objectNameTokens.hasMoreTokens()) {
 							itemName = objectNameTokens.nextToken();
 						}
+						String loopName = "loop";
+						if (objectNameTokens.hasMoreTokens()) {
+							loopName = objectNameTokens.nextToken();
+						}
 						partsStack.push(parts);
-						parts = new LoopPart(dataProvider, collectionName, itemName);
+						parts = new LoopPart(dataProvider, collectionName, itemName, loopName);
 					} else if (function.equals("/foreach")) {
 						ContainerPart innerParts = parts;
 						parts = partsStack.pop();
