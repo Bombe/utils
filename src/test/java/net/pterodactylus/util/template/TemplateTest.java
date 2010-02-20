@@ -424,4 +424,87 @@ public class TemplateTest extends TestCase {
 		assertEquals("List: 1, 2, 3, 4.", output);
 	}
 
+	/**
+	 * Tests for string templates that contain <%if>.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithIf() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "A: <%if a>true<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: true", output);
+
+		templateString = "A: <%if a>true<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", false);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: ", output);
+
+		templateString = "A: <%if a>true<%if b>true<%/if><%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", true);
+		template.set("b", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: truetrue", output);
+
+		templateString = "A: <%if a>true<%if b>true<%/if><%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", false);
+		template.set("b", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: ", output);
+
+		templateString = "A: <%if a>true<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: true", output);
+
+		templateString = "A: <%if a>true<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", false);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: false", output);
+
+		templateString = "A: <%if a>(a)<%elseif b>(b)<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", false);
+		template.set("b", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: (b)", output);
+
+		templateString = "A: <%if a>(a)<%elseif b>(b)<%elseif c>(c)<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.set("a", false);
+		template.set("b", true);
+		template.set("c", true);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("A: (b)", output);
+	}
+
 }
