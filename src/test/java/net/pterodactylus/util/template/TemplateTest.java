@@ -527,4 +527,58 @@ public class TemplateTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Tests for string templates that uses filters.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	@SuppressWarnings("synthetic-access")
+	public void testStringTemplatesWithFilter() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "<%a> (<%=a|test>)";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("test", new TestFilter());
+		template.set("a", 4);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("4 ([java.lang.Integer@4])", output);
+
+		templateString = "<%a> (<%=  a | test  >)";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("test", new TestFilter());
+		template.set("a", 4);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("4 ([java.lang.Integer@4])", output);
+
+		templateString = "<%a> (<%=  a | test |test >)";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("test", new TestFilter());
+		template.set("a", 4);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("4 ([java.lang.String@-587672038])", output);
+	}
+
+	private static class TestFilter implements Filter {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String format(Object data) {
+			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
+		}
+
+	}
+
 }
