@@ -90,6 +90,20 @@ public class Template extends DataProvider {
 	}
 
 	/**
+	 * Parses the input of the template if it wasn’t already parsed.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 *             if the template can not be parsed
+	 */
+	public synchronized void parse() throws IOException, TemplateException {
+		if (parsedTemplate == null) {
+			parsedTemplate = extractParts();
+		}
+	}
+
+	/**
 	 * Renders the template to the given writer.
 	 *
 	 * @param writer
@@ -100,9 +114,7 @@ public class Template extends DataProvider {
 	 *             if the template can not be parsed
 	 */
 	public synchronized void render(Writer writer) throws IOException, TemplateException {
-		if (parsedTemplate == null) {
-			parsedTemplate = extractParts();
-		}
+		parse();
 		parsedTemplate.render(this, writer);
 	}
 
