@@ -93,12 +93,10 @@ public class Template extends DataProvider {
 	/**
 	 * Parses the input of the template if it wasn’t already parsed.
 	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 * @throws TemplateException
 	 *             if the template can not be parsed
 	 */
-	public synchronized void parse() throws IOException, TemplateException {
+	public synchronized void parse() throws TemplateException {
 		if (parsedTemplate == null) {
 			parsedTemplate = extractParts();
 		}
@@ -109,12 +107,10 @@ public class Template extends DataProvider {
 	 *
 	 * @param writer
 	 *            The write to render the template to
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 * @throws TemplateException
 	 *             if the template can not be parsed
 	 */
-	public synchronized void render(Writer writer) throws IOException, TemplateException {
+	public synchronized void render(Writer writer) throws TemplateException {
 		parse();
 		parsedTemplate.render(this, writer);
 	}
@@ -139,12 +135,10 @@ public class Template extends DataProvider {
 	 * Parses the template and creates {@link Part}s of the input.
 	 *
 	 * @return The list of parts created from the template’s {@link #input}
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 * @throws TemplateException
 	 *             if the template can not be parsed correctly
 	 */
-	private Part extractParts() throws IOException, TemplateException {
+	private Part extractParts() throws TemplateException {
 		BufferedReader bufferedInputReader;
 		if (input instanceof BufferedReader) {
 			bufferedInputReader = (BufferedReader) input;
@@ -165,7 +159,12 @@ public class Template extends DataProvider {
 		boolean inSingleQuotes = false;
 		boolean inDoubleQuotes = false;
 		while (true) {
-			int nextCharacter = bufferedInputReader.read();
+			int nextCharacter;
+			try {
+				nextCharacter = bufferedInputReader.read();
+			} catch (IOException ioe1) {
+				throw new TemplateException("Can not read template.", ioe1);
+			}
 			if (nextCharacter == -1) {
 				break;
 			}

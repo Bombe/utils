@@ -44,8 +44,12 @@ class TextPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws IOException {
-		writer.write(text);
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		try {
+			writer.write(text);
+		} catch (IOException ioe1) {
+			throw new TemplateException("Can not render part.", ioe1);
+		}
 	}
 
 }

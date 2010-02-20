@@ -45,8 +45,12 @@ class DataProviderPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
-		writer.write(String.valueOf(dataProvider.getData(name)));
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		try {
+			writer.write(String.valueOf(dataProvider.getData(name)));
+		} catch (IOException ioe1) {
+			throw new TemplateException("Can not render part.", ioe1);
+		}
 	}
 
 }

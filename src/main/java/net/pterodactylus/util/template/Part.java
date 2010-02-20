@@ -17,7 +17,6 @@
 
 package net.pterodactylus.util.template;
 
-import java.io.IOException;
 import java.io.Writer;
 
 /**
@@ -35,11 +34,9 @@ abstract class Part {
 	 *            The data provider for the part
 	 * @param writer
 	 *            The writer to render the part to
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 * @throws TemplateException
 	 *             if a template variable can not be parsed
 	 */
-	public abstract void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException;
+	public abstract void render(DataProvider dataProvider, Writer writer) throws TemplateException;
 
 }

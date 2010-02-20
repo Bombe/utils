@@ -59,12 +59,16 @@ public class FilteredTextPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		String output = text;
 		for (Filter filter : filters) {
 			output = filter.format(output, allFilterParameters.get(filter));
 		}
-		writer.write(output);
+		try {
+			writer.write(output);
+		} catch (IOException ioe1) {
+			throw new TemplateException("Can not render part.", ioe1);
+		}
 	}
 
 }

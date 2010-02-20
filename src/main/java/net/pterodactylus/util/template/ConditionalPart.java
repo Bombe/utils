@@ -17,7 +17,6 @@
 
 package net.pterodactylus.util.template;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,7 +47,7 @@ class ConditionalPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		if (condition.isAllowed(dataProvider)) {
 			super.render(dataProvider, writer);
 		}

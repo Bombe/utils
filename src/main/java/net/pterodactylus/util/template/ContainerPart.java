@@ -17,7 +17,6 @@
 
 package net.pterodactylus.util.template;
 
-import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -64,7 +63,7 @@ class ContainerPart extends Part implements Iterable<Part> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		for (Part part : parts) {
 			part.render(dataProvider, writer);
 		}
