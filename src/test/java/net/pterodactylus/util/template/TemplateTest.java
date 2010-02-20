@@ -505,6 +505,24 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("A: (b)", output);
+
+		templateString = "A: <%if a>(a)<%else>wrong<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		try {
+			template = new Template(new StringReader(templateString));
+			fail();
+		} catch (TemplateException te1) {
+			/* ignore. */
+		}
+
+		templateString = "A: <%if a>(a)<%elseif b>(b)<%else>wrong<%elseif c>(c)<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		try {
+			template = new Template(new StringReader(templateString));
+			fail();
+		} catch (TemplateException te1) {
+			/* ignore. */
+		}
 	}
 
 }
