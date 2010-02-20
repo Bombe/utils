@@ -34,25 +34,19 @@ class ContainerPart extends Part implements Iterable<Part> {
 	protected final List<Part> parts = new ArrayList<Part>();
 
 	/**
-	 * Creates a new empty container part
-	 *
-	 * @param dataProvider
-	 *            The part’s data provider
+	 * Creates a new container part that contains the given parts
 	 */
-	public ContainerPart(DataProvider dataProvider) {
-		super(dataProvider);
+	public ContainerPart() {
+		/* do nothing. */
 	}
 
 	/**
-	 * Creates a new container part that contains the given parts
+	 * /** Creates a new container part that contains the given parts
 	 *
-	 * @param dataProvider
-	 *            The part’s data provider
 	 * @param parts
 	 *            The parts the container part contains
 	 */
-	public ContainerPart(DataProvider dataProvider, List<Part> parts) {
-		this(dataProvider);
+	public ContainerPart(List<Part> parts) {
 		this.parts.addAll(parts);
 	}
 
@@ -70,9 +64,9 @@ class ContainerPart extends Part implements Iterable<Part> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		for (Part part : parts) {
-			part.render(writer);
+			part.render(dataProvider, writer);
 		}
 	}
 

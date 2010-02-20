@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 /**
  * Simple template system that is geared towards easy of use and high
@@ -82,7 +81,7 @@ public class Template extends DataProvider {
 	 *             if the template can not be parsed
 	 */
 	public void render(Writer writer) throws IOException, TemplateException {
-		parsedTemplate.render(writer);
+		parsedTemplate.render(this, writer);
 	}
 
 	//
@@ -110,7 +109,6 @@ public class Template extends DataProvider {
 	 * @throws TemplateException
 	 *             if the template can not be parsed correctly
 	 */
-	@SuppressWarnings("synthetic-access")
 	private Part extractParts() throws IOException, TemplateException {
 		BufferedReader bufferedInputReader;
 		if (input instanceof BufferedReader) {
@@ -122,8 +120,7 @@ public class Template extends DataProvider {
 		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
 		Stack<String> lastCollectionName = new Stack<String>();
 		Stack<String> lastLoopName = new Stack<String>();
-		DataProvider dataProvider = new DynamicDataProvider();
-		ContainerPart parts = new ContainerPart(dataProvider);
+		ContainerPart parts = new ContainerPart();
 		StringBuilder currentTextPart = new StringBuilder();
 		boolean gotLeftAngleBracket = false;
 		boolean inAngleBracket = false;
@@ -150,7 +147,7 @@ public class Template extends DataProvider {
 							lastCollectionName.pop();
 							lastLoopName.pop();
 							parts.add(innerParts);
-						} else if (lastFunction.equals("first") || lastFunction.equals("last") || lastFunction.equals("notlast")) {
+						} else if (lastFunction.equals("first") || lastFunction.equals("notfirst") || lastFunction.equals("last") || lastFunction.equals("notlast")) {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
 							parts.add(innerParts);
@@ -169,7 +166,7 @@ public class Template extends DataProvider {
 							loopName = objectNameTokens.nextToken();
 						}
 						partsStack.push(parts);
-						parts = new LoopPart(dataProvider, collectionName, itemName, loopName);
+						parts = new LoopPart(collectionName, itemName, loopName);
 						commandStack.push("foreach");
 						lastCollectionName.push(collectionName);
 						lastLoopName.push(loopName);
@@ -178,14 +175,14 @@ public class Template extends DataProvider {
 							throw new TemplateException("foreachelse is only allowed in foreach");
 						}
 						partsStack.peek().add(parts);
-						parts = new EmptyLoopPart(dataProvider, lastCollectionName.peek());
+						parts = new EmptyLoopPart(lastCollectionName.peek());
 					} else if (function.equals("first")) {
 						if (!"foreach".equals(commandStack.peek())) {
 							throw new TemplateException("first is only allowed in foreach");
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
 
 							@Override
 							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
@@ -193,13 +190,27 @@ public class Template extends DataProvider {
 							}
 						});
 						commandStack.push("first");
+					} else if (function.equals("notfirst")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("notfirst is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return !(Boolean) (dataProvider.getData(loopName + ".first"));
+							}
+						});
+						commandStack.push("notfirst");
 					} else if (function.equals("last")) {
 						if (!"foreach".equals(commandStack.peek())) {
 							throw new TemplateException("last is only allowed in foreach");
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
 
 							@Override
 							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
@@ -213,7 +224,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
 
 							@Override
 							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
@@ -222,8 +233,7 @@ public class Template extends DataProvider {
 						});
 						commandStack.push("notlast");
 					} else if (objectNameTokens.countTokens() == 0) {
-						parts.add(new DataProviderPart(dataProvider, objectName));
-						currentTextPart.setLength(0);
+						parts.add(new DataProviderPart(objectName));
 					} else {
 						throw new TemplateException("unknown directive: " + function);
 					}
@@ -235,8 +245,10 @@ public class Template extends DataProvider {
 			if (gotLeftAngleBracket) {
 				if (nextCharacter == '%') {
 					inAngleBracket = true;
-					parts.add(new TextPart(currentTextPart.toString()));
-					currentTextPart.setLength(0);
+					if (currentTextPart.length() > 0) {
+						parts.add(new TextPart(currentTextPart.toString()));
+						currentTextPart.setLength(0);
+					}
 				} else {
 					currentTextPart.append('<').append((char) nextCharacter);
 				}
@@ -256,52 +268,6 @@ public class Template extends DataProvider {
 			throw new TemplateException("Unbalanced template.");
 		}
 		return parts;
-	}
-
-	/**
-	 * {@link DataProvider} implementation that always uses the {@link Template}
-	 * as data provider to allow rendering a template multiple times after
-	 * changing the template variables.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class DynamicDataProvider extends DataProvider {
-
-		/** Accessors. */
-		private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public void addAccessor(Class<?> clazz, Accessor accessor) {
-			classAccessors.put(clazz, accessor);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		protected Accessor findAccessor(Class<?> clazz) {
-			if (classAccessors.containsKey(clazz)) {
-				return classAccessors.get(clazz);
-			}
-			for (Entry<Class<?>, Accessor> classAccessor : classAccessors.entrySet()) {
-				if (classAccessor.getKey().isAssignableFrom(clazz)) {
-					return classAccessor.getValue();
-				}
-			}
-			return Template.this.findAccessor(clazz);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object retrieveData(String name) {
-			return Template.this.retrieveData(name);
-		}
-
 	}
 
 }

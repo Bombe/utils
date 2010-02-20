@@ -37,13 +37,10 @@ class EmptyLoopPart extends ContainerPart {
 	/**
 	 * Creates a new empty loop part.
 	 *
-	 * @param dataProvider
-	 *            The part’s data provider
 	 * @param collectionName
 	 *            The name of the collection
 	 */
-	public EmptyLoopPart(DataProvider dataProvider, String collectionName) {
-		super(dataProvider);
+	public EmptyLoopPart(String collectionName) {
 		this.collectionName = collectionName;
 	}
 
@@ -51,12 +48,12 @@ class EmptyLoopPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		if (!collection.isEmpty()) {
 			return;
 		}
-		super.render(writer);
+		super.render(dataProvider, writer);
 	}
 
 }

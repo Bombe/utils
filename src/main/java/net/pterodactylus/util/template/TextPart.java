@@ -37,7 +37,6 @@ class TextPart extends Part {
 	 *            The text of the part
 	 */
 	public TextPart(String text) {
-		super(null);
 		this.text = text;
 	}
 
@@ -45,7 +44,7 @@ class TextPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException {
 		writer.write(text);
 	}
 

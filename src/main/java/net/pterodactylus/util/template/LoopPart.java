@@ -46,22 +46,18 @@ class LoopPart extends ContainerPart {
 	/**
 	 * Creates a new loop part.
 	 *
-	 * @param dataProvider
-	 *            The part’s data provider
 	 * @param collectionName
 	 *            The name of the collection
 	 * @param itemName
 	 *            The name under which to store the current item
 	 */
-	public LoopPart(DataProvider dataProvider, String collectionName, String itemName) {
-		this(dataProvider, collectionName, itemName, "loop");
+	public LoopPart(String collectionName, String itemName) {
+		this(collectionName, itemName, "loop");
 	}
 
 	/**
 	 * Creates a new loop part.
 	 *
-	 * @param dataProvider
-	 *            The part’s data provider
 	 * @param collectionName
 	 *            The name of the collection
 	 * @param itemName
@@ -69,8 +65,7 @@ class LoopPart extends ContainerPart {
 	 * @param loopName
 	 *            The name of the loop
 	 */
-	public LoopPart(DataProvider dataProvider, String collectionName, String itemName, String loopName) {
-		super(dataProvider);
+	public LoopPart(String collectionName, String itemName, String loopName) {
 		this.collectionName = collectionName;
 		this.itemName = itemName;
 		this.loopName = loopName;
@@ -82,7 +77,7 @@ class LoopPart extends ContainerPart {
 	 * @throws TemplateException
 	 */
 	@Override
-	public void render(Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		if (collection.isEmpty()) {
 			return;
@@ -95,8 +90,7 @@ class LoopPart extends ContainerPart {
 			DataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
 			loopDataProvider.addAccessor(LoopStructure.class, LOOP_STRUCTURE_ACCESSOR);
 			for (Part part : parts) {
-				part.setDataProvider(loopDataProvider);
-				part.render(writer);
+				part.render(loopDataProvider, writer);
 			}
 			loopStructure.incCount();
 		}

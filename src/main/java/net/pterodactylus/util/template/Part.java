@@ -28,32 +28,11 @@ import java.io.Writer;
  */
 abstract class Part {
 
-	/** The part’s data provider. */
-	protected DataProvider dataProvider;
-
-	/**
-	 * Creates a new part.
-	 *
-	 * @param dataProvider
-	 *            The part’s data provider
-	 */
-	protected Part(DataProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
-
-	/**
-	 * Sets the data provider of this part.
-	 *
-	 * @param dataProvider
-	 *            The part’s data provider
-	 */
-	protected void setDataProvider(DataProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
-
 	/**
 	 * Renders this part.
 	 *
+	 * @param dataProvider
+	 *            The data provider for the part
 	 * @param writer
 	 *            The writer to render the part to
 	 * @throws IOException
@@ -61,6 +40,6 @@ abstract class Part {
 	 * @throws TemplateException
 	 *             if a template variable can not be parsed
 	 */
-	public abstract void render(Writer writer) throws IOException, TemplateException;
+	public abstract void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException;
 
 }

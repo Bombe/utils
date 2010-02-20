@@ -34,13 +34,11 @@ class ConditionalPart extends ContainerPart {
 	/**
 	 * Creates a new conditional part.
 	 *
-	 * @param dataProvider
-	 *            The part’s data provider
 	 * @param condition
 	 *            The condition
 	 */
-	public ConditionalPart(DataProvider dataProvider, Condition condition) {
-		super(dataProvider);
+	public ConditionalPart(Condition condition) {
+		super();
 		this.condition = condition;
 	}
 
@@ -48,9 +46,9 @@ class ConditionalPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		if (condition.isAllowed(dataProvider)) {
-			super.render(writer);
+			super.render(dataProvider, writer);
 		}
 	}
 

@@ -34,13 +34,10 @@ class DataProviderPart extends Part {
 	/**
 	 * Creates a new data provider part.
 	 *
-	 * @param dataProvider
-	 *            The data provider for this part
 	 * @param name
 	 *            The name of the object
 	 */
-	public DataProviderPart(DataProvider dataProvider, String name) {
-		super(dataProvider);
+	public DataProviderPart(String name) {
 		this.name = name;
 	}
 
@@ -48,7 +45,7 @@ class DataProviderPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException, TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		writer.write(String.valueOf(dataProvider.getData(name)));
 	}
 
