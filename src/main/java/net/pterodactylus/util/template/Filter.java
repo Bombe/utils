@@ -40,6 +40,26 @@ public interface Filter {
 	public String format(Object data, Map<String, String> parameters);
 
 	/**
+	 * {@link Filter} implementation that replaces parts of a value.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class ReplaceFilter implements Filter {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String format(Object data, Map<String, String> parameters) {
+			String input = String.valueOf(data);
+			String needle = parameters.get("needle");
+			String replacement = parameters.get("replacement");
+			return input.replace(needle, replacement);
+		}
+
+	}
+
+	/**
 	 * Filters HTML by replacing all characters that match a defined HTML entity
 	 * by that entity. Unknown characters that are outside of the US-ASCII range
 	 * (0 to 127) are encoded using the {@code &amp;#1234;} syntax.
