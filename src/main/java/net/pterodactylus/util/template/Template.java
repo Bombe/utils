@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -377,18 +378,17 @@ public class Template extends DataProvider {
 							itemName = function.substring(1);
 							directText = true;
 						}
-						Map<Filter, Map<String, String>> allFilterParameters = new HashMap<Filter, Map<String, String>>();
+						Map<Filter, Map<String, String>> allFilterParameters = new LinkedHashMap<Filter, Map<String, String>>();
 						if (tokens.hasNext() && (tokens.next() != null)) {
 							throw new TemplateException("expected \"|\" token");
 						}
-						List<Filter> wantedFilters = new ArrayList<Filter>();
 						while (tokens.hasNext()) {
 							String filterName = tokens.next();
 							Filter filter = filters.get(filterName);
 							if (filter == null) {
 								throw new TemplateException("unknown filter: " + filterName);
 							}
-							wantedFilters.add(filter);
+							filter = new FilterWrapper(filter);
 							System.out.println("added filter: " + filterName);
 							Map<String, String> filterParameters = new HashMap<String, String>();
 							while (tokens.hasNext()) {
@@ -409,9 +409,9 @@ public class Template extends DataProvider {
 						}
 						System.out.println("itemName: " + itemName);
 						if (directText) {
-							parts.add(new FilteredTextPart(itemName, wantedFilters, allFilterParameters));
+							parts.add(new FilteredTextPart(itemName, allFilterParameters.keySet(), allFilterParameters));
 						} else {
-							parts.add(new FilteredPart(itemName, wantedFilters, allFilterParameters));
+							parts.add(new FilteredPart(itemName, allFilterParameters.keySet(), allFilterParameters));
 						}
 					}
 				} else {
@@ -506,6 +506,37 @@ public class Template extends DataProvider {
 			expressions.add(currentExpression.toString());
 		}
 		return expressions;
+	}
+
+	/**
+	 * Wrapper around a {@link Filter} that allows adding several instances of a
+	 * filter to a single tag.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class FilterWrapper implements Filter {
+
+		/** The original filter. */
+		private final Filter originalFilter;
+
+		/**
+		 * Creates a new filter wrapper.
+		 *
+		 * @param originalFilter
+		 *            The filter to wrap
+		 */
+		public FilterWrapper(Filter originalFilter) {
+			this.originalFilter = originalFilter;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String format(Object data, Map<String, String> parameters) {
+			return originalFilter.format(data, parameters);
+		}
+
 	}
 
 }
