@@ -381,12 +381,14 @@ public class Template extends DataProvider {
 						if (tokens.hasNext() && (tokens.next() != null)) {
 							throw new TemplateException("expected \"|\" token");
 						}
+						List<Filter> wantedFilters = new ArrayList<Filter>();
 						while (tokens.hasNext()) {
 							String filterName = tokens.next();
 							Filter filter = filters.get(filterName);
 							if (filter == null) {
 								throw new TemplateException("unknown filter: " + filterName);
 							}
+							wantedFilters.add(filter);
 							System.out.println("added filter: " + filterName);
 							Map<String, String> filterParameters = new HashMap<String, String>();
 							while (tokens.hasNext()) {
@@ -407,9 +409,9 @@ public class Template extends DataProvider {
 						}
 						System.out.println("itemName: " + itemName);
 						if (directText) {
-							parts.add(new FilteredTextPart(itemName, allFilterParameters.keySet(), allFilterParameters));
+							parts.add(new FilteredTextPart(itemName, wantedFilters, allFilterParameters));
 						} else {
-							parts.add(new FilteredPart(itemName, allFilterParameters.keySet(), allFilterParameters));
+							parts.add(new FilteredPart(itemName, wantedFilters, allFilterParameters));
 						}
 					}
 				} else {
