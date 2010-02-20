@@ -21,10 +21,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
+
+import net.pterodactylus.util.template.ConditionalPart.AndCondition;
+import net.pterodactylus.util.template.ConditionalPart.Condition;
+import net.pterodactylus.util.template.ConditionalPart.DataCondition;
+import net.pterodactylus.util.template.ConditionalPart.NotCondition;
+import net.pterodactylus.util.template.ConditionalPart.OrCondition;
 
 /**
  * Simple template system that is geared towards easy of use and high
@@ -120,6 +129,9 @@ public class Template extends DataProvider {
 		Stack<ContainerPart> partsStack = new Stack<ContainerPart>();
 		Stack<String> lastCollectionName = new Stack<String>();
 		Stack<String> lastLoopName = new Stack<String>();
+		Stack<Condition> lastCondition = new Stack<Condition>();
+		Stack<List<Condition>> lastConditions = new Stack<List<Condition>>();
+		Stack<String> lastIfCommand = new Stack<String>();
 		ContainerPart parts = new ContainerPart();
 		StringBuilder currentTextPart = new StringBuilder();
 		boolean gotLeftAngleBracket = false;
@@ -150,6 +162,11 @@ public class Template extends DataProvider {
 						} else if (lastFunction.equals("first") || lastFunction.equals("notfirst") || lastFunction.equals("last") || lastFunction.equals("notlast")) {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
+							parts.add(innerParts);
+						} else if (lastFunction.equals("if")) {
+							ContainerPart innerParts = parts;
+							parts = partsStack.pop();
+							lastCondition.pop();
 							parts.add(innerParts);
 						}
 					} else if (function.equals("foreach")) {
@@ -232,6 +249,74 @@ public class Template extends DataProvider {
 							}
 						});
 						commandStack.push("notlast");
+					} else if (function.equals("if")) {
+						if (!objectNameTokens.hasMoreTokens()) {
+							throw new TemplateException("if requires one or two parameters");
+						}
+						String itemName = objectNameTokens.nextToken();
+						boolean invert = false;
+						if (itemName.equals("!")) {
+							invert = true;
+							if (!objectNameTokens.hasMoreTokens()) {
+								throw new TemplateException("if ! requires one parameter");
+							}
+							itemName = objectNameTokens.nextToken();
+						} else {
+							if (itemName.startsWith("!")) {
+								invert = true;
+								itemName = itemName.substring(1);
+							}
+						}
+						partsStack.push(parts);
+						Condition condition = new DataCondition(itemName, invert);
+						parts = new ConditionalPart(condition);
+						commandStack.push("if");
+						lastCondition.push(condition);
+						lastConditions.push(new ArrayList<Condition>(Arrays.asList(condition)));
+						lastIfCommand.push("if");
+					} else if (function.equals("else")) {
+						if (!"if".equals(commandStack.peek())) {
+							throw new TemplateException("else is only allowed in if");
+						}
+						if (!"if".equals(lastIfCommand.peek()) && !"elseif".equals(lastIfCommand.peek())) {
+							throw new TemplateException("else may only follow if or elseif");
+						}
+						partsStack.peek().add(parts);
+						Condition condition = new NotCondition(new OrCondition(lastConditions.pop()));
+						parts = new ConditionalPart(condition);
+						lastIfCommand.pop();
+						lastIfCommand.push("else");
+					} else if (function.equals("elseif")) {
+						if (!"if".equals(commandStack.peek())) {
+							throw new TemplateException("elseif is only allowed in if");
+						}
+						if (!"if".equals(lastIfCommand.peek()) && !"elseif".equals(lastIfCommand.peek())) {
+							throw new TemplateException("elseif is only allowed after if or elseif");
+						}
+						if (!objectNameTokens.hasMoreTokens()) {
+							throw new TemplateException("elseif requires one or two parameters");
+						}
+						String itemName = objectNameTokens.nextToken();
+						boolean invert = false;
+						if (itemName.equals("!")) {
+							invert = true;
+							if (!objectNameTokens.hasMoreTokens()) {
+								throw new TemplateException("if ! requires one parameter");
+							}
+							itemName = objectNameTokens.nextToken();
+						} else {
+							if (itemName.startsWith("!")) {
+								invert = true;
+								itemName = itemName.substring(1);
+							}
+						}
+						partsStack.peek().add(parts);
+						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), new DataCondition(itemName, invert));
+						parts = new ConditionalPart(condition);
+						lastCondition.push(condition);
+						lastConditions.peek().add(condition);
+						lastIfCommand.pop();
+						lastIfCommand.push("elseif");
 					} else if (objectNameTokens.countTokens() == 0) {
 						parts.add(new DataProviderPart(objectName));
 					} else {
