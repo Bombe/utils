@@ -367,21 +367,50 @@ public class TemplateTest extends TestCase {
 	}
 
 	/**
-	 * Tests for string templates that contain a collection and the <%between>
+	 * Tests for string templates that contain a collection and the <%notfirst>
 	 * directive.
 	 *
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 * @throws TemplateException
 	 */
-	public void testStringTemplatesWithCollectionBetween() throws IOException, TemplateException {
+	public void testStringTemplatesWithCollectionNotFirst() throws IOException, TemplateException {
 		Template template;
 		String templateString;
 		StringWriter outputWriter;
 		String output;
 		Collection<Object> collection;
 
-		templateString = "List: <%foreach items item><%item><%between>, <%/between><%last>.<%/last><%/foreach>";
+		templateString = "List: <%foreach items item><%first><%item><%/first><%notfirst>, <%item><%/notfirst><%/foreach>.";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add(1);
+		collection.add(2);
+		collection.add(3);
+		collection.add(4);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("List: 1, 2, 3, 4.", output);
+	}
+
+	/**
+	 * Tests for string templates that contain a collection and the <%notlast>
+	 * directive.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithCollectionNotLast() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+
+		templateString = "List: <%foreach items item><%item><%notlast>, <%/notlast><%last>.<%/last><%/foreach>";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
 		collection = new ArrayList<Object>();
