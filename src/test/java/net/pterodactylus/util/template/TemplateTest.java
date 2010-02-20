@@ -585,6 +585,14 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("<bar>", output);
+
+		templateString = "test <%= test | replace needle='t' replacement='b' | replace needle='sb' replacement='ao'> test";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("test beao test", output);
 	}
 
 	public void testTagParser() {
