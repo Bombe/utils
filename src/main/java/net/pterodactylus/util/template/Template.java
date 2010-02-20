@@ -50,21 +50,19 @@ public class Template extends DataProvider {
 	private final Reader input;
 
 	/** The parsed template. */
-	private final Part parsedTemplate;
+	private Part parsedTemplate;
+
+	/** Filters for the template. */
+	private final Map<String, Filter> filters = new HashMap<String, Filter>();
 
 	/**
 	 * Creates a new template from the given input.
 	 *
 	 * @param input
 	 *            The template’s input source
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 * @throws TemplateException
-	 *             if the template can not be parsed correctly
 	 */
-	public Template(Reader input) throws IOException, TemplateException {
+	public Template(Reader input) {
 		this.input = input;
-		parsedTemplate = extractParts();
 	}
 
 	/**
@@ -89,7 +87,10 @@ public class Template extends DataProvider {
 	 * @throws TemplateException
 	 *             if the template can not be parsed
 	 */
-	public void render(Writer writer) throws IOException, TemplateException {
+	public synchronized void render(Writer writer) throws IOException, TemplateException {
+		if (parsedTemplate == null) {
+			parsedTemplate = extractParts();
+		}
 		parsedTemplate.render(this, writer);
 	}
 

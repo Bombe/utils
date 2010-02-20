@@ -510,6 +510,7 @@ public class TemplateTest extends TestCase {
 		outputWriter = new StringWriter();
 		try {
 			template = new Template(new StringReader(templateString));
+			template.render(outputWriter);
 			fail();
 		} catch (TemplateException te1) {
 			/* ignore. */
@@ -519,6 +520,7 @@ public class TemplateTest extends TestCase {
 		outputWriter = new StringWriter();
 		try {
 			template = new Template(new StringReader(templateString));
+			template.render(outputWriter);
 			fail();
 		} catch (TemplateException te1) {
 			/* ignore. */
