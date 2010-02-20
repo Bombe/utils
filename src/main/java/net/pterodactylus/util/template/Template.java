@@ -198,18 +198,32 @@ public class Template extends DataProvider {
 						StringTokenizer filterTokens = new StringTokenizer(objectName.substring(1).trim(), "|");
 						String itemName = filterTokens.nextToken().trim();
 						List<Filter> wantedFilters = new ArrayList<Filter>();
+						Map<Filter, Map<String, String>> allFilterParameters = new HashMap<Filter, Map<String, String>>();
 						while (filterTokens.hasMoreTokens()) {
-							String filterName = filterTokens.nextToken().trim();
+							String filterToken = filterTokens.nextToken().trim();
+							StringTokenizer filterParameterTokens = new StringTokenizer(filterToken, " ");
+							String filterName = filterParameterTokens.nextToken();
+							Map<String, String> filterParameters = new HashMap<String, String>();
+							while (filterParameterTokens.hasMoreTokens()) {
+								String parameterToken = filterParameterTokens.nextToken();
+								int equals = parameterToken.indexOf('=');
+								if (equals > -1) {
+									String key = parameterToken.substring(0, equals).trim();
+									String value = parameterToken.substring(equals + 1).trim();
+									filterParameters.put(key, value);
+								}
+							}
 							Filter filter = filters.get(filterName);
 							if (filter == null) {
 								throw new TemplateException("unknown filter: " + filterName);
 							}
+							allFilterParameters.put(filter, filterParameters);
 							wantedFilters.add(filter);
 						}
 						if (itemName.startsWith("\"") && itemName.endsWith("\"")) {
-							parts.add(new FilteredTextPart(itemName.substring(1, itemName.length() - 1), wantedFilters));
+							parts.add(new FilteredTextPart(itemName.substring(1, itemName.length() - 1), wantedFilters, allFilterParameters));
 						} else {
-							parts.add(new FilteredPart(itemName, wantedFilters));
+							parts.add(new FilteredPart(itemName, wantedFilters, allFilterParameters));
 						}
 					} else if (function.equals("foreach")) {
 						if (!objectNameTokens.hasMoreTokens()) {

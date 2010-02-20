@@ -33,9 +33,11 @@ public interface Filter {
 	 *
 	 * @param data
 	 *            The data to format
+	 * @param parameters
+	 *            Parameters for the filter
 	 * @return The formatted data
 	 */
-	public String format(Object data);
+	public String format(Object data, Map<String, String> parameters);
 
 	/**
 	 * Filters HTML by replacing all characters that match a defined HTML entity
@@ -307,7 +309,7 @@ public interface Filter {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Object data) {
+		public String format(Object data, Map<String, String> parameters) {
 			StringBuilder htmlOutput = new StringBuilder();
 			for (char c : ((String) data).toCharArray()) {
 				if (htmlEntities.containsKey(c)) {

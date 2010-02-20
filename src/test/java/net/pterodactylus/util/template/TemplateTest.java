@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import junit.framework.TestCase;
@@ -583,7 +584,7 @@ public class TemplateTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Object data) {
+		public String format(Object data, Map<String, String> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
 		}
 

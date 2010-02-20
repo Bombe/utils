@@ -19,8 +19,8 @@ package net.pterodactylus.util.template;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * {@link Part} implementation that runs a predefined text through one or more
@@ -36,17 +36,8 @@ public class FilteredTextPart extends Part {
 	/** The filters to apply. */
 	private final Collection<Filter> filters;
 
-	/**
-	 * Creates a new filtered part.
-	 *
-	 * @param text
-	 *            The text to filter
-	 * @param filters
-	 *            The filters to apply
-	 */
-	public FilteredTextPart(String text, Filter... filters) {
-		this(text, Arrays.asList(filters));
-	}
+	/** Parameters for all filters. */
+	private final Map<Filter, Map<String, String>> allFilterParameters;
 
 	/**
 	 * Creates a new filtered part.
@@ -55,10 +46,13 @@ public class FilteredTextPart extends Part {
 	 *            The text to filter
 	 * @param filters
 	 *            The filters to apply
+	 * @param allFilterParameters
+	 *            Parameters for all filters
 	 */
-	public FilteredTextPart(String text, Collection<Filter> filters) {
+	public FilteredTextPart(String text, Collection<Filter> filters, Map<Filter, Map<String, String>> allFilterParameters) {
 		this.text = text;
 		this.filters = filters;
+		this.allFilterParameters = allFilterParameters;
 	}
 
 	/**
@@ -68,7 +62,7 @@ public class FilteredTextPart extends Part {
 	public void render(DataProvider dataProvider, Writer writer) throws IOException, TemplateException {
 		String output = text;
 		for (Filter filter : filters) {
-			output = filter.format(output);
+			output = filter.format(output, allFilterParameters.get(filter));
 		}
 		writer.write(output);
 	}

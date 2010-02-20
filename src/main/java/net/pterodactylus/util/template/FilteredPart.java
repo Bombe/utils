@@ -19,8 +19,8 @@ package net.pterodactylus.util.template;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * {@link Part} implementation that runs the output of another part through one
@@ -36,17 +36,8 @@ public class FilteredPart extends Part {
 	/** The filters to apply. */
 	private final Collection<Filter> filters;
 
-	/**
-	 * Creates a new filtered part.
-	 *
-	 * @param name
-	 *            The name of the data object
-	 * @param filters
-	 *            The filters to apply
-	 */
-	public FilteredPart(String name, Filter... filters) {
-		this(name, Arrays.asList(filters));
-	}
+	/** Parameters for all filters. */
+	private final Map<Filter, Map<String, String>> allFilterParameters;
 
 	/**
 	 * Creates a new filtered part.
@@ -55,10 +46,13 @@ public class FilteredPart extends Part {
 	 *            The name of the data object
 	 * @param filters
 	 *            The filters to apply
+	 * @param allFilterParameters
+	 *            All filters’ parameters
 	 */
-	public FilteredPart(String name, Collection<Filter> filters) {
+	public FilteredPart(String name, Collection<Filter> filters, Map<Filter, Map<String, String>> allFilterParameters) {
 		this.name = name;
 		this.filters = filters;
+		this.allFilterParameters = allFilterParameters;
 	}
 
 	/**
@@ -69,7 +63,7 @@ public class FilteredPart extends Part {
 		Object data = dataProvider.getData(name);
 		String output = "";
 		for (Filter filter : filters) {
-			data = output = filter.format(data);
+			data = output = filter.format(data, allFilterParameters.get(filter));
 		}
 		writer.write(output);
 	}
