@@ -29,7 +29,7 @@ import java.util.Collection;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class EmptyLoopPart extends ContainerPart {
+class EmptyLoopPart extends ContainerPart {
 
 	/** The name of the collection. */
 	private final String collectionName;
