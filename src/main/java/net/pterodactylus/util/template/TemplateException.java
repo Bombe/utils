@@ -24,7 +24,7 @@ package net.pterodactylus.util.template;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplateException extends Exception {
+public class TemplateException extends RuntimeException {
 
 	/**
 	 * Creates a new template exception.
