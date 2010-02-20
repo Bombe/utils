@@ -194,7 +194,11 @@ public class Template extends DataProvider {
 							}
 							wantedFilters.add(filter);
 						}
-						parts.add(new FilteredPart(itemName, wantedFilters));
+						if (itemName.startsWith("\"") && itemName.endsWith("\"")) {
+							parts.add(new FilteredTextPart(itemName.substring(1, itemName.length() - 1), wantedFilters));
+						} else {
+							parts.add(new FilteredPart(itemName, wantedFilters));
+						}
 					} else if (function.equals("foreach")) {
 						if (!objectNameTokens.hasMoreTokens()) {
 							throw new TemplateException("foreach requires at least one parameter");
