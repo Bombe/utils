@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import junit.framework.TestCase;
 
@@ -310,6 +311,59 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("This template repeats: first item: 0 - item: 1 - end", output);
+	}
+
+	/**
+	 * Tests for string templates that uses a custom accessor.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 * @throws TemplateException
+	 */
+	public void testStringTemplatesWithAccessors() throws IOException, TemplateException {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+		Accessor callableAccessor = new Accessor() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			@SuppressWarnings("unchecked")
+			public Object get(Object object, String member) {
+				try {
+					return ((Callable<String>) object).call();
+				} catch (Exception e1) {
+					/* ignore. */
+				}
+				return null;
+			}
+		};
+
+		templateString = "List: <%foreach items item><%item.call> <%/foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addAccessor(Callable.class, callableAccessor);
+		collection = new ArrayList<Object>();
+		collection.add(new Callable<String>() {
+
+			public String call() {
+				return "Yay!";
+			}
+		});
+		collection.add(new Callable<String>() {
+
+			public String call() {
+				return "Hooray!";
+			}
+		});
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("List: Yay! Hooray! ", output);
 	}
 
 }
