@@ -567,6 +567,14 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("4 ([java.lang.String@-587672038])", output);
+
+		templateString = "<%= \"foo\" |test>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("test", new TestFilter());
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("[java.lang.String@101574]", output);
 	}
 
 	private static class TestFilter implements Filter {
