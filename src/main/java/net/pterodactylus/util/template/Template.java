@@ -40,9 +40,6 @@ public class Template extends DataProvider {
 	/** The input of the template. */
 	private final Reader input;
 
-	/** The data provider of this template. */
-	private DataProvider dataProvider = this;
-
 	/** The parsed template. */
 	private final Part parsedTemplate;
 
@@ -259,9 +256,8 @@ public class Template extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		@SuppressWarnings("synthetic-access")
 		public Object retrieveData(String name) {
-			return dataProvider.retrieveData(name);
+			return Template.this.retrieveData(name);
 		}
 
 	}
