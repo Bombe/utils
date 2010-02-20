@@ -78,6 +78,18 @@ public class Template extends DataProvider {
 	}
 
 	/**
+	 * Adds a filter with the given name.
+	 *
+	 * @param name
+	 *            The name of the filter
+	 * @param filter
+	 *            The filter
+	 */
+	public void addFilter(String name, Filter filter) {
+		filters.put(name, filter);
+	}
+
+	/**
 	 * Renders the template to the given writer.
 	 *
 	 * @param writer
@@ -170,6 +182,19 @@ public class Template extends DataProvider {
 							lastCondition.pop();
 							parts.add(innerParts);
 						}
+					} else if (function.startsWith("=")) {
+						StringTokenizer filterTokens = new StringTokenizer(objectName.substring(1).trim(), "|");
+						String itemName = filterTokens.nextToken().trim();
+						List<Filter> wantedFilters = new ArrayList<Filter>();
+						while (filterTokens.hasMoreTokens()) {
+							String filterName = filterTokens.nextToken().trim();
+							Filter filter = filters.get(filterName);
+							if (filter == null) {
+								throw new TemplateException("unknown filter: " + filterName);
+							}
+							wantedFilters.add(filter);
+						}
+						parts.add(new FilteredPart(itemName, wantedFilters));
 					} else if (function.equals("foreach")) {
 						if (!objectNameTokens.hasMoreTokens()) {
 							throw new TemplateException("foreach requires at least one parameter");
