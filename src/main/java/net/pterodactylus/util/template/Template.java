@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 /**
  * Simple template system that is geared towards easy of use and high
@@ -245,12 +246,39 @@ public class Template extends DataProvider {
 
 	/**
 	 * {@link DataProvider} implementation that always uses the {@link Template}
-	 * ’s current {@link Template#dataProvider} to allow rendering a template
-	 * multiple times after changing the data provider.
+	 * as data provider to allow rendering a template multiple times after
+	 * changing the template variables.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private class DynamicDataProvider extends DataProvider {
+
+		/** Accessors. */
+		private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void addAccessor(Class<?> clazz, Accessor accessor) {
+			classAccessors.put(clazz, accessor);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Accessor findAccessor(Class<?> clazz) {
+			if (classAccessors.containsKey(clazz)) {
+				return classAccessors.get(clazz);
+			}
+			for (Entry<Class<?>, Accessor> classAccessor : classAccessors.entrySet()) {
+				if (classAccessor.getKey().isAssignableFrom(clazz)) {
+					return classAccessor.getValue();
+				}
+			}
+			return Template.this.findAccessor(clazz);
+		}
 
 		/**
 		 * {@inheritDoc}
