@@ -189,7 +189,6 @@ public class Template extends DataProvider {
 					inAngleBracket = false;
 					String tagContent = currentTextPart.toString().trim();
 					currentTextPart.setLength(0);
-					System.out.println("tag content: " + tagContent);
 					Iterator<String> tokens = parseTag(tagContent).iterator();
 					if (!tokens.hasNext()) {
 						throw new TemplateException("empty tag found");
@@ -388,7 +387,6 @@ public class Template extends DataProvider {
 								throw new TemplateException("unknown filter: " + filterName);
 							}
 							filter = new FilterWrapper(filter);
-							System.out.println("added filter: " + filterName);
 							Map<String, String> filterParameters = new HashMap<String, String>();
 							while (tokens.hasNext()) {
 								String parameterToken = tokens.next();
@@ -403,10 +401,8 @@ public class Template extends DataProvider {
 								String value = parameterToken.substring(equals + 1);
 								filterParameters.put(key, value);
 							}
-							System.out.println("parameters: " + filterParameters);
 							allFilterParameters.put(filter, filterParameters);
 						}
-						System.out.println("itemName: " + itemName);
 						if (directText) {
 							parts.add(new FilteredTextPart(itemName, allFilterParameters.keySet(), allFilterParameters));
 						} else {
