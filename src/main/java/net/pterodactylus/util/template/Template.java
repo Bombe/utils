@@ -24,10 +24,10 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 import net.pterodactylus.util.template.ConditionalPart.AndCondition;
 import net.pterodactylus.util.template.ConditionalPart.Condition;
@@ -161,18 +161,40 @@ public class Template extends DataProvider {
 		StringBuilder currentTextPart = new StringBuilder();
 		boolean gotLeftAngleBracket = false;
 		boolean inAngleBracket = false;
+		boolean inSingleQuotes = false;
+		boolean inDoubleQuotes = false;
 		while (true) {
 			int nextCharacter = bufferedInputReader.read();
 			if (nextCharacter == -1) {
 				break;
 			}
 			if (inAngleBracket) {
-				if (nextCharacter == '>') {
+				if (inSingleQuotes) {
+					if (nextCharacter == '\'') {
+						inSingleQuotes = false;
+					}
+					currentTextPart.append((char) nextCharacter);
+				} else if (inDoubleQuotes) {
+					if (nextCharacter == '"') {
+						inDoubleQuotes = false;
+					}
+					currentTextPart.append((char) nextCharacter);
+				} else if (nextCharacter == '\'') {
+					inSingleQuotes = true;
+					currentTextPart.append((char) nextCharacter);
+				} else if (nextCharacter == '"') {
+					inDoubleQuotes = true;
+					currentTextPart.append((char) nextCharacter);
+				} else if (nextCharacter == '>') {
 					inAngleBracket = false;
-					String objectName = currentTextPart.toString().trim();
+					String tagContent = currentTextPart.toString().trim();
 					currentTextPart.setLength(0);
-					StringTokenizer objectNameTokens = new StringTokenizer(objectName);
-					String function = objectNameTokens.nextToken();
+					System.out.println("tag content: " + tagContent);
+					Iterator<String> tokens = parseTag(tagContent).iterator();
+					if (!tokens.hasNext()) {
+						throw new TemplateException("empty tag found");
+					}
+					String function = tokens.next();
 					if (function.startsWith("/")) {
 						String lastFunction = commandStack.pop();
 						if (!("/" + lastFunction).equals(function)) {
@@ -194,49 +216,18 @@ public class Template extends DataProvider {
 							lastCondition.pop();
 							parts.add(innerParts);
 						}
-					} else if (function.startsWith("=")) {
-						StringTokenizer filterTokens = new StringTokenizer(objectName.substring(1).trim(), "|");
-						String itemName = filterTokens.nextToken().trim();
-						List<Filter> wantedFilters = new ArrayList<Filter>();
-						Map<Filter, Map<String, String>> allFilterParameters = new HashMap<Filter, Map<String, String>>();
-						while (filterTokens.hasMoreTokens()) {
-							String filterToken = filterTokens.nextToken().trim();
-							StringTokenizer filterParameterTokens = new StringTokenizer(filterToken, " ");
-							String filterName = filterParameterTokens.nextToken();
-							Map<String, String> filterParameters = new HashMap<String, String>();
-							while (filterParameterTokens.hasMoreTokens()) {
-								String parameterToken = filterParameterTokens.nextToken();
-								int equals = parameterToken.indexOf('=');
-								if (equals > -1) {
-									String key = parameterToken.substring(0, equals).trim();
-									String value = parameterToken.substring(equals + 1).trim();
-									filterParameters.put(key, value);
-								}
-							}
-							Filter filter = filters.get(filterName);
-							if (filter == null) {
-								throw new TemplateException("unknown filter: " + filterName);
-							}
-							allFilterParameters.put(filter, filterParameters);
-							wantedFilters.add(filter);
-						}
-						if (itemName.startsWith("\"") && itemName.endsWith("\"")) {
-							parts.add(new FilteredTextPart(itemName.substring(1, itemName.length() - 1), wantedFilters, allFilterParameters));
-						} else {
-							parts.add(new FilteredPart(itemName, wantedFilters, allFilterParameters));
-						}
 					} else if (function.equals("foreach")) {
-						if (!objectNameTokens.hasMoreTokens()) {
+						if (!tokens.hasNext()) {
 							throw new TemplateException("foreach requires at least one parameter");
 						}
-						String collectionName = objectNameTokens.nextToken();
+						String collectionName = tokens.next();
 						String itemName = null;
-						if (objectNameTokens.hasMoreTokens()) {
-							itemName = objectNameTokens.nextToken();
+						if (tokens.hasNext()) {
+							itemName = tokens.next();
 						}
 						String loopName = "loop";
-						if (objectNameTokens.hasMoreTokens()) {
-							loopName = objectNameTokens.nextToken();
+						if (tokens.hasNext()) {
+							loopName = tokens.next();
 						}
 						partsStack.push(parts);
 						parts = new LoopPart(collectionName, itemName, loopName);
@@ -306,17 +297,17 @@ public class Template extends DataProvider {
 						});
 						commandStack.push("notlast");
 					} else if (function.equals("if")) {
-						if (!objectNameTokens.hasMoreTokens()) {
+						if (!tokens.hasNext()) {
 							throw new TemplateException("if requires one or two parameters");
 						}
-						String itemName = objectNameTokens.nextToken();
+						String itemName = tokens.next();
 						boolean invert = false;
 						if (itemName.equals("!")) {
 							invert = true;
-							if (!objectNameTokens.hasMoreTokens()) {
+							if (!tokens.hasNext()) {
 								throw new TemplateException("if ! requires one parameter");
 							}
-							itemName = objectNameTokens.nextToken();
+							itemName = tokens.next();
 						} else {
 							if (itemName.startsWith("!")) {
 								invert = true;
@@ -349,17 +340,17 @@ public class Template extends DataProvider {
 						if (!"if".equals(lastIfCommand.peek()) && !"elseif".equals(lastIfCommand.peek())) {
 							throw new TemplateException("elseif is only allowed after if or elseif");
 						}
-						if (!objectNameTokens.hasMoreTokens()) {
+						if (!tokens.hasNext()) {
 							throw new TemplateException("elseif requires one or two parameters");
 						}
-						String itemName = objectNameTokens.nextToken();
+						String itemName = tokens.next();
 						boolean invert = false;
 						if (itemName.equals("!")) {
 							invert = true;
-							if (!objectNameTokens.hasMoreTokens()) {
+							if (!tokens.hasNext()) {
 								throw new TemplateException("if ! requires one parameter");
 							}
-							itemName = objectNameTokens.nextToken();
+							itemName = tokens.next();
 						} else {
 							if (itemName.startsWith("!")) {
 								invert = true;
@@ -373,10 +364,53 @@ public class Template extends DataProvider {
 						lastConditions.peek().add(condition);
 						lastIfCommand.pop();
 						lastIfCommand.push("elseif");
-					} else if (objectNameTokens.countTokens() == 0) {
-						parts.add(new DataProviderPart(objectName));
 					} else {
-						throw new TemplateException("unknown directive: " + function);
+						boolean directText = false;
+						String itemName = function;
+						if (function.equals("=")) {
+							if (!tokens.hasNext()) {
+								throw new TemplateException("empty tag found");
+							}
+							itemName = tokens.next();
+							directText = true;
+						} else if (function.startsWith("=")) {
+							itemName = function.substring(1);
+							directText = true;
+						}
+						Map<Filter, Map<String, String>> allFilterParameters = new HashMap<Filter, Map<String, String>>();
+						if (tokens.hasNext() && (tokens.next() != null)) {
+							throw new TemplateException("expected \"|\" token");
+						}
+						while (tokens.hasNext()) {
+							String filterName = tokens.next();
+							Filter filter = filters.get(filterName);
+							if (filter == null) {
+								throw new TemplateException("unknown filter: " + filterName);
+							}
+							System.out.println("added filter: " + filterName);
+							Map<String, String> filterParameters = new HashMap<String, String>();
+							while (tokens.hasNext()) {
+								String parameterToken = tokens.next();
+								if (parameterToken == null) {
+									break;
+								}
+								int equals = parameterToken.indexOf('=');
+								if (equals == -1) {
+									throw new TemplateException("found parameter without \"=\" sign");
+								}
+								String key = parameterToken.substring(0, equals).trim();
+								String value = parameterToken.substring(equals + 1);
+								filterParameters.put(key, value);
+							}
+							System.out.println("parameters: " + filterParameters);
+							allFilterParameters.put(filter, filterParameters);
+						}
+						System.out.println("itemName: " + itemName);
+						if (directText) {
+							parts.add(new FilteredTextPart(itemName, allFilterParameters.keySet(), allFilterParameters));
+						} else {
+							parts.add(new FilteredPart(itemName, allFilterParameters.keySet(), allFilterParameters));
+						}
 					}
 				} else {
 					currentTextPart.append((char) nextCharacter);
@@ -409,6 +443,67 @@ public class Template extends DataProvider {
 			throw new TemplateException("Unbalanced template.");
 		}
 		return parts;
+	}
+
+	/**
+	 * Parses the content of a tag into words, obeying syntactical rules about
+	 * separators and quotes. Separators are parsed as {@code null}.
+	 *
+	 * @param tagContent
+	 *            The content of the tag to parse
+	 * @return The parsed words
+	 */
+	static List<String> parseTag(String tagContent) {
+		List<String> expressions = new ArrayList<String>();
+		boolean inSingleQuotes = false;
+		boolean inDoubleQuotes = false;
+		boolean inBackslash = false;
+		StringBuilder currentExpression = new StringBuilder();
+		for (char c : tagContent.toCharArray()) {
+			if (inSingleQuotes) {
+				if (c == '\'') {
+					inSingleQuotes = false;
+				} else {
+					currentExpression.append(c);
+				}
+			} else if (inBackslash) {
+				currentExpression.append(c);
+				inBackslash = false;
+			} else if (inDoubleQuotes) {
+				if (c == '"') {
+					inDoubleQuotes = false;
+				} else {
+					currentExpression.append(c);
+				}
+			} else {
+				if (c == '\'') {
+					inSingleQuotes = true;
+				} else if (c == '"') {
+					inDoubleQuotes = true;
+				} else if (c == '\\') {
+					inBackslash = true;
+				} else if (c == '|') {
+					if (currentExpression.toString().trim().length() > 0) {
+						expressions.add(currentExpression.toString());
+						currentExpression.setLength(0);
+					}
+					expressions.add(null);
+				} else {
+					if (c == ' ') {
+						if (currentExpression.length() > 0) {
+							expressions.add(currentExpression.toString());
+							currentExpression.setLength(0);
+						}
+					} else {
+						currentExpression.append(c);
+					}
+				}
+			}
+		}
+		if (currentExpression.length() > 0) {
+			expressions.add(currentExpression.toString());
+		}
+		return expressions;
 	}
 
 }

@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -542,7 +543,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "<%a> (<%=a|test>)";
+		templateString = "<%a> (<%a|test>)";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
 		template.addFilter("test", new TestFilter());
@@ -551,7 +552,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("4 ([java.lang.Integer@4])", output);
 
-		templateString = "<%a> (<%=  a | test  >)";
+		templateString = "<%a> (<%  a | test  >)";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
 		template.addFilter("test", new TestFilter());
@@ -560,16 +561,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("4 ([java.lang.Integer@4])", output);
 
-		templateString = "<%a> (<%=  a | test |test >)";
-		outputWriter = new StringWriter();
-		template = new Template(new StringReader(templateString));
-		template.addFilter("test", new TestFilter());
-		template.set("a", 4);
-		template.render(outputWriter);
-		output = outputWriter.toString();
-		assertEquals("4 ([java.lang.String@-587672038])", output);
-
-		templateString = "<%= \"foo\" |test>";
+		templateString = "<%= foo |test>";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
 		template.addFilter("test", new TestFilter());
@@ -577,13 +569,70 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("[java.lang.String@101574]", output);
 
-		templateString = "<%= \"foo\" |replace needle=foo replacement=bar>";
+		templateString = "<%= foo |replace needle=foo replacement=bar>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.set("foo", "baz");
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("bar", output);
+
+		templateString = "<%= foo |replace needle=foo replacement='<bar>'>";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
 		template.addFilter("replace", new Filter.ReplaceFilter());
 		template.render(outputWriter);
 		output = outputWriter.toString();
-		assertEquals("bar", output);
+		assertEquals("<bar>", output);
+	}
+
+	public void testTagParser() {
+		String tagContent;
+		List<String> tagWords;
+
+		tagContent = " item | replace a=b";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item", null, "replace", "a=b");
+
+		tagContent = " item | replace a=b|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item", null, "replace", "a=b", null, "html");
+
+		tagContent = " item | replace a=b\\|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item", null, "replace", "a=b|html");
+
+		tagContent = " item' '| replace a=b\\|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item ", null, "replace", "a=b|html");
+
+		tagContent = " item\" \"| replace a=b\\|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item ", null, "replace", "a=b|html");
+
+		tagContent = " item\" '\"| replace a=b\\|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item '", null, "replace", "a=b|html");
+
+		tagContent = " item | replace a='<b foo=\"bar\">'|html";
+		tagWords = Template.parseTag(tagContent);
+		assertNotNull(tagWords);
+		compare(tagWords, "item", null, "replace", "a=<b foo=\"bar\">", null, "html");
+	}
+
+	private void compare(List<String> actualWords, String... expectedWords) {
+		assertEquals(expectedWords.length, actualWords.size());
+		int counter = 0;
+		for (String expectedWord : expectedWords) {
+			assertEquals(expectedWord, actualWords.get(counter++));
+		}
 	}
 
 	private static class TestFilter implements Filter {
