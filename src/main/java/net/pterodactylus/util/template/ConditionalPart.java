@@ -19,6 +19,8 @@ package net.pterodactylus.util.template;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * {@link ContainerPart} implementation that determines at render time whether
@@ -71,6 +73,175 @@ class ConditionalPart extends ContainerPart {
 		 *             if a template variable can not be parsed or evaluated
 		 */
 		public boolean isAllowed(DataProvider dataProvider) throws TemplateException;
+
+	}
+
+	/**
+	 * {@link Condition} implements that inverts another condition.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class NotCondition implements Condition {
+
+		/** The condition to invert. */
+		private final Condition condition;
+
+		/**
+		 * Creates a inverting condition.
+		 *
+		 * @param condition
+		 *            The condition to invert
+		 */
+		public NotCondition(Condition condition) {
+			this.condition = condition;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			return !condition.isAllowed(dataProvider);
+		}
+
+	}
+
+	/**
+	 * {@link Condition} implementation that only returns true if all its
+	 * conditions are true also.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class AndCondition implements Condition {
+
+		/** The conditions. */
+		private final Collection<Condition> conditions;
+
+		/**
+		 * Creates a new AND condition.
+		 *
+		 * @param conditions
+		 *            The conditions
+		 */
+		public AndCondition(Condition... conditions) {
+			this(Arrays.asList(conditions));
+		}
+
+		/**
+		 * Creates a new AND condition.
+		 *
+		 * @param conditions
+		 *            The conditions
+		 */
+		public AndCondition(Collection<Condition> conditions) {
+			this.conditions = conditions;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			for (Condition condition : conditions) {
+				if (!condition.isAllowed(dataProvider)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+	}
+
+	/**
+	 * {@link Condition} implementation that only returns false if all its
+	 * conditions are false also.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class OrCondition implements Condition {
+
+		/** The conditions. */
+		private final Collection<Condition> conditions;
+
+		/**
+		 * Creates a new OR condition.
+		 *
+		 * @param conditions
+		 *            The conditions
+		 */
+		public OrCondition(Condition... conditions) {
+			this(Arrays.asList(conditions));
+		}
+
+		/**
+		 * Creates a new OR condition.
+		 *
+		 * @param conditions
+		 *            The conditions
+		 */
+		public OrCondition(Collection<Condition> conditions) {
+			this.conditions = conditions;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			for (Condition condition : conditions) {
+				if (condition.isAllowed(dataProvider)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+	}
+
+	/**
+	 * {@link Condition} implementation that asks the {@link DataProvider} for a
+	 * {@link Boolean} value.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class DataCondition implements Condition {
+
+		/** Whether to invert the result. */
+		private final boolean invert;
+
+		/** The name of the data item to check. */
+		private final String itemName;
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param itemName
+		 *            The name of the item to check
+		 */
+		public DataCondition(String itemName) {
+			this(itemName, false);
+		}
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param itemName
+		 *            The name of the item to check
+		 * @param invert
+		 *            {@code true} to invert the result, {@code false} otherwise
+		 */
+		public DataCondition(String itemName, boolean invert) {
+			this.invert = invert;
+			this.itemName = itemName;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			return (Boolean) dataProvider.getData(itemName) ^ invert;
+		}
 
 	}
 
