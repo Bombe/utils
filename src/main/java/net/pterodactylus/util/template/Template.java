@@ -150,7 +150,7 @@ public class Template extends DataProvider {
 							lastCollectionName.pop();
 							lastLoopName.pop();
 							parts.add(innerParts);
-						} else if (lastFunction.equals("first") || lastFunction.equals("last")) {
+						} else if (lastFunction.equals("first") || lastFunction.equals("last") || lastFunction.equals("between")) {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
 							parts.add(innerParts);
@@ -207,6 +207,20 @@ public class Template extends DataProvider {
 							}
 						});
 						commandStack.push("last");
+					} else if (function.equals("between")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("between is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(dataProvider, new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return !(Boolean) (dataProvider.getData(loopName + ".last"));
+							}
+						});
+						commandStack.push("between");
 					} else if (objectNameTokens.countTokens() == 0) {
 						parts.add(new DataProviderPart(dataProvider, objectName));
 						currentTextPart.setLength(0);
