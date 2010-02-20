@@ -576,6 +576,14 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("[java.lang.String@101574]", output);
+
+		templateString = "<%= \"foo\" |replace needle=foo replacement=bar>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("bar", output);
 	}
 
 	private static class TestFilter implements Filter {
