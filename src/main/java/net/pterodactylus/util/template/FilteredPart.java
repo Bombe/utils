@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FilteredPart extends Part {
+class FilteredPart extends Part {
 
 	/** The name of the data object to filter. */
 	private final String name;

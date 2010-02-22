@@ -27,7 +27,7 @@ import java.util.Map.Entry;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class DataProvider {
+abstract class DataProvider {
 
 	/** Accessors. */
 	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();

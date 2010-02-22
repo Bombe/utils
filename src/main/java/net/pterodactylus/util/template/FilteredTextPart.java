@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FilteredTextPart extends Part {
+class FilteredTextPart extends Part {
 
 	/** The text to filter. */
 	private final String text;
