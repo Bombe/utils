@@ -162,6 +162,28 @@ class LoopPart extends ContainerPart {
 			return count == (size - 1);
 		}
 
+		/**
+		 * Returns whether the current loop count is odd, i.e. not divisible by
+		 * {@code 2}.
+		 *
+		 * @return {@code true} if the loop count is odd, {@code false}
+		 *         otherwise
+		 */
+		public boolean isOdd() {
+			return (count & 1) == 1;
+		}
+
+		/**
+		 * Returns whether the current loop count is even, i.e. divisible by
+		 * {@code 2}.
+		 *
+		 * @return {@code true} if the loop count is even, {@code false}
+		 *         otherwise
+		 */
+		public boolean isEven() {
+			return (count & 1) == 0;
+		}
+
 	}
 
 	/**
@@ -186,6 +208,10 @@ class LoopPart extends ContainerPart {
 				return loopStructure.isFirst();
 			} else if ("last".equals(member)) {
 				return loopStructure.isLast();
+			} else if ("odd".equals(member)) {
+				return loopStructure.isOdd();
+			} else if ("even".equals(member)) {
+				return loopStructure.isEven();
 			}
 			return null;
 		}
