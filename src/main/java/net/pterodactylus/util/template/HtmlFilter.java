@@ -292,7 +292,7 @@ public class HtmlFilter implements Filter {
 	@Override
 	public String format(Object data, Map<String, String> parameters) {
 		StringBuilder htmlOutput = new StringBuilder();
-		for (char c : ((String) data).toCharArray()) {
+		for (char c : String.valueOf(data).toCharArray()) {
 			if (htmlEntities.containsKey(c)) {
 				htmlOutput.append('&').append(htmlEntities.get(c)).append(';');
 				continue;
