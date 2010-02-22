@@ -205,7 +205,7 @@ public class Template extends DataProvider {
 							lastCollectionName.pop();
 							lastLoopName.pop();
 							parts.add(innerParts);
-						} else if (lastFunction.equals("first") || lastFunction.equals("notfirst") || lastFunction.equals("last") || lastFunction.equals("notlast")) {
+						} else if (lastFunction.equals("first") || lastFunction.equals("notfirst") || lastFunction.equals("last") || lastFunction.equals("notlast") || lastFunction.equals("odd") || lastFunction.equals("even")) {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
 							parts.add(innerParts);
@@ -295,6 +295,34 @@ public class Template extends DataProvider {
 							}
 						});
 						commandStack.push("notlast");
+					} else if (function.equals("odd")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("odd is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return (Boolean) dataProvider.getData(loopName + ".odd");
+							}
+						});
+						commandStack.push("odd");
+					} else if (function.equals("even")) {
+						if (!"foreach".equals(commandStack.peek())) {
+							throw new TemplateException("even is only allowed in foreach");
+						}
+						partsStack.push(parts);
+						final String loopName = lastLoopName.peek();
+						parts = new ConditionalPart(new ConditionalPart.Condition() {
+
+							@Override
+							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+								return (Boolean) (dataProvider.getData(loopName + ".even"));
+							}
+						});
+						commandStack.push("even");
 					} else if (function.equals("if")) {
 						if (!tokens.hasNext()) {
 							throw new TemplateException("if requires one or two parameters");
