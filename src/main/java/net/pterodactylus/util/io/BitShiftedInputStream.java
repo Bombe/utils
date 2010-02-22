@@ -66,6 +66,20 @@ public class BitShiftedInputStream extends FilterInputStream {
 	 */
 	@Override
 	public int read() throws IOException {
+		return read(valueSize);
+	}
+
+	/**
+	 * Reads a value with the given number of bits from the underlying input
+	 * stream.
+	 *
+	 * @param valueSize
+	 *            The number of bits to read
+	 * @return A value from the underlying input stream
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public int read(int valueSize) throws IOException {
 		int bitsLeft = valueSize;
 		int value = 0;
 		while (bitsLeft > 0) {
