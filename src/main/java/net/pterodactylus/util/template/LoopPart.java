@@ -72,8 +72,6 @@ class LoopPart extends ContainerPart {
 
 	/**
 	 * {@inheritDoc}
-	 *
-	 * @throws TemplateException
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
