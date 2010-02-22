@@ -19,8 +19,6 @@ package net.pterodactylus.util.template;
 
 import java.io.Reader;
 
-import net.pterodactylus.util.template.Filter.HtmlFilter;
-import net.pterodactylus.util.template.Filter.ReplaceFilter;
 
 /**
  * Interface for factories that can create templates with pre-defined settings,
@@ -100,10 +98,10 @@ public interface TemplateFactory {
 		public Template createTemplate(Reader templateSource) {
 			Template template = new Template(templateSource);
 			if (addHtmlFilter) {
-				template.addFilter("html", new Filter.HtmlFilter());
+				template.addFilter("html", new HtmlFilter());
 			}
 			if (addReplaceFilter) {
-				template.addFilter("replace", new Filter.ReplaceFilter());
+				template.addFilter("replace", new ReplaceFilter());
 			}
 			return template;
 		}

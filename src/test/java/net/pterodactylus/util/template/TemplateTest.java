@@ -572,7 +572,7 @@ public class TemplateTest extends TestCase {
 		templateString = "<%= foo |replace needle=foo replacement=bar>";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
-		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.addFilter("replace", new ReplaceFilter());
 		template.set("foo", "baz");
 		template.render(outputWriter);
 		output = outputWriter.toString();
@@ -581,7 +581,7 @@ public class TemplateTest extends TestCase {
 		templateString = "<%= foo |replace needle=foo replacement='<bar>'>";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
-		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.addFilter("replace", new ReplaceFilter());
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("<bar>", output);
@@ -589,7 +589,7 @@ public class TemplateTest extends TestCase {
 		templateString = "test <%= test | replace needle='t' replacement='b' | replace needle='sb' replacement='ao'> test";
 		outputWriter = new StringWriter();
 		template = new Template(new StringReader(templateString));
-		template.addFilter("replace", new Filter.ReplaceFilter());
+		template.addFilter("replace", new ReplaceFilter());
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("test beao test", output);
