@@ -1,3 +1,4 @@
+
 package net.pterodactylus.util.template;
 
 import java.io.IOException;
@@ -424,6 +425,56 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("List: 1, 2, 3, 4.", output);
+	}
+
+	/**
+	 * Tests for string templates that contain a collection and the <%odd>
+	 * directive.
+	 */
+	public void testStringTemplatesWithCollectionOdd() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+
+		templateString = "List: <%foreach items item><%odd><% item> (odd) <%/odd><%/foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add(1);
+		collection.add(2);
+		collection.add(3);
+		collection.add(4);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("List: 2 (odd) 4 (odd) ", output);
+	}
+
+	/**
+	 * Tests for string templates that contain a collection and the <%even>
+	 * directive.
+	 */
+	public void testStringTemplatesWithCollectionEven() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Collection<Object> collection;
+
+		templateString = "List: <%foreach items item><%even><% item> (even) <%/even><%/foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		collection = new ArrayList<Object>();
+		collection.add(1);
+		collection.add(2);
+		collection.add(3);
+		collection.add(4);
+		template.set("items", collection);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("List: 1 (even) 3 (even) ", output);
 	}
 
 	/**
