@@ -61,12 +61,12 @@ class FilteredPart extends Part {
 	@Override
 	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
 		Object data = dataProvider.getData(template, name);
-		String output = String.valueOf(data);
+		Object output = data;
 		for (Filter filter : filters) {
 			data = output = filter.format(template, data, allFilterParameters.get(filter));
 		}
 		try {
-			writer.write(output);
+			writer.write(String.valueOf(output));
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}

@@ -38,6 +38,6 @@ public interface Filter {
 	 *            Parameters for the filter
 	 * @return The formatted data
 	 */
-	public String format(Template template, Object data, Map<String, String> parameters);
+	public Object format(Template template, Object data, Map<String, String> parameters);
 
 }

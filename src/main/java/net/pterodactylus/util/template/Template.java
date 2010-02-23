@@ -520,7 +520,7 @@ public class Template extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Template template, Object data, Map<String, String> parameters) {
+		public Object format(Template template, Object data, Map<String, String> parameters) {
 			return originalFilter.format(template, data, parameters);
 		}
 
