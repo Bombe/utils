@@ -42,6 +42,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** Whether to add a {@link InsertFilter} to created templates. */
 	private final boolean addInsertFilter;
 
+	/** Whether to add a {@link defaultFilter} to created templates. */
+	private final boolean addDefaultFilter;
+
 	/**
 	 * Creates a new default template factory that adds both an
 	 * {@link HtmlFilter} and a {@link ReplaceFilter} to created templates.
@@ -81,10 +84,34 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	 *            templates, {@code false} otherwise
 	 */
 	public DefaultTemplateFactory(boolean addHtmlFilter, boolean addReplaceFilter, boolean addStoreFilter, boolean addInsertFilter) {
+		this(addHtmlFilter, addReplaceFilter, addStoreFilter, addInsertFilter, true);
+	}
+
+	/**
+	 * Creates a new default template factory.
+	 *
+	 * @param addHtmlFilter
+	 *            {@code true} to add an {@link HtmlFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addReplaceFilter
+	 *            {@code true} to add a {@link ReplaceFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addStoreFilter
+	 *            {@code true} to add a {@link StoreFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addInsertFilter
+	 *            {@code true} to add a {@link InsertFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addDefaultFilter
+	 *            {@code true} to add a {@link DefaultFilter} to created
+	 *            templates, {@code false} otherwise
+	 */
+	public DefaultTemplateFactory(boolean addHtmlFilter, boolean addReplaceFilter, boolean addStoreFilter, boolean addInsertFilter, boolean addDefaultFilter) {
 		this.addHtmlFilter = addHtmlFilter;
 		this.addReplaceFilter = addReplaceFilter;
 		this.addStoreFilter = addStoreFilter;
 		this.addInsertFilter = addInsertFilter;
+		this.addDefaultFilter = addDefaultFilter;
 	}
 
 	/**
@@ -116,6 +143,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		}
 		if (addInsertFilter) {
 			template.addFilter("insert", new InsertFilter());
+		}
+		if (addDefaultFilter) {
+			template.addFilter("default", new DefaultFilter());
 		}
 		return template;
 	}
