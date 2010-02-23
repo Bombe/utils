@@ -34,6 +34,7 @@ import net.pterodactylus.util.template.ConditionalPart.AndCondition;
 import net.pterodactylus.util.template.ConditionalPart.Condition;
 import net.pterodactylus.util.template.ConditionalPart.DataCondition;
 import net.pterodactylus.util.template.ConditionalPart.NotCondition;
+import net.pterodactylus.util.template.ConditionalPart.NullDataCondition;
 import net.pterodactylus.util.template.ConditionalPart.OrCondition;
 
 /**
@@ -287,11 +288,12 @@ public class Template {
 						final String loopName = lastLoopName.peek();
 						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".even"));
 						commandStack.push("even");
-					} else if (function.equals("if")) {
+					} else if (function.equals("if") || function.equals("ifnull")) {
 						if (!tokens.hasNext()) {
 							throw new TemplateException("if requires one or two parameters");
 						}
 						String itemName = tokens.next();
+						boolean checkForNull = function.equals("ifnull");
 						boolean invert = false;
 						if (itemName.equals("!")) {
 							invert = true;
@@ -306,7 +308,7 @@ public class Template {
 							}
 						}
 						partsStack.push(parts);
-						Condition condition = new DataCondition(itemName, invert);
+						Condition condition = checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert);
 						parts = new ConditionalPart(condition);
 						commandStack.push("if");
 						lastCondition.push(condition);
@@ -324,7 +326,7 @@ public class Template {
 						parts = new ConditionalPart(condition);
 						lastIfCommand.pop();
 						lastIfCommand.push("else");
-					} else if (function.equals("elseif")) {
+					} else if (function.equals("elseif") || function.equals("elseifnull")) {
 						if (!"if".equals(commandStack.peek())) {
 							throw new TemplateException("elseif is only allowed in if");
 						}
@@ -335,6 +337,7 @@ public class Template {
 							throw new TemplateException("elseif requires one or two parameters");
 						}
 						String itemName = tokens.next();
+						boolean checkForNull = function.equals("elseifnull");
 						boolean invert = false;
 						if (itemName.equals("!")) {
 							invert = true;
@@ -349,7 +352,7 @@ public class Template {
 							}
 						}
 						partsStack.peek().add(parts);
-						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), new DataCondition(itemName, invert));
+						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert));
 						parts = new ConditionalPart(condition);
 						lastCondition.push(condition);
 						lastConditions.peek().add(condition);
