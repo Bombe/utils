@@ -244,4 +244,51 @@ class ConditionalPart extends ContainerPart {
 
 	}
 
+	/**
+	 * {@link Condition} implementation that asks the {@link DataProvider} for a
+	 * {@link Boolean} value and checks whether it’s {@code null} or not.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class NullDataCondition implements Condition {
+
+		/** Whether to invert the result. */
+		private final boolean invert;
+
+		/** The name of the data item to check. */
+		private final String itemName;
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param itemName
+		 *            The name of the item to check
+		 */
+		public NullDataCondition(String itemName) {
+			this(itemName, false);
+		}
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param itemName
+		 *            The name of the item to check
+		 * @param invert
+		 *            {@code true} to invert the result, {@code false} otherwise
+		 */
+		public NullDataCondition(String itemName, boolean invert) {
+			this.invert = invert;
+			this.itemName = itemName;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			return (dataProvider.getData(itemName) == null) ^ invert;
+		}
+
+	}
+
 }
