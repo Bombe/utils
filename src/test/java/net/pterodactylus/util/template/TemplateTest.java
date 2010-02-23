@@ -337,7 +337,7 @@ public class TemplateTest extends TestCase {
 			 */
 			@Override
 			@SuppressWarnings("unchecked")
-			public Object get(Template template, Object object, String member) {
+			public Object get(DataProvider dataProvider, Object object, String member) {
 				try {
 					return ((Callable<String>) object).call();
 				} catch (Exception e1) {
@@ -769,7 +769,7 @@ public class TemplateTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Template template, Object data, Map<String, String> parameters) {
+		public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
 		}
 

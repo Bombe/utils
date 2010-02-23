@@ -27,7 +27,10 @@ import java.util.Map.Entry;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-abstract class DataProvider {
+public class DataProvider {
+
+	/** Object store. */
+	private final DataStore dataStore;
 
 	/** Accessors. */
 	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
@@ -35,7 +38,18 @@ abstract class DataProvider {
 	/**
 	 * Creates a new data provider.
 	 */
-	protected DataProvider() {
+	public DataProvider() {
+		this(new DataStore.MapDataStore());
+	}
+
+	/**
+	 * Creates a new data provider using the given data store as backend.
+	 *
+	 * @param dataStore
+	 *            The data store
+	 */
+	public DataProvider(DataStore dataStore) {
+		this.dataStore = dataStore;
 		classAccessors.put(Map.class, Accessor.MAP_ACCESSOR);
 	}
 
@@ -62,6 +76,7 @@ abstract class DataProvider {
 	 *         could be found
 	 */
 	protected Accessor findAccessor(Class<?> clazz) {
+		System.out.println("dataprovider: accessors: " + classAccessors);
 		if (classAccessors.containsKey(clazz)) {
 			return classAccessors.get(clazz);
 		}
@@ -78,28 +93,28 @@ abstract class DataProvider {
 	 * hierarchical structures separated by a dot (“.”), such as “loop.count” in
 	 * which case a {@link Map} must be stored under “loop”.
 	 *
-	 * @param template
-	 *            The template that is currently being rendered
 	 * @param name
 	 *            The name of the object to get
 	 * @return The object
 	 * @throws TemplateException
 	 *             if the name or some objects can not be parsed or evaluated
 	 */
-	public Object getData(Template template, String name) throws TemplateException {
+	public Object getData(String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
-			return retrieveData(name);
+			return dataStore.get(name);
 		}
 		StringTokenizer nameTokens = new StringTokenizer(name, ".");
 		Object object = null;
 		while (nameTokens.hasMoreTokens()) {
 			String nameToken = nameTokens.nextToken();
 			if (object == null) {
-				object = retrieveData(nameToken);
+				object = dataStore.get(nameToken);
 			} else {
+				System.out.println("dataprovider: get accessor for " + object.getClass().getName());
 				Accessor accessor = findAccessor(object.getClass());
+				System.out.println("dataprovider: got accessor: " + accessor);
 				if (accessor != null) {
-					object = accessor.get(template, object, nameToken);
+					object = accessor.get(this, object, nameToken);
 				} else {
 					throw new TemplateException("no accessor found for " + object.getClass());
 				}
@@ -112,13 +127,15 @@ abstract class DataProvider {
 	}
 
 	/**
-	 * Returns the object with the given name.
+	 * Sets data in this data provider.
 	 *
 	 * @param name
-	 *            The name of the object
-	 * @return The object, or {@code null} if an object with the given name does
-	 *         not exist
+	 *            The key under which to store the data
+	 * @param data
+	 *            The data to store
 	 */
-	protected abstract Object retrieveData(String name);
+	public void setData(String name, Object data) {
+		dataStore.set(name, data);
+	}
 
 }

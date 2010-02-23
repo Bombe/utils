@@ -63,9 +63,9 @@ class ContainerPart extends Part implements Iterable<Part> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		for (Part part : parts) {
-			part.render(template, dataProvider, writer);
+			part.render(dataProvider, writer);
 		}
 	}
 

@@ -42,10 +42,10 @@ import net.pterodactylus.util.template.ConditionalPart.OrCondition;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Template extends DataProvider {
+public class Template {
 
-	/** Objects stored in the template. */
-	private final Map<String, Object> templateObjects = new HashMap<String, Object>();
+	/** The template’s default data store. */
+	private DataProvider dataProvider = new DataProvider();
 
 	/** The input of the template. */
 	private final Reader input;
@@ -75,7 +75,19 @@ public class Template extends DataProvider {
 	 *            The object to store in the template
 	 */
 	public void set(String name, Object object) {
-		templateObjects.put(name, object);
+		dataProvider.setData(name, object);
+	}
+
+	/**
+	 * Adds an accessor to the underlying {@link DataStore}.
+	 *
+	 * @param clazz
+	 *            The class for which to add an accessor
+	 * @param accessor
+	 *            The accessor to add
+	 */
+	public void addAccessor(Class<?> clazz, Accessor accessor) {
+		dataProvider.addAccessor(clazz, accessor);
 	}
 
 	/**
@@ -112,19 +124,7 @@ public class Template extends DataProvider {
 	 */
 	public synchronized void render(Writer writer) throws TemplateException {
 		parse();
-		parsedTemplate.render(this, this, writer);
-	}
-
-	//
-	// INTERFACE DataProvider
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Object retrieveData(String name) {
-		return templateObjects.get(name);
+		parsedTemplate.render(dataProvider, writer);
 	}
 
 	//
@@ -520,8 +520,8 @@ public class Template extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object format(Template template, Object data, Map<String, String> parameters) {
-			return originalFilter.format(template, data, parameters);
+		public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+			return originalFilter.format(dataProvider, data, parameters);
 		}
 
 	}

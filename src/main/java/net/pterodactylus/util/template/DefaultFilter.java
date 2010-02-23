@@ -31,7 +31,7 @@ public class DefaultFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(Template template, Object data, Map<String, String> parameters) {
+	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 		String defaultValue = parameters.get("value");
 		if (data == null) {
 			return defaultValue;

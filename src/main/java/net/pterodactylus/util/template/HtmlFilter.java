@@ -290,7 +290,7 @@ public class HtmlFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(Template template, Object data, Map<String, String> parameters) {
+	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 		StringBuilder htmlOutput = new StringBuilder();
 		for (char c : String.valueOf(data).toCharArray()) {
 			if (htmlEntities.containsKey(c)) {

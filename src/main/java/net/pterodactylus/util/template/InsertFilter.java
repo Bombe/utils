@@ -33,9 +33,9 @@ public class InsertFilter extends ReplaceFilter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(Template template, Object data, Map<String, String> parameters) {
-		parameters.put("replacement", String.valueOf(template.getData(template, parameters.get("key"))));
-		return super.format(template, data, parameters);
+	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+		parameters.put("replacement", String.valueOf(dataProvider.getData(parameters.get("key"))));
+		return super.format(dataProvider, data, parameters);
 	}
 
 }

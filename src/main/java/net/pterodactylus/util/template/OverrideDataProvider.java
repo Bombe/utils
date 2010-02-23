@@ -35,9 +35,6 @@ class OverrideDataProvider extends DataProvider {
 	/** Accessors. */
 	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
 
-	/** Map with override objects. */
-	private final Map<String, Object> overrideObjects = new HashMap<String, Object>();
-
 	/**
 	 * Creates a new override data provider.
 	 *
@@ -49,8 +46,8 @@ class OverrideDataProvider extends DataProvider {
 	 *            The object
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, String name, Object object) {
+		super(new OverrideDataStore(parentDataProvider, name, object));
 		this.parentDataProvider = parentDataProvider;
-		overrideObjects.put(name, object);
 	}
 
 	/**
@@ -62,8 +59,8 @@ class OverrideDataProvider extends DataProvider {
 	 *            The override objects
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, Map<String, Object> overrideObjects) {
+		super(new OverrideDataStore(parentDataProvider, overrideObjects));
 		this.parentDataProvider = parentDataProvider;
-		this.overrideObjects.putAll(overrideObjects);
 	}
 
 	/**
@@ -91,14 +88,66 @@ class OverrideDataProvider extends DataProvider {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@link DataStore} implementation that can override objects and redirects
+	 * requests for not-overridden objects to a parent {@link DataProvider}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	@Override
-	protected Object retrieveData(String name) {
-		if (overrideObjects.containsKey(name)) {
-			return overrideObjects.get(name);
+	private static class OverrideDataStore implements DataStore {
+
+		/** The parent data provider. */
+		private final DataProvider parentDataProvider;
+
+		/** The store containing the overridden objects. */
+		private final Map<String, Object> overrideDataStore = new HashMap<String, Object>();
+
+		/**
+		 * Creates a new overriding data store.
+		 *
+		 * @param parentDataProvider
+		 *            The parent data provider
+		 * @param name
+		 *            The key of the object to override
+		 * @param data
+		 *            The object to override
+		 */
+		public OverrideDataStore(DataProvider parentDataProvider, String name, Object data) {
+			this.parentDataProvider = parentDataProvider;
+			overrideDataStore.put(name, data);
 		}
-		return parentDataProvider.retrieveData(name);
+
+		/**
+		 * Creates a new overriding data store.
+		 *
+		 * @param parentDataProvider
+		 *            The parent data provider
+		 * @param overrideDataStore
+		 *            {@link Map} containing all overriding objects
+		 */
+		public OverrideDataStore(DataProvider parentDataProvider, Map<String, Object> overrideDataStore) {
+			this.parentDataProvider = parentDataProvider;
+			this.overrideDataStore.putAll(overrideDataStore);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object get(String name) {
+			if (overrideDataStore.containsKey(name)) {
+				return overrideDataStore.get(name);
+			}
+			return parentDataProvider.getData(name);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void set(String name, Object data) {
+			parentDataProvider.setData(name, data);
+		}
+
 	}
 
 }

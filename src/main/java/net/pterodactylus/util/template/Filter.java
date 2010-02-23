@@ -30,14 +30,14 @@ public interface Filter {
 	/**
 	 * Formats the given data object.
 	 *
-	 * @param template
-	 *            The template that is currently being rendered
+	 * @param dataProvider
+	 *            The current data provider
 	 * @param data
 	 *            The data to format
 	 * @param parameters
 	 *            Parameters for the filter
 	 * @return The formatted data
 	 */
-	public Object format(Template template, Object data, Map<String, String> parameters);
+	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters);
 
 }

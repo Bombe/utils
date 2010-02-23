@@ -47,12 +47,12 @@ class EmptyLoopPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
-		Collection<?> collection = (Collection<?>) dataProvider.getData(template, collectionName);
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		if (!collection.isEmpty()) {
 			return;
 		}
-		super.render(template, dataProvider, writer);
+		super.render(dataProvider, writer);
 	}
 
 }

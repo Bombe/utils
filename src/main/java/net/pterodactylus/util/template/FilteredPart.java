@@ -59,11 +59,11 @@ class FilteredPart extends Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object data = dataProvider.getData(template, name);
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		Object data = dataProvider.getData(name);
 		Object output = data;
 		for (Filter filter : filters) {
-			data = output = filter.format(template, data, allFilterParameters.get(filter));
+			data = output = filter.format(dataProvider, data, allFilterParameters.get(filter));
 		}
 		try {
 			writer.write(String.valueOf(output));
