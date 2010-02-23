@@ -105,7 +105,7 @@ abstract class DataProvider {
 				}
 			}
 			if ((object == null) && nameTokens.hasMoreTokens()) {
-				throw new TemplateException("can not access " + nameTokens.nextToken() + " on null");
+				return null;
 			}
 		}
 		return object;
