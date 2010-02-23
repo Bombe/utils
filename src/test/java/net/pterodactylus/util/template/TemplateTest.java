@@ -646,6 +646,39 @@ public class TemplateTest extends TestCase {
 		assertEquals("test beao test", output);
 	}
 
+	public void testStoreFilter() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "<% name | store key='foo'>Hello, <% foo>!";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("store", new StoreFilter());
+		template.set("name", "User");
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Hello, User!", output);
+	}
+
+	public void testStoreAndInsertFilter() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "<% name | store key='foo'>Hello, <%= ${name} | insert needle='${name}' key='foo'>!";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("store", new StoreFilter());
+		template.addFilter("insert", new InsertFilter());
+		template.set("name", "User");
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Hello, User!", output);
+	}
+
 	public void testTagParser() {
 		String tagContent;
 		List<String> tagWords;
@@ -700,7 +733,7 @@ public class TemplateTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Object data, Map<String, String> parameters) {
+		public String format(Template template, Object data, Map<String, String> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
 		}
 
