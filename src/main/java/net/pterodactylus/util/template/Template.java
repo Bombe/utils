@@ -245,13 +245,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return (Boolean) (dataProvider.getData(loopName + ".first"));
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".first"));
 						commandStack.push("first");
 					} else if (function.equals("notfirst")) {
 						if (!"foreach".equals(commandStack.peek())) {
@@ -259,13 +253,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return !(Boolean) (dataProvider.getData(loopName + ".first"));
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".first", true));
 						commandStack.push("notfirst");
 					} else if (function.equals("last")) {
 						if (!"foreach".equals(commandStack.peek())) {
@@ -273,13 +261,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return (Boolean) (dataProvider.getData(loopName + ".last"));
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".last"));
 						commandStack.push("last");
 					} else if (function.equals("notlast")) {
 						if (!"foreach".equals(commandStack.peek())) {
@@ -287,13 +269,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return !(Boolean) (dataProvider.getData(loopName + ".last"));
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".last", true));
 						commandStack.push("notlast");
 					} else if (function.equals("odd")) {
 						if (!"foreach".equals(commandStack.peek())) {
@@ -301,13 +277,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return (Boolean) dataProvider.getData(loopName + ".odd");
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".odd"));
 						commandStack.push("odd");
 					} else if (function.equals("even")) {
 						if (!"foreach".equals(commandStack.peek())) {
@@ -315,13 +285,7 @@ public class Template extends DataProvider {
 						}
 						partsStack.push(parts);
 						final String loopName = lastLoopName.peek();
-						parts = new ConditionalPart(new ConditionalPart.Condition() {
-
-							@Override
-							public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-								return (Boolean) (dataProvider.getData(loopName + ".even"));
-							}
-						});
+						parts = new ConditionalPart(new ConditionalPart.DataCondition(loopName + ".even"));
 						commandStack.push("even");
 					} else if (function.equals("if")) {
 						if (!tokens.hasNext()) {
