@@ -576,6 +576,33 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("A: (b)", output);
 
+		templateString = "<%if a.b>a.b<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("b", "true");
+		template.set("a", map);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("a.b", output);
+
+		templateString = "<%if a.c>a.b<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		map = new HashMap<String, String>();
+		map.put("b", "true");
+		template.set("a", map);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("", output);
+
+		templateString = "<%if a.c>a.b<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("", output);
+
 		templateString = "A: <%if a>(a)<%else>wrong<%else>false<%/if>";
 		outputWriter = new StringWriter();
 		try {
