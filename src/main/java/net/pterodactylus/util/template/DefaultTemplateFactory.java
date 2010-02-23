@@ -42,7 +42,7 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** Whether to add a {@link InsertFilter} to created templates. */
 	private final boolean addInsertFilter;
 
-	/** Whether to add a {@link defaultFilter} to created templates. */
+	/** Whether to add a {@link DefaultFilter} to created templates. */
 	private final boolean addDefaultFilter;
 
 	/**
