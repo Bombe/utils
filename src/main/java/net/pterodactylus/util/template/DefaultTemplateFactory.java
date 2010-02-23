@@ -36,6 +36,12 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** Whether to add a {@link ReplaceFilter} to created templates. */
 	private final boolean addReplaceFilter;
 
+	/** Whether to add a {@link StoreFilter} to created templates. */
+	private final boolean addStoreFilter;
+
+	/** Whether to add a {@link InsertFilter} to created templates. */
+	private final boolean addInsertFilter;
+
 	/**
 	 * Creates a new default template factory that adds both an
 	 * {@link HtmlFilter} and a {@link ReplaceFilter} to created templates.
@@ -55,8 +61,30 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	 *            templates, {@code false} otherwise
 	 */
 	public DefaultTemplateFactory(boolean addHtmlFilter, boolean addReplaceFilter) {
+		this(addHtmlFilter, addReplaceFilter, true, true);
+	}
+
+	/**
+	 * Creates a new default template factory.
+	 *
+	 * @param addHtmlFilter
+	 *            {@code true} to add an {@link HtmlFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addReplaceFilter
+	 *            {@code true} to add a {@link ReplaceFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addStoreFilter
+	 *            {@code true} to add a {@link StoreFilter} to created
+	 *            templates, {@code false} otherwise
+	 * @param addInsertFilter
+	 *            {@code true} to add a {@link InsertFilter} to created
+	 *            templates, {@code false} otherwise
+	 */
+	public DefaultTemplateFactory(boolean addHtmlFilter, boolean addReplaceFilter, boolean addStoreFilter, boolean addInsertFilter) {
 		this.addHtmlFilter = addHtmlFilter;
 		this.addReplaceFilter = addReplaceFilter;
+		this.addStoreFilter = addStoreFilter;
+		this.addInsertFilter = addInsertFilter;
 	}
 
 	/**
@@ -82,6 +110,12 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		}
 		if (addReplaceFilter) {
 			template.addFilter("replace", new ReplaceFilter());
+		}
+		if (addStoreFilter) {
+			template.addFilter("store", new StoreFilter());
+		}
+		if (addInsertFilter) {
+			template.addFilter("insert", new InsertFilter());
 		}
 		return template;
 	}
