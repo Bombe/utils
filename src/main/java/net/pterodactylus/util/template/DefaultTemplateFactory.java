@@ -31,10 +31,10 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	private static DefaultTemplateFactory instance;
 
 	/** Whether to add an {@link HtmlFilter} to created templates. */
-	private boolean addHtmlFilter;
+	private final boolean addHtmlFilter;
 
 	/** Whether to add a {@link ReplaceFilter} to created templates. */
-	private boolean addReplaceFilter;
+	private final boolean addReplaceFilter;
 
 	/**
 	 * Creates a new default template factory that adds both an
