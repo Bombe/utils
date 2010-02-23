@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -677,6 +678,25 @@ public class TemplateTest extends TestCase {
 		template.render(outputWriter);
 		output = outputWriter.toString();
 		assertEquals("Hello, User!", output);
+	}
+
+	public void testInsertFilter() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "Hello, <%= ${name} | insert needle='${name}' key='map.a'>!";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("store", new StoreFilter());
+		template.addFilter("insert", new InsertFilter());
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("a", "b");
+		template.set("map", map);
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Hello, b!", output);
 	}
 
 	public void testTagParser() {
