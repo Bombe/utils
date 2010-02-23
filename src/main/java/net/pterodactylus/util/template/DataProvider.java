@@ -116,7 +116,7 @@ public class DataProvider {
 					throw new TemplateException("no accessor found for " + object.getClass());
 				}
 			}
-			if ((object == null) && nameTokens.hasMoreTokens()) {
+			if (object == null) {
 				return null;
 			}
 		}
