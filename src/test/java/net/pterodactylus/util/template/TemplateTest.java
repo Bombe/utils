@@ -603,6 +603,13 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("", output);
 
+		templateString = "<%ifnull a.c>a.b<%/if>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("a.b", output);
+
 		templateString = "A: <%if a>(a)<%else>wrong<%else>false<%/if>";
 		outputWriter = new StringWriter();
 		try {
