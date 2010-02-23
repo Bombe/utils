@@ -241,7 +241,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(Template template, DataProvider dataProvider) throws TemplateException {
-			return (Boolean) dataProvider.getData(template, itemName) ^ invert;
+			return Boolean.valueOf(String.valueOf(dataProvider.getData(template, itemName))) ^ invert;
 		}
 
 	}
