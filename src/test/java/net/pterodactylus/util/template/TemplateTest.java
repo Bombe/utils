@@ -699,6 +699,22 @@ public class TemplateTest extends TestCase {
 		assertEquals("Hello, b!", output);
 	}
 
+	public void testDefaultFilter() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "Test: <% value | default value='0'><% noValue | default value='1'>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		template.addFilter("default", new DefaultFilter());
+		template.set("value", "2");
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Test: 21", output);
+	}
+
 	public void testTagParser() {
 		String tagContent;
 		List<String> tagWords;
