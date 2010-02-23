@@ -221,6 +221,24 @@
  * &lt;div&gt;Your name is &lt;% name|html|replace needle=Frank replacement=Steve&gt;, right?&lt;/div&gt;
  * </pre>
  *
+ * <h3>Storing Values in the Template</h3>
+ *
+ * <p>
+ * Sometimes it can be necessary to store a value in the template for later
+ * use. In conjunction with a replacement filter this can be used to include
+ * template variables in strings that are output by other filters, e.g. an
+ * i18n filter.
+ * </p>
+ *
+ * <pre>
+ * <% user | html | store key='htmlUser'>
+ * <% HelloText | i18n | html | insert needle='${user}' key='htmlUser'>
+ * </pre>
+ *
+ * <p>
+ * The “insert” filter can also read variables directly from the template.
+ * </p>
+ *
  * <h3>Internationalization / Localization (i18n, l10n)</h3>
  *
  * <p>
