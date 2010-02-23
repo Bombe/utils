@@ -32,13 +32,15 @@ public interface Accessor {
 	/**
 	 * Returns the member with the given name.
 	 *
+	 * @param template
+	 *            The template that is currently being rendered
 	 * @param object
 	 *            The object to access
 	 * @param member
 	 *            The name of the member
 	 * @return The member, or {@code null} if the member does not exist
 	 */
-	public Object get(Object object, String member);
+	public Object get(Template template, Object object, String member);
 
 }
 
@@ -53,7 +55,7 @@ class MapAccessor implements Accessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(Object object, String member) {
+	public Object get(Template template, Object object, String member) {
 		return ((Map<?, ?>) object).get(member);
 	}
 

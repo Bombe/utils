@@ -34,7 +34,7 @@ public class InsertFilter extends ReplaceFilter {
 	 */
 	@Override
 	public String format(Template template, Object data, Map<String, String> parameters) {
-		parameters.put("replacement", String.valueOf(template.getData(parameters.get("key"))));
+		parameters.put("replacement", String.valueOf(template.getData(template, parameters.get("key"))));
 		return super.format(template, data, parameters);
 	}
 

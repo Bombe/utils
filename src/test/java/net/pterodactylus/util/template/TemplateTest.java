@@ -337,7 +337,7 @@ public class TemplateTest extends TestCase {
 			 */
 			@Override
 			@SuppressWarnings("unchecked")
-			public Object get(Object object, String member) {
+			public Object get(Template template, Object object, String member) {
 				try {
 					return ((Callable<String>) object).call();
 				} catch (Exception e1) {

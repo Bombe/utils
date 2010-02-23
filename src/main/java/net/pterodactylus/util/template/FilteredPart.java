@@ -60,7 +60,7 @@ class FilteredPart extends Part {
 	 */
 	@Override
 	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object data = dataProvider.getData(name);
+		Object data = dataProvider.getData(template, name);
 		String output = String.valueOf(data);
 		for (Filter filter : filters) {
 			data = output = filter.format(template, data, allFilterParameters.get(filter));

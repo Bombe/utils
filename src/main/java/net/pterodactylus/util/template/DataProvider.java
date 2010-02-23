@@ -78,13 +78,15 @@ abstract class DataProvider {
 	 * hierarchical structures separated by a dot (“.”), such as “loop.count” in
 	 * which case a {@link Map} must be stored under “loop”.
 	 *
+	 * @param template
+	 *            The template that is currently being rendered
 	 * @param name
 	 *            The name of the object to get
 	 * @return The object
 	 * @throws TemplateException
 	 *             if the name or some objects can not be parsed or evaluated
 	 */
-	public Object getData(String name) throws TemplateException {
+	public Object getData(Template template, String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
 			return retrieveData(name);
 		}
@@ -97,7 +99,7 @@ abstract class DataProvider {
 			} else {
 				Accessor accessor = findAccessor(object.getClass());
 				if (accessor != null) {
-					object = accessor.get(object, nameToken);
+					object = accessor.get(template, object, nameToken);
 				} else {
 					throw new TemplateException("no accessor found for " + object.getClass());
 				}

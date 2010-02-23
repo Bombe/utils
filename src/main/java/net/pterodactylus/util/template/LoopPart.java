@@ -75,7 +75,7 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
-		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
+		Collection<?> collection = (Collection<?>) dataProvider.getData(template, collectionName);
 		if (collection.isEmpty()) {
 			return;
 		}
@@ -198,7 +198,7 @@ class LoopPart extends ContainerPart {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Object get(Object object, String member) {
+		public Object get(Template template, Object object, String member) {
 			LoopStructure loopStructure = (LoopStructure) object;
 			if ("size".equals(member)) {
 				return loopStructure.getSize();
