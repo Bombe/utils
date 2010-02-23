@@ -47,9 +47,9 @@ class ConditionalPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
 		if (condition.isAllowed(dataProvider)) {
-			super.render(dataProvider, writer);
+			super.render(template, dataProvider, writer);
 		}
 	}
 

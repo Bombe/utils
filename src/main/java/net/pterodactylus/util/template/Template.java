@@ -112,7 +112,7 @@ public class Template extends DataProvider {
 	 */
 	public synchronized void render(Writer writer) throws TemplateException {
 		parse();
-		parsedTemplate.render(this, writer);
+		parsedTemplate.render(this, this, writer);
 	}
 
 	//
@@ -556,8 +556,8 @@ public class Template extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(Object data, Map<String, String> parameters) {
-			return originalFilter.format(data, parameters);
+		public String format(Template template, Object data, Map<String, String> parameters) {
+			return originalFilter.format(template, data, parameters);
 		}
 
 	}

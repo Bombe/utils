@@ -74,7 +74,7 @@ class LoopPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+	public void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
 		if (collection.isEmpty()) {
 			return;
@@ -87,7 +87,7 @@ class LoopPart extends ContainerPart {
 			DataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
 			loopDataProvider.addAccessor(LoopStructure.class, LOOP_STRUCTURE_ACCESSOR);
 			for (Part part : parts) {
-				part.render(loopDataProvider, writer);
+				part.render(template, loopDataProvider, writer);
 			}
 			loopStructure.incCount();
 		}

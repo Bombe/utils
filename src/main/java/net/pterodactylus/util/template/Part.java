@@ -30,6 +30,8 @@ abstract class Part {
 	/**
 	 * Renders this part.
 	 *
+	 * @param template
+	 *            The template that is currently being parsed or rendered
 	 * @param dataProvider
 	 *            The data provider for the part
 	 * @param writer
@@ -37,6 +39,6 @@ abstract class Part {
 	 * @throws TemplateException
 	 *             if a template variable can not be parsed
 	 */
-	public abstract void render(DataProvider dataProvider, Writer writer) throws TemplateException;
+	public abstract void render(Template template, DataProvider dataProvider, Writer writer) throws TemplateException;
 
 }
