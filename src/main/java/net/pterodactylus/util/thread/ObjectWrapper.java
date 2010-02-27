@@ -67,6 +67,17 @@ public class ObjectWrapper<T> {
 	}
 
 	/**
+	 * Returns whether the value has been set.
+	 *
+	 * @return {@code true} if the value was set, {@code false} otherwise
+	 */
+	public boolean isSet() {
+		synchronized (syncObject) {
+			return set;
+		}
+	}
+
+	/**
 	 * Sets the wrapped object.
 	 *
 	 * @param wrappedObject
