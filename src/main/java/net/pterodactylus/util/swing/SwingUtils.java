@@ -19,6 +19,7 @@ package net.pterodactylus.util.swing;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
 
@@ -68,6 +69,17 @@ public class SwingUtils {
 		window.pack();
 		window.setLocation((center.x - window.getWidth() / 2), (center.y - window.getHeight() / 2));
 		window.repaint();
+	}
+
+	/**
+	 * Returns the center of the given rectangle.
+	 *
+	 * @param bounds
+	 *            The rectangle which center to get
+	 * @return The center of the rectangle
+	 */
+	private static Point getCenter(Rectangle bounds) {
+		return new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 	}
 
 }
