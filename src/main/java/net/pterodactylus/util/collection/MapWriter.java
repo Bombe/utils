@@ -40,7 +40,7 @@ import net.pterodactylus.util.number.Hex;
  * drawbacks of {@link Properties} (namely the fact that a
  * <code>Properties</code> can not contain <code>null</code> values).
  *
- * @author David Roden &lt;droden@gmail.com&gt;
+ * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MapWriter {
 
