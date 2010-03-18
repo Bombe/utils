@@ -56,4 +56,18 @@ public class SwingUtils {
 		window.setLocation(ownerWindowLocation.x + (ownerWindowDimension.width - windowSize.width) / 2, ownerWindowLocation.y + (ownerWindowDimension.height - windowSize.height) / 2);
 	}
 
+	/**
+	 * {@link Window#pack() Packs} the given window and positions it so that its
+	 * center stays the same.
+	 *
+	 * @param window
+	 *            The window to pack and recenter
+	 */
+	public static void repackCentered(Window window) {
+		Point center = getCenter(window.getBounds());
+		window.pack();
+		window.setLocation((center.x - window.getWidth() / 2), (center.y - window.getHeight() / 2));
+		window.repaint();
+	}
+
 }
