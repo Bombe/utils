@@ -443,10 +443,13 @@ public class I18n {
 	 *            The name of the resource
 	 */
 	private void loadResource(Properties currentValues, ClassLoader classLoader, String resourceName) {
+		logger.log(Level.FINEST, "Trying to load resources from " + resourceName + "…");
 		InputStream inputStream = classLoader.getResourceAsStream(resourceName);
 		if (inputStream != null) {
 			try {
+				logger.log(Level.FINEST, "Loading resources from " + resourceName + "…");
 				currentValues.load(inputStream);
+				logger.log(Level.FINEST, "Resources successfully loaded.");
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, String.format("Could not read properties from “%1$s”.", resourceName), ioe1);
 			} catch (IllegalArgumentException iae1) {
