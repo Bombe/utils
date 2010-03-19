@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Formatter;
@@ -69,6 +70,9 @@ public class I18n {
 
 	/** The current translation values. */
 	private Map<String, String> values = new HashMap<String, String>();
+
+	/** Whether to use {@link MessageFormat} for formatting. */
+	private boolean useMessageFormat = false;
 
 	/**
 	 * Creates a new i18n handler.
@@ -194,6 +198,18 @@ public class I18n {
 	//
 
 	/**
+	 * Sets whether to use {@link MessageFormat} for formatting values with
+	 * parameters.
+	 *
+	 * @param useMessageFormat
+	 *            {@code true} to use {@link MessageFormat}, {@code false} to
+	 *            use {@link String#format(String, Object...)}
+	 */
+	public void useMessageFormat(boolean useMessageFormat) {
+		this.useMessageFormat = useMessageFormat;
+	}
+
+	/**
 	 * Returns the current locale.
 	 *
 	 * @return The current locale
@@ -273,7 +289,7 @@ public class I18n {
 			return key;
 		}
 		if ((parameters != null) && (parameters.length > 0)) {
-			return String.format(value, parameters);
+			return useMessageFormat ? MessageFormat.format(value, parameters) : String.format(value, parameters);
 		}
 		return value;
 	}
