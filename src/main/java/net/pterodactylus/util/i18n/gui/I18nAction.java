@@ -33,7 +33,7 @@ import net.pterodactylus.util.i18n.I18n.RemovalReference;
 public abstract class I18nAction extends AbstractAction implements I18nable {
 
 	/** The i18n handler. */
-	private final I18n i18n;
+	protected final I18n i18n;
 
 	/** The I18n basename. */
 	private final String i18nName;
