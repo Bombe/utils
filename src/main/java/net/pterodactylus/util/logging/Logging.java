@@ -118,7 +118,9 @@ public class Logging {
 		});
 		rootLogger.addHandler(consoleHandler);
 		rootLogger.setUseParentHandlers(false);
-		rootLogger.setLevel(Level.ALL);
+		if (rootLogger.getLevel() == null) {
+			rootLogger.setLevel(Level.ALL);
+		}
 	}
 
 	/**
