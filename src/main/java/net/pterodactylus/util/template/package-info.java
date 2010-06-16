@@ -69,7 +69,7 @@
  * Item: &lt;% pointItem&gt;
  * &lt;/li&gt;
  * &lt;%/foreach&gt;
- * &lt;/ut&gt;
+ * &lt;/ul&gt;
  * </pre>
  *
  * This will output the value of each item in the collection.
@@ -91,8 +91,10 @@
  * &lt;li&gt;
  * Item: &lt;% pointItem&gt;
  * &lt;/li&gt;
+ * &lt;%last&gt;
+ * &lt;/ul&gt;
+ * &lt;%/last&gt;
  * &lt;%/foreach&gt;
- * &lt;/ut&gt;
  * </pre>
  *
  * <p>
@@ -111,13 +113,13 @@
  * </p>
  *
  * <pre>
- * &lt;%foreach itemCollection item&gt;
  * &lt;ul&gt;
+ * &lt;%foreach itemCollection item&gt;
  * &lt;li&gt;
  * Item: &lt;a href="item?id=&lt;% item.id&gt;">&lt;% item.name&gt;&lt;/a&gt;
  * &lt;/li&gt;
  * &lt;%/foreach&gt;
- * &lt;/ut&gt;
+ * &lt;/ul&gt;
  * </pre>
  *
  * <p>
