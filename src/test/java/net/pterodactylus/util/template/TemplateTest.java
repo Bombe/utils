@@ -805,6 +805,42 @@ public class TemplateTest extends TestCase {
 		compare(tagWords, "item", null, "replace", "a=<b foo=\"bar\">", null, "html");
 	}
 
+	/**
+	 * Tests template inclusion with the “<%include>” directive.
+	 */
+	public void testTemplateInclusion() {
+		Template outerTemplate;
+		Template innerTemplate;
+		StringWriter stringWriter;
+
+		outerTemplate = new Template(new StringReader("Line.\n<%include test>\nLine."));
+		innerTemplate = new Template(new StringReader("Sentence!"));
+		stringWriter = new StringWriter();
+
+		outerTemplate.set("test", innerTemplate);
+		outerTemplate.render(stringWriter);
+		assertEquals("Line.\nSentence!\nLine.", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("Line.\n<%include test>\nLine."));
+		innerTemplate = new Template(new StringReader("<% a>"));
+		stringWriter = new StringWriter();
+
+		innerTemplate.set("a", "a");
+		outerTemplate.set("test", innerTemplate);
+		outerTemplate.render(stringWriter);
+		assertEquals("Line.\na\nLine.", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("Line.\n<%include test>\nLine."));
+		innerTemplate = new Template(new StringReader("<% a>"));
+		stringWriter = new StringWriter();
+
+		innerTemplate.set("a", "a");
+		outerTemplate.set("test", innerTemplate);
+		outerTemplate.set("a", "b");
+		outerTemplate.render(stringWriter);
+		assertEquals("Line.\nb\nLine.", stringWriter.toString());
+	}
+
 	private void compare(List<String> actualWords, String... expectedWords) {
 		assertEquals(expectedWords.length, actualWords.size());
 		int counter = 0;
