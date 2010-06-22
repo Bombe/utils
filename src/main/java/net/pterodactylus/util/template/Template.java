@@ -48,6 +48,9 @@ public class Template {
 	/** The template’s default data store. */
 	private DataProvider dataProvider = new DataProvider();
 
+	/** The template’s default template provider. */
+	private TemplateProvider templateProvider = new DataTemplateProvider(dataProvider);
+
 	/** The input of the template. */
 	private final Reader input;
 
@@ -104,6 +107,25 @@ public class Template {
 	}
 
 	/**
+	 * Sets a custom template provider for this template.
+	 *
+	 * @param templateProvider
+	 *            The new template provider
+	 */
+	public void setTemplateProvider(TemplateProvider templateProvider) {
+		this.templateProvider = templateProvider;
+	}
+
+	/**
+	 * Exposes the data provider, e.g. for {@link TemplatePart}.
+	 *
+	 * @return The template’s data provider
+	 */
+	DataProvider getDataProvider() {
+		return dataProvider;
+	}
+
+	/**
 	 * Parses the input of the template if it wasn’t already parsed.
 	 *
 	 * @throws TemplateException
@@ -124,6 +146,20 @@ public class Template {
 	 *             if the template can not be parsed
 	 */
 	public synchronized void render(Writer writer) throws TemplateException {
+		render(dataProvider, writer);
+	}
+
+	/**
+	 * Renders the template to the given writer.
+	 *
+	 * @param dataProvider
+	 *            The data provider for template variables
+	 * @param writer
+	 *            The write to render the template to
+	 * @throws TemplateException
+	 *             if the template can not be parsed
+	 */
+	public synchronized void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		parse();
 		parsedTemplate.render(dataProvider, writer);
 	}
@@ -358,6 +394,15 @@ public class Template {
 						lastConditions.peek().add(condition);
 						lastIfCommand.pop();
 						lastIfCommand.push("elseif");
+					} else if (function.equals("include")) {
+						if (!tokens.hasNext()) {
+							throw new TemplateException("include requires one parameter");
+						}
+						String templateName = tokens.next();
+						Template includedTemplate = templateProvider.getTemplate(templateName);
+						if (includedTemplate != null) {
+							parts.add(new TemplatePart(includedTemplate));
+						}
 					} else {
 						boolean directText = false;
 						String itemName = function;
