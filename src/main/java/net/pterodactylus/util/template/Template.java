@@ -509,6 +509,8 @@ public class Template {
 			} else if (inDoubleQuotes) {
 				if (c == '"') {
 					inDoubleQuotes = false;
+				} else if (c == '\\') {
+					inBackslash = true;
 				} else {
 					currentExpression.append(c);
 				}
