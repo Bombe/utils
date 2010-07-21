@@ -44,6 +44,7 @@ public class ReadOnlyValue<T> implements Value<T> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public T getValue() throws ConfigurationException {
 		return value;
 	}
@@ -53,6 +54,7 @@ public class ReadOnlyValue<T> implements Value<T> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public T getValue(T defaultValue) {
 		return value;
 	}
@@ -62,6 +64,7 @@ public class ReadOnlyValue<T> implements Value<T> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(T newValue) throws ConfigurationException {
 		/* ignore. */
 	}

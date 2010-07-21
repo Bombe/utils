@@ -39,6 +39,7 @@ public interface Service extends ServiceMBean {
 	 *
 	 * @return The current state of this service
 	 */
+	@Override
 	public State getState();
 
 	/**
@@ -57,6 +58,7 @@ public interface Service extends ServiceMBean {
 	 * @see net.pterodactylus.util.service.ServiceMBean#getAction()
 	 * @return The current action of the service
 	 */
+	@Override
 	public String getAction();
 
 	/**
@@ -84,11 +86,13 @@ public interface Service extends ServiceMBean {
 	/**
 	 * Starts the service.
 	 */
+	@Override
 	public void start();
 
 	/**
 	 * Stops the service.
 	 */
+	@Override
 	public void stop();
 
 	/**

@@ -56,6 +56,7 @@ public class PairCreator<L, R> implements ObjectCreator<Pair<L, R>> {
 	/**
 	 * @see net.pterodactylus.util.database.ObjectCreator#createObject(java.sql.ResultSet)
 	 */
+	@Override
 	public Pair<L, R> createObject(ResultSet resultSet) throws SQLException {
 		return new Pair<L, R>(leftObjectCreator.createObject(resultSet), rightObjectCreator.createObject(resultSet));
 	}

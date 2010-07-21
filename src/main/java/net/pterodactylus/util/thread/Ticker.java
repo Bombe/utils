@@ -213,6 +213,7 @@ public class Ticker implements Runnable {
 	/**
 	 * Main ticker thread.
 	 */
+	@Override
 	public void run() {
 		logger.log(Level.INFO, "Ticker started.");
 		synchronized (syncObject) {
@@ -322,6 +323,7 @@ public class Ticker implements Runnable {
 		 *
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
+		@Override
 		public int compareTo(EventIdentifier o) {
 			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, executionTime - o.executionTime));
 		}

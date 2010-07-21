@@ -91,6 +91,7 @@ public abstract class AbstractCommand implements Command {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -98,6 +99,7 @@ public abstract class AbstractCommand implements Command {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getBriefDescription() {
 		return briefDescription;
 	}
@@ -105,6 +107,7 @@ public abstract class AbstractCommand implements Command {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<String> getDetailedDescription() {
 		return detailedDescription;
 	}

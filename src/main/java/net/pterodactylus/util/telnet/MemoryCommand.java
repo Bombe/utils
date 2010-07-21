@@ -40,6 +40,7 @@ public class MemoryCommand extends AbstractCommand {
 	/**
 	 * @see net.pterodactylus.util.telnet.Command#execute(java.util.List)
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		long freeMemory = Runtime.getRuntime().freeMemory();
 		long totalMemory = Runtime.getRuntime().totalMemory();

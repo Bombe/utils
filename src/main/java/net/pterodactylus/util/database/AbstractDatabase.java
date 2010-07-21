@@ -47,6 +47,7 @@ public abstract class AbstractDatabase implements Database {
 	 * @see net.pterodactylus.util.database.Database#getSingle(net.pterodactylus.util.database.Query,
 	 *      net.pterodactylus.util.database.ObjectCreator)
 	 */
+	@Override
 	public <T> T getSingle(Query query, ObjectCreator<T> objectCreator) throws DatabaseException {
 		return new SingleDatabaseWorker<T>(query, objectCreator).work();
 	}
@@ -55,6 +56,7 @@ public abstract class AbstractDatabase implements Database {
 	 * @see net.pterodactylus.util.database.Database#getMultiple(net.pterodactylus.util.database.Query,
 	 *      net.pterodactylus.util.database.ObjectCreator)
 	 */
+	@Override
 	public <T> Collection<T> getMultiple(Query query, ObjectCreator<T> objectCreator) throws DatabaseException {
 		return new MultipleDatabaseWorker<T>(query, objectCreator).work();
 	}
@@ -62,6 +64,7 @@ public abstract class AbstractDatabase implements Database {
 	/**
 	 * @see net.pterodactylus.util.database.Database#insert(net.pterodactylus.util.database.Query)
 	 */
+	@Override
 	public long insert(Query query) throws DatabaseException {
 		return new InsertDatabaseWorker(query).work();
 	}
@@ -69,6 +72,7 @@ public abstract class AbstractDatabase implements Database {
 	/**
 	 * @see net.pterodactylus.util.database.Database#update(net.pterodactylus.util.database.Query)
 	 */
+	@Override
 	public int update(Query query) throws DatabaseException {
 		return new UpdateDatabaseWorker(query).work();
 	}
@@ -78,6 +82,7 @@ public abstract class AbstractDatabase implements Database {
 	 *
 	 * @see net.pterodactylus.util.database.Database#process(Query, ResultProcessor)
 	 */
+	@Override
 	public void process(Query query, ResultProcessor resultProcessor) throws DatabaseException {
 		new ProcessWorker(query, resultProcessor).work();
 	}

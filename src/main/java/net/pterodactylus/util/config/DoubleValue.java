@@ -42,6 +42,7 @@ public class DoubleValue extends AbstractValue<Double> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public Double getValue() throws ConfigurationException {
 		String value = null;
 		try {
@@ -58,6 +59,7 @@ public class DoubleValue extends AbstractValue<Double> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public Double getValue(Double defaultValue) {
 		String value = null;
 		try {
@@ -76,6 +78,7 @@ public class DoubleValue extends AbstractValue<Double> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(Double newValue) throws ConfigurationException {
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}

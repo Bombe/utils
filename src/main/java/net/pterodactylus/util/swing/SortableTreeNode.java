@@ -89,6 +89,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean getAllowsChildren() {
 		return allowsChildren;
 	}
@@ -96,6 +97,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public TreeNode getChildAt(int childIndex) {
 		return children.get(childIndex);
 	}
@@ -103,6 +105,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getChildCount() {
 		return children.size();
 	}
@@ -110,6 +113,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getIndex(TreeNode node) {
 		return children.indexOf(node);
 	}
@@ -117,6 +121,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public TreeNode getParent() {
 		return parentNode;
 	}
@@ -133,6 +138,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isLeaf() {
 		return children.isEmpty();
 	}
@@ -140,6 +146,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Enumeration<?> children() {
 		return Collections.enumeration(children);
 	}
@@ -162,6 +169,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void insert(MutableTreeNode child, int index) {
 		children.add(index, child);
 		child.setParent(this);
@@ -170,6 +178,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void remove(int index) {
 		children.remove(index).setParent(null);
 	}
@@ -177,6 +186,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void remove(MutableTreeNode node) {
 		children.remove(node);
 		node.setParent(null);
@@ -185,6 +195,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeFromParent() {
 		if (parentNode != null) {
 			parentNode.remove(this);
@@ -205,6 +216,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setParent(MutableTreeNode newParent) {
 		parentNode = newParent;
 	}
@@ -212,6 +224,7 @@ public class SortableTreeNode implements MutableTreeNode {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setUserObject(Object userObject) {
 		this.userObject = userObject;
 	}
@@ -225,6 +238,7 @@ public class SortableTreeNode implements MutableTreeNode {
 			/**
 			 * {@inheritDoc}
 			 */
+			@Override
 			@SuppressWarnings( { "synthetic-access", "unchecked" })
 			public int compare(MutableTreeNode firstNode, MutableTreeNode secondNode) {
 				if (!(firstNode instanceof SortableTreeNode) || !(secondNode instanceof SortableTreeNode)) {

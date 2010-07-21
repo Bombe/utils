@@ -42,6 +42,7 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public Boolean getValue() throws ConfigurationException {
 		String value = configuration.configurationBackend.getValue(attribute);
 		return Boolean.valueOf(("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value)));
@@ -52,6 +53,7 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public Boolean getValue(Boolean defaultValue) {
 		try {
 			String value = configuration.configurationBackend.getValue(attribute);
@@ -66,6 +68,7 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(Boolean newValue) throws ConfigurationException {
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}

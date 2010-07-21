@@ -41,6 +41,7 @@ public class UptimeCommand extends AbstractCommand {
 	/**
 	 * @see net.pterodactylus.util.telnet.Command#execute(java.util.List)
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		return new Reply(200, new Duration(System.currentTimeMillis() - startupTime).toString(false));
 	}

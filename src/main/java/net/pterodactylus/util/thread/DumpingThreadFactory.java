@@ -92,6 +92,7 @@ public class DumpingThreadFactory implements ThreadFactory {
 	 *         runnable
 	 * @see java.util.concurrent.ThreadFactory#newThread(java.lang.Runnable)
 	 */
+	@Override
 	public Thread newThread(Runnable r) {
 		Thread thread = new DumpingThread(r);
 		thread.setDaemon(createDaemonThreads);

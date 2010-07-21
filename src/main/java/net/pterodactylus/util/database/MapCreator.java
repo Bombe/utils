@@ -44,6 +44,7 @@ public class MapCreator implements ObjectCreator<Map<String, Object>> {
 	/**
 	 * @see net.pterodactylus.util.database.ObjectCreator#createObject(java.sql.ResultSet)
 	 */
+	@Override
 	public Map<String, Object> createObject(ResultSet resultSet) throws SQLException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		ResultSetMetaData metadata = resultSet.getMetaData();

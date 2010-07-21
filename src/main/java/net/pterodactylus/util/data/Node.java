@@ -156,6 +156,7 @@ public interface Node<E extends Comparable<E>> extends Iterable<Node<E>>, Compar
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Iterator<Node<E>> iterator();
 
 	/**

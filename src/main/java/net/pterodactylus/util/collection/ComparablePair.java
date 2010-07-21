@@ -46,6 +46,7 @@ public class ComparablePair<S extends Comparable<S>, T extends Comparable<T>> ex
 	/**
 	 * @see java.lang.Comparable#compareTo(Object)
 	 */
+	@Override
 	public int compareTo(ComparablePair<S, T> pair) {
 		int leftDifference = left.compareTo(pair.left);
 		return (leftDifference == 0) ? right.compareTo(pair.right) : leftDifference;

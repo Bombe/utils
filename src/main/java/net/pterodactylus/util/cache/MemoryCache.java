@@ -99,6 +99,7 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 	/**
 	 * @see net.pterodactylus.util.cache.Cache#clear()
 	 */
+	@Override
 	public void clear() {
 		cacheLock.writeLock().lock();
 		try {
@@ -111,6 +112,7 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 	/**
 	 * @see net.pterodactylus.util.cache.Cache#contains(java.lang.Object)
 	 */
+	@Override
 	public boolean contains(K key) {
 		cacheLock.readLock().lock();
 		try {
@@ -123,6 +125,7 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 	/**
 	 * @see net.pterodactylus.util.cache.Cache#get(java.lang.Object)
 	 */
+	@Override
 	public V get(K key) throws CacheException {
 		cacheLock.readLock().lock();
 		try {
@@ -152,6 +155,7 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 	/**
 	 * @see net.pterodactylus.util.cache.Cache#size()
 	 */
+	@Override
 	public int size() {
 		cacheLock.readLock().lock();
 		try {

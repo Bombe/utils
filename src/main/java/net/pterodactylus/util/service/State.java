@@ -122,6 +122,7 @@ public class State implements Comparable<State> {
 	 * @return A negative number if this state’s ordinal is smaller than the
 	 *         ordinal of the given state’s basic state
 	 */
+	@Override
 	public int compareTo(State state) {
 		return this.basicState.ordinal - state.basicState.ordinal;
 	}

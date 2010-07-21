@@ -68,6 +68,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Node<E> getParent() {
 		return parentNode;
 	}
@@ -75,6 +76,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public E getElement() {
 		return element;
 	}
@@ -82,6 +84,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Node<E> addChild(E child) {
 		Node<E> childNode = new DefaultNode<E>(this, child);
 		children.add(childNode);
@@ -91,6 +94,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int size() {
 		return children.size();
 	}
@@ -98,6 +102,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Node<E> getChild(int childIndex) {
 		return children.get(childIndex);
 	}
@@ -105,6 +110,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Node<E> getChild(E element) {
 		for (Node<E> childNode : children) {
 			if (childNode.getElement().equals(element)) {
@@ -117,6 +123,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean hasChild(Node<E> childNode) {
 		return children.contains(childNode);
 	}
@@ -124,6 +131,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean hasChild(E element) {
 		for (Node<E> childNode : children) {
 			if (childNode.getElement().equals(element)) {
@@ -136,6 +144,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getIndexOfChild(Node<E> childNode) {
 		int childIndex = 0;
 		for (Node<E> node : children) {
@@ -150,6 +159,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getIndexOfChild(E element) {
 		int childIndex = 0;
 		for (Node<E> node : children) {
@@ -164,6 +174,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeChild(Node<E> childNode) {
 		children.remove(childNode);
 	}
@@ -171,6 +182,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeChild(E child) {
 		for (Node<E> childNode : children) {
 			if (child.equals(childNode.getElement())) {
@@ -183,6 +195,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeChild(int childIndex) {
 		children.remove(childIndex);
 	}
@@ -190,6 +203,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeAllChildren() {
 		children.clear();
 	}
@@ -197,6 +211,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Iterator<Node<E>> iterator() {
 		return children.iterator();
 	}
@@ -204,6 +219,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Node<E> findChild(E element) {
 		for (Node<E> childNode : children) {
 			Node<E> wantedNode = childNode.findChild(element);
@@ -220,6 +236,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void sortChildren() {
 		Collections.sort(children);
 	}
@@ -227,6 +244,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void sortChildren(Comparator<Node<E>> comparator) {
 		Collections.sort(children, comparator);
 	}
@@ -238,6 +256,7 @@ class DefaultNode<E extends Comparable<E>> implements Node<E> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int compareTo(Node<E> otherNode) {
 		return element.compareTo(otherNode.getElement());
 	}

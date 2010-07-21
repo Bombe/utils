@@ -42,6 +42,7 @@ public class IntegerValue extends AbstractValue<Integer> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public Integer getValue() throws ConfigurationException {
 		String value = null;
 		try {
@@ -58,6 +59,7 @@ public class IntegerValue extends AbstractValue<Integer> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public Integer getValue(Integer defaultValue) {
 		String value = null;
 		try {
@@ -76,6 +78,7 @@ public class IntegerValue extends AbstractValue<Integer> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(Integer newValue) throws ConfigurationException {
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}

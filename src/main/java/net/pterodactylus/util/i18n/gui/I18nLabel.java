@@ -190,6 +190,7 @@ public class I18nLabel extends JLabel implements I18nable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateI18n() {
 		setText(i18n.get(i18nBasename + ".name", arguments));
 		if (getLabelFor() != null) {

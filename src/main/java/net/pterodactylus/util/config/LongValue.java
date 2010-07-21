@@ -42,6 +42,7 @@ public class LongValue extends AbstractValue<Long> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public Long getValue() throws ConfigurationException {
 		String value = null;
 		try {
@@ -58,6 +59,7 @@ public class LongValue extends AbstractValue<Long> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public Long getValue(Long defaultValue) {
 		String value = null;
 		try {
@@ -76,6 +78,7 @@ public class LongValue extends AbstractValue<Long> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(Long newValue) throws ConfigurationException {
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}

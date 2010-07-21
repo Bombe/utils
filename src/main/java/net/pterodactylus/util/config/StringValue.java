@@ -42,6 +42,7 @@ public class StringValue extends AbstractValue<String> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue()
 	 */
+	@Override
 	public String getValue() throws ConfigurationException {
 		return configuration.configurationBackend.getValue(attribute);
 	}
@@ -51,6 +52,7 @@ public class StringValue extends AbstractValue<String> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#getValue(java.lang.Object)
 	 */
+	@Override
 	public String getValue(String defaultValue) {
 		try {
 			return configuration.configurationBackend.getValue(attribute);
@@ -64,6 +66,7 @@ public class StringValue extends AbstractValue<String> {
 	 *
 	 * @see net.pterodactylus.util.config.Value#setValue(java.lang.Object)
 	 */
+	@Override
 	public void setValue(String newValue) throws ConfigurationException {
 		configuration.configurationBackend.putValue(attribute, newValue);
 	}

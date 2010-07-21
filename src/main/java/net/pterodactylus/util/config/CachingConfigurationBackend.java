@@ -49,6 +49,7 @@ public class CachingConfigurationBackend implements ConfigurationBackend {
 	 *
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#getValue(java.lang.String)
 	 */
+	@Override
 	public synchronized String getValue(String attribute) throws ConfigurationException {
 		if (attributeCache.containsKey(attribute)) {
 			return attributeCache.get(attribute);
@@ -64,6 +65,7 @@ public class CachingConfigurationBackend implements ConfigurationBackend {
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#putValue(java.lang.String,
 	 *      java.lang.String)
 	 */
+	@Override
 	public synchronized void putValue(String attribute, String value) throws ConfigurationException {
 		attributeCache.put(attribute, value);
 		realConfigurationBackend.putValue(attribute, value);

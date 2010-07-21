@@ -133,6 +133,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#addServiceListener(net.pterodactylus.util.service.ServiceListener)
 	 */
+	@Override
 	public void addServiceListener(ServiceListener serviceListener) {
 		serviceListenerSupport.addListener(serviceListener);
 	}
@@ -142,6 +143,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#removeServiceListener(net.pterodactylus.util.service.ServiceListener)
 	 */
+	@Override
 	public void removeServiceListener(ServiceListener serviceListener) {
 		serviceListenerSupport.removeListener(serviceListener);
 	}
@@ -166,6 +168,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#getState()
 	 */
+	@Override
 	public State getState() {
 		synchronized (syncObject) {
 			return state;
@@ -175,6 +178,7 @@ public abstract class AbstractService implements Service, Runnable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Deprecated
 	public String getStateReason() {
 		synchronized (syncObject) {
@@ -187,6 +191,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @return The current action of the service
 	 */
+	@Override
 	public String getAction() {
 		synchronized (syncObject) {
 			return action;
@@ -198,6 +203,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -215,6 +221,7 @@ public abstract class AbstractService implements Service, Runnable {
 	/**
 	 * @see net.pterodactylus.util.service.Service#getServiceAttribute(java.lang.String)
 	 */
+	@Override
 	public Object getServiceAttribute(String attributeName) {
 		synchronized (syncObject) {
 			return serviceAttributes.get(attributeName);
@@ -224,6 +231,7 @@ public abstract class AbstractService implements Service, Runnable {
 	/**
 	 * @see net.pterodactylus.util.service.Service#hasServiceAttribute(java.lang.String)
 	 */
+	@Override
 	public boolean hasServiceAttribute(String attributeName) {
 		synchronized (syncObject) {
 			return serviceAttributes.containsKey(attributeName);
@@ -234,6 +242,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 * @see net.pterodactylus.util.service.Service#setServiceAttribute(java.lang.String,
 	 *      java.lang.Object)
 	 */
+	@Override
 	public void setServiceAttribute(String attributeName, Object attributeValue) {
 		synchronized (syncObject) {
 			serviceAttributes.put(attributeName, attributeValue);
@@ -347,6 +356,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 * @see #serviceInit()
 	 * @see net.pterodactylus.util.service.Service#init()
 	 */
+	@Override
 	public final void init() {
 		if (state.getBasicState() != State.offline) {
 			logger.log(Level.WARNING, "will not init " + name + ", state is " + getState());
@@ -374,6 +384,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 * @see #serviceStart()
 	 * @see net.pterodactylus.util.service.Service#start()
 	 */
+	@Override
 	public final void start() {
 		if (getState() != State.offline) {
 			logger.log(Level.WARNING, "will not start " + name + ", state is " + getState());
@@ -414,6 +425,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 * both cases a {@link ServiceListener#serviceStopped(Service, Throwable)
 	 * Service-Stopped} event is fired.
 	 */
+	@Override
 	public final void run() {
 		Throwable cause = null;
 		try {
@@ -447,6 +459,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#stop()
 	 */
+	@Override
 	public final void stop() {
 		synchronized (syncObject) {
 			shouldStop = true;
@@ -473,6 +486,7 @@ public abstract class AbstractService implements Service, Runnable {
 	 *
 	 * @see net.pterodactylus.util.service.Service#destroy()
 	 */
+	@Override
 	public final void destroy() {
 		serviceDestroy();
 	}
@@ -566,6 +580,7 @@ public abstract class AbstractService implements Service, Runnable {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		@SuppressWarnings("synthetic-access")
 		public void serviceStarted(Service service) {
 			logger.log(Level.FINER, AbstractService.this + " started.");
@@ -577,6 +592,7 @@ public abstract class AbstractService implements Service, Runnable {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		public void serviceStateChanged(Service service, net.pterodactylus.util.service.State oldState, net.pterodactylus.util.service.State newState) {
 			/* ignore. */
 		}
@@ -584,6 +600,7 @@ public abstract class AbstractService implements Service, Runnable {
 		/**
 		 * {@inheritDoc}
 		 */
+		@Override
 		@SuppressWarnings("synthetic-access")
 		public void serviceStopped(Service service, Throwable cause) {
 			logger.log(Level.FINE, AbstractService.this + " stopped.", cause);

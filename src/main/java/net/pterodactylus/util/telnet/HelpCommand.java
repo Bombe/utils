@@ -52,6 +52,7 @@ public class HelpCommand extends AbstractCommand {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		Reply reply = new Reply(200);
 

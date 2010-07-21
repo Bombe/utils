@@ -156,6 +156,7 @@ public class Filters {
 			 *
 			 * @see java.util.Iterator#hasNext()
 			 */
+			@Override
 			public boolean hasNext() {
 				getNextElement();
 				return gotNextElement;
@@ -166,6 +167,7 @@ public class Filters {
 			 *
 			 * @see java.util.Iterator#next()
 			 */
+			@Override
 			public E next() {
 				getNextElement();
 				if (!gotNextElement) {
@@ -180,6 +182,7 @@ public class Filters {
 			 *
 			 * @see java.util.Iterator#remove()
 			 */
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException("remove() not supported on this iteration");
 			}

@@ -153,6 +153,7 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 *
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#getValue(java.lang.String)
 	 */
+	@Override
 	public String getValue(String attribute) throws ConfigurationException {
 		if (configurationFile.lastModified() > lastModified) {
 			logger.info("reloading configuration file " + configurationFile.getAbsolutePath());
@@ -171,6 +172,7 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#putValue(java.lang.String,
 	 *      java.lang.String)
 	 */
+	@Override
 	public void putValue(String attribute, String value) throws ConfigurationException {
 		SimpleXML node = getNode(attribute, true);
 		node.setValue(value);

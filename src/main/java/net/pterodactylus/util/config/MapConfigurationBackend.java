@@ -44,6 +44,7 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	 *
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#getValue(java.lang.String)
 	 */
+	@Override
 	public String getValue(String attribute) {
 		return values.get(attribute);
 	}
@@ -54,6 +55,7 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#putValue(java.lang.String,
 	 *      java.lang.String)
 	 */
+	@Override
 	public void putValue(String attribute, String value) {
 		values.put(attribute, value);
 	}

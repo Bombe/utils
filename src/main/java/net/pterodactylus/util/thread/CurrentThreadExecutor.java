@@ -31,6 +31,7 @@ public class CurrentThreadExecutor implements Executor {
 	 *
 	 * @see java.util.concurrent.Executor#execute(java.lang.Runnable)
 	 */
+	@Override
 	public void execute(Runnable command) {
 		command.run();
 	}

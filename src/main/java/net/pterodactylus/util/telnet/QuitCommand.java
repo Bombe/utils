@@ -36,6 +36,7 @@ public class QuitCommand extends AbstractCommand {
 	/**
 	 * @see net.pterodactylus.util.telnet.Command#execute(java.util.List)
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		return new Reply(200, "Goodbye.");
 	}

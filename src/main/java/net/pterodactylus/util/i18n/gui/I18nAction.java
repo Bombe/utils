@@ -185,6 +185,7 @@ public abstract class I18nAction extends AbstractAction implements I18nable {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void updateI18n() {
 		putValue(Action.NAME, i18n.get(i18nName + ".name"));
 		putValue(Action.MNEMONIC_KEY, i18n.getKey(i18nName + ".mnemonic"));

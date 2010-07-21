@@ -82,6 +82,7 @@ public interface ObjectCreator<T> {
 		/**
 		 * @see net.pterodactylus.util.database.ObjectCreator#createObject(java.sql.ResultSet)
 		 */
+		@Override
 		public Integer createObject(ResultSet resultSet) throws SQLException {
 			Integer result = resultSet.getInt(index);
 			if (resultSet.wasNull()) {
@@ -124,6 +125,7 @@ public interface ObjectCreator<T> {
 		/**
 		 * @see net.pterodactylus.util.database.ObjectCreator#createObject(java.sql.ResultSet)
 		 */
+		@Override
 		public String createObject(ResultSet resultSet) throws SQLException {
 			return resultSet.getString(index);
 		}

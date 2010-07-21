@@ -143,6 +143,7 @@ public class Version implements Comparable<Version> {
 	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
+	@Override
 	public int compareTo(Version version) {
 		int lengthDiff = numbers.length - version.numbers.length;
 		for (int index = 0; index < Math.abs(lengthDiff); index++) {

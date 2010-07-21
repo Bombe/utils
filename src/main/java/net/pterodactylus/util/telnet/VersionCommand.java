@@ -49,6 +49,7 @@ public class VersionCommand extends AbstractCommand {
 	/**
 	 * @see net.pterodactylus.util.telnet.Command#execute(java.util.List)
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		return new Reply(200, application + " " + version);
 	}

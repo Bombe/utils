@@ -19,6 +19,7 @@ public class GarbageCollectionCommand extends AbstractCommand {
 	/**
 	 * @see net.pterodactylus.util.telnet.Command#execute(java.util.List)
 	 */
+	@Override
 	public Reply execute(List<String> parameters) {
 		System.gc();
 		return new Reply(200, "Garbage Collection suggested.");
