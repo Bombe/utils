@@ -83,6 +83,7 @@ public class DataProvider {
 			if (classAccessors.containsKey(classToCheck)) {
 				return classAccessors.get(classToCheck);
 			}
+			classToCheck = classToCheck.getSuperclass();
 		}
 		for (Class<?> interfaceClass : clazz.getInterfaces()) {
 			if (classAccessors.containsKey(interfaceClass)) {
