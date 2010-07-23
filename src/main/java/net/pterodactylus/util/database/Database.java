@@ -17,7 +17,7 @@
 
 package net.pterodactylus.util.database;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface for the database abstraction. This interface holds methods that
@@ -52,11 +52,11 @@ public interface Database {
 	 *            The query to execute
 	 * @param objectCreator
 	 *            The object creator
-	 * @return A collection containing the objects from the database
+	 * @return A list containing the objects from the database
 	 * @throws DatabaseException
 	 *             if a database error occurs
 	 */
-	public <T> Collection<T> getMultiple(Query query, ObjectCreator<T> objectCreator) throws DatabaseException;
+	public <T> List<T> getMultiple(Query query, ObjectCreator<T> objectCreator) throws DatabaseException;
 
 	/**
 	 * Inserts an object into the database and returns the automatically

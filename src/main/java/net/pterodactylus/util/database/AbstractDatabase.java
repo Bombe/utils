@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -57,7 +56,7 @@ public abstract class AbstractDatabase implements Database {
 	 *      net.pterodactylus.util.database.ObjectCreator)
 	 */
 	@Override
-	public <T> Collection<T> getMultiple(Query query, ObjectCreator<T> objectCreator) throws DatabaseException {
+	public <T> List<T> getMultiple(Query query, ObjectCreator<T> objectCreator) throws DatabaseException {
 		return new MultipleDatabaseWorker<T>(query, objectCreator).work();
 	}
 
@@ -302,7 +301,7 @@ public abstract class AbstractDatabase implements Database {
 	 *            The type of the results
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class MultipleDatabaseWorker<T> extends AbstractDatabaseWorker<Collection<T>> {
+	private class MultipleDatabaseWorker<T> extends AbstractDatabaseWorker<List<T>> {
 
 		/** The object creator. */
 		private final ObjectCreator<T> objectCreator;
@@ -324,7 +323,7 @@ public abstract class AbstractDatabase implements Database {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Collection<T> run(ResultSet resultSet) throws SQLException {
+		protected List<T> run(ResultSet resultSet) throws SQLException {
 			List<T> results = new ArrayList<T>();
 			while (resultSet.next()) {
 				T object = objectCreator.createObject(resultSet);
