@@ -17,12 +17,17 @@
 
 package net.pterodactylus.util.database;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.pterodactylus.util.database.OrderField.Order;
 
 /**
  * Container for SQL queries and their parameters.
@@ -31,237 +36,228 @@ import java.util.Map;
  */
 public class Query {
 
-	/** The query string. */
-	private final String query;
-
-	/** The parameters. */
-	private final Map<Integer, Parameter<?>> parameters = new HashMap<Integer, Parameter<?>>();
-
 	/**
-	 * Creates a new query from the given string.
+	 * The type of the query.
 	 *
-	 * @param query
-	 *            The query string
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public Query(String query) {
-		this.query = query;
+	public enum Type {
+
+		/** Query is a SELECT. */
+		SELECT,
+
+		/** Query is an INSERT. */
+		INSERT,
+
+		/** Query is an UPDATE. */
+		UPDATE,
+
+		/** Query is a DELETE. */
+		DELETE
+
 	}
 
-	//
-	// ACTIONS
-	//
+	/** The type of the query. */
+	private final Type type;
+
+	/** The fields for a select query. */
+	private final List<Field> fields = new ArrayList<Field>();
+
+	/** The value fields for an insert or update query. */
+	private final List<ValueField> valueFields = new ArrayList<ValueField>();
+
+	/** The name of the table. */
+	private final String table;
+
+	/** The WHERE clauses. */
+	private final List<WhereClause> whereClauses = new ArrayList<WhereClause>();
+
+	/** The order fields for select queries. */
+	private final List<OrderField> orderFields = new ArrayList<OrderField>();
 
 	/**
-	 * Sets the integer at the given index to the given value.
+	 * Creates a new query.
 	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
+	 * @param type
+	 *            The type of the query
+	 * @param table
+	 *            The table that is processed
 	 */
-	public void setInt(int index, int value) {
-		parameters.put(index, new IntegerParameter(value));
-	}
-
-	/**
-	 * Sets the integer at the given index to the given value.
-	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
-	 */
-	public void setParameter(int index, int value) {
-		setInt(index, value);
-	}
-
-	/**
-	 * Sets the long at the given index to the given value.
-	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
-	 */
-	public void setLong(int index, long value) {
-		parameters.put(index, new LongParameter(value));
+	public Query(Type type, String table) {
+		this.type = type;
+		this.table = table;
 	}
 
 	/**
-	 * Sets the long at the given index to the given value.
+	 * Adds one or more fields to this query.
 	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
+	 * @param fields
+	 *            The fields to add
 	 */
-	public void setParameter(int index, long value) {
-		setLong(index, value);
+	public void addField(Field... fields) {
+		for (Field field : fields) {
+			this.fields.add(field);
+		}
 	}
 
 	/**
-	 * Sets the string at the given index to the given value.
+	 * Adds one or more value fields to this query.
 	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
+	 * @param valueFields
+	 *            The value fields to add
 	 */
-	public void setString(int index, String value) {
-		parameters.put(index, new StringParameter(value));
+	public void addValueField(ValueField... valueFields) {
+		for (ValueField valueField : valueFields) {
+			this.valueFields.add(valueField);
+		}
 	}
 
 	/**
-	 * Sets the string at the given index to the given value.
+	 * Adds one or more WHERE clauses to this query.
 	 *
-	 * @param index
-	 *            The index of the value to set
-	 * @param value
-	 *            The value to set
+	 * @param whereClauses
+	 *            The WHERE clauses to add
 	 */
-	public void setParameter(int index, String value) {
-		setString(index, value);
+	public void addWhereClause(WhereClause... whereClauses) {
+		for (WhereClause whereClause : whereClauses) {
+			this.whereClauses.add(whereClause);
+		}
 	}
 
 	/**
-	 * Creates a {@link PreparedStatement} from this query and its parameters.
+	 * Adds one or more order fields to this query.
+	 *
+	 * @param orderFields
+	 *            The order fields to add
+	 */
+	public void addOrderField(OrderField... orderFields) {
+		if (type != Type.SELECT) {
+			throw new IllegalStateException("Order fields are only allowed in SELECT queries.");
+		}
+		for (OrderField orderField : orderFields) {
+			this.orderFields.add(orderField);
+		}
+	}
+
+	/**
+	 * Creates an SQL statement from the given connection and prepares it for
+	 * execution.
 	 *
 	 * @param connection
-	 *            The connection to create a statement on
-	 * @return The created prepared statement
+	 *            The connection to create a statement from
+	 * @return The prepared statement, ready for execution
 	 * @throws SQLException
 	 *             if an SQL error occurs
 	 */
 	public PreparedStatement createStatement(Connection connection) throws SQLException {
+		StringWriter queryWriter = new StringWriter();
+		try {
+			render(queryWriter);
+		} catch (IOException ioe1) {
+			/* ignore. */
+		}
+		String query = queryWriter.toString();
+		System.out.println(query);
 		PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-		int index = 1;
-		while (parameters.containsKey(index)) {
-			Parameter<?> parameterValue = parameters.get(index);
-			parameterValue.setValue(preparedStatement, index);
-			index++;
+		int index = 0;
+		if ((type == Type.SELECT) || (type == Type.INSERT) || (type == Type.UPDATE)) {
+			for (WhereClause whereClause : whereClauses) {
+				for (Parameter<?> parameter : whereClause.getParameters()) {
+					parameter.set(preparedStatement, ++index);
+				}
+			}
 		}
 		return preparedStatement;
 	}
 
 	/**
-	 * Abstract base class for parameters.
+	 * Renders this query to the given writer.
 	 *
-	 * @param <T>
-	 *            The type of the parameter’s value
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 * @param writer
+	 *            The writer to render the query to
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
-	private abstract static class Parameter<T> {
-
-		/** The value. */
-		protected final T value;
-
-		/**
-		 * Creates a new parameter value.
-		 *
-		 * @param value
-		 *            The value of the parameter
-		 */
-		protected Parameter(T value) {
-			this.value = value;
+	public void render(Writer writer) throws IOException {
+		writer.write(type.name());
+		if (type == Type.SELECT) {
+			writer.write(' ');
+			if (fields.isEmpty()) {
+				writer.write('*');
+			} else {
+				boolean first = true;
+				for (Field field : fields) {
+					if (!first) {
+						writer.write(", ");
+					}
+					writer.write(field.getName());
+					first = false;
+				}
+			}
+			writer.write(" FROM ");
+			writer.write(table);
+			renderWhereClauses(writer);
+			if (!orderFields.isEmpty()) {
+				writer.write(" ORDER BY ");
+				boolean first = true;
+				for (OrderField orderField : orderFields) {
+					if (!first) {
+						writer.write(", ");
+					}
+					writer.write(orderField.getField().getName());
+					writer.write((orderField.getOrder() == Order.ASCENDING) ? " ASC" : " DESC");
+					first = false;
+				}
+			}
+		} else if (type == Type.UPDATE) {
+			writer.write(' ');
+			writer.write(table);
+			writer.write(" SET (");
+			boolean first = true;
+			for (ValueField valueField : valueFields) {
+				if (!first) {
+					writer.write(", ");
+				}
+				writer.write(valueField.getName());
+				first = false;
+			}
+			writer.write(") VALUES (");
+			first = true;
+			for (int fieldIndex = 0; fieldIndex < valueFields.size(); ++fieldIndex) {
+				if (!first) {
+					writer.write(", ");
+				}
+				writer.write('?');
+				first = false;
+			}
+			renderWhereClauses(writer);
+		} else if (type == Type.INSERT) {
+			/* TODO */
+		} else if (type == Type.DELETE) {
+			/* TODO */
 		}
-
-		/**
-		 * Sets the value of this parameter on the given statement at the given
-		 * index.
-		 *
-		 * @param preparedStatement
-		 *            The prepared statement to set the value on
-		 * @param index
-		 *            The index of the value to set
-		 * @throws SQLException
-		 *             if an SQL error occurs
-		 */
-		public abstract void setValue(PreparedStatement preparedStatement, int index) throws SQLException;
-
 	}
 
 	/**
-	 * A parameter that holds an integer value.
+	 * Renders the WHERE clauses, prepending a “WHERE” if there are WHERE
+	 * clauses to render.
 	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 * @param writer
+	 *            The writer to render the WHERE clauses to
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
-	private static class IntegerParameter extends Parameter<Integer> {
-
-		/**
-		 * Creates a new integer parameter with the given value.
-		 *
-		 * @param value
-		 *            The value of the parameter
-		 */
-		public IntegerParameter(int value) {
-			super(value);
+	private void renderWhereClauses(Writer writer) throws IOException {
+		if (whereClauses.isEmpty()) {
+			return;
 		}
-
-		/**
-		 * @see net.pterodactylus.util.database.Query.Parameter#setValue(java.sql.PreparedStatement,
-		 *      int)
-		 */
-		@Override
-		public void setValue(PreparedStatement preparedStatement, int index) throws SQLException {
-			preparedStatement.setInt(index, value);
+		writer.write(" WHERE ");
+		if (whereClauses.size() == 1) {
+			whereClauses.get(0).render(writer);
+			return;
 		}
-
-	}
-
-	/**
-	 * A parameter that holds a {@link Long} value.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private static class LongParameter extends Parameter<Long> {
-
-		/**
-		 * Creates a new long parameter with the given value.
-		 *
-		 * @param value
-		 *            The value of the parameter
-		 */
-		public LongParameter(long value) {
-			super(value);
-		}
-
-		/**
-		 * @see net.pterodactylus.util.database.Query.Parameter#setValue(java.sql.PreparedStatement,
-		 *      int)
-		 */
-		@Override
-		public void setValue(PreparedStatement preparedStatement, int index) throws SQLException {
-			preparedStatement.setLong(index, value);
-		}
-
-	}
-
-	/**
-	 * A parameter that holds a string value.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private static class StringParameter extends Parameter<String> {
-
-		/**
-		 * Creates a new string parameter with the given value.
-		 *
-		 * @param value
-		 *            The value of the parameter
-		 */
-		public StringParameter(String value) {
-			super(value);
-		}
-
-		/**
-		 * @see net.pterodactylus.util.database.Query.Parameter#setValue(java.sql.PreparedStatement,
-		 *      int)
-		 */
-		@Override
-		public void setValue(PreparedStatement preparedStatement, int index) throws SQLException {
-			preparedStatement.setString(index, value);
-		}
-
+		AndWhereClause whereClause = new AndWhereClause(whereClauses);
+		whereClause.render(writer);
 	}
 
 }
