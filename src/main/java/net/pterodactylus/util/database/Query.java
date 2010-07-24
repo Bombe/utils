@@ -160,7 +160,12 @@ public class Query {
 		System.out.println(query);
 		PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		int index = 0;
-		if ((type == Type.SELECT) || (type == Type.INSERT) || (type == Type.UPDATE)) {
+		if ((type == Type.UPDATE) || (type == Type.INSERT)) {
+			for (ValueField valueField : valueFields) {
+				valueField.getParameter().set(preparedStatement, ++index);
+			}
+		}
+		if ((type == Type.SELECT) || (type == Type.UPDATE) || (type == Type.DELETE)) {
 			for (WhereClause whereClause : whereClauses) {
 				for (Parameter<?> parameter : whereClause.getParameters()) {
 					parameter.set(preparedStatement, ++index);
@@ -232,7 +237,24 @@ public class Query {
 			}
 			renderWhereClauses(writer);
 		} else if (type == Type.INSERT) {
-			/* TODO */
+			writer.write(" INTO ");
+			writer.write(table);
+			writer.write(" (");
+			boolean first = true;
+			for (ValueField valueField : valueFields) {
+				if (!first) {
+					writer.write(", ");
+				}
+				writer.write(valueField.getName());
+			}
+			writer.write(") VALUES (");
+			first = true;
+			for (int fieldIndex = 0; fieldIndex < valueFields.size(); ++fieldIndex) {
+				if (!first) {
+					writer.write(", ");
+				}
+				writer.write('?');
+			}
 		} else if (type == Type.DELETE) {
 			/* TODO */
 		}
