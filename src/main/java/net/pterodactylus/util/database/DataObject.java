@@ -177,7 +177,7 @@ public abstract class DataObject<D extends DataObject<D>> {
 	 * @throws DatabaseException
 	 *             if a database error occurs
 	 */
-	public static <D extends DataObject<D>> D load(Database database, DataObjectFactory<D> dataObjectFactory, long id) throws DatabaseException {
+	public static <D extends DataObject<D>> D loadById(Database database, DataObjectFactory<D> dataObjectFactory, long id) throws DatabaseException {
 		return loadByWhereClause(database, dataObjectFactory, new ValueFieldWhereClause(new ValueField(dataObjectFactory.getIdentityColumn(), new LongParameter(id))));
 	}
 
