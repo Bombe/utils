@@ -66,7 +66,7 @@ class FilteredPart extends Part {
 			data = output = filter.format(dataProvider, data, allFilterParameters.get(filter));
 		}
 		try {
-			writer.write(String.valueOf(output));
+			writer.write((output != null) ? String.valueOf(output) : "");
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}

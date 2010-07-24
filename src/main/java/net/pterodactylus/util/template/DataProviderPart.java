@@ -46,8 +46,9 @@ class DataProviderPart extends Part {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		Object output = dataProvider.getData(name);
 		try {
-			writer.write(String.valueOf(dataProvider.getData(name)));
+			writer.write((output != null) ? String.valueOf(output) : "");
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}
