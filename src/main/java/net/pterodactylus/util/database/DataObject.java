@@ -235,4 +235,26 @@ public abstract class DataObject<D extends DataObject<D>> {
 		return database.getMultiple(query, dataObjectFactory);
 	}
 
+	/**
+	 * Creates a new data object with the given value fields.
+	 *
+	 * @param <D>
+	 *            The type of the data object
+	 * @param database
+	 *            The database to create the object in
+	 * @param dataObjectFactory
+	 *            The data object factory
+	 * @param valueFields
+	 *            The value fields
+	 * @return The created object
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public static <D extends DataObject<D>> D create(Database database, DataObjectFactory<D> dataObjectFactory, ValueField... valueFields) throws DatabaseException {
+		Query query = new Query(Type.INSERT, dataObjectFactory.getTable());
+		query.addValueField(valueFields);
+		long id = database.insert(query);
+		return loadById(database, dataObjectFactory, id);
+	}
+
 }
