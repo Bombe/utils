@@ -246,6 +246,7 @@ public class Query {
 					writer.write(", ");
 				}
 				writer.write(valueField.getName());
+				first = false;
 			}
 			writer.write(") VALUES (");
 			first = true;
@@ -254,6 +255,7 @@ public class Query {
 					writer.write(", ");
 				}
 				writer.write('?');
+				first = false;
 			}
 		} else if (type == Type.DELETE) {
 			/* TODO */
