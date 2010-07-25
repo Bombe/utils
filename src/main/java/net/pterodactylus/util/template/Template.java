@@ -71,6 +71,17 @@ public class Template {
 	}
 
 	/**
+	 * Returns the object with the given name from the data provider.
+	 *
+	 * @param name
+	 *            The name of the object
+	 * @return The object, or {@code null} if no object could be found
+	 */
+	public Object get(String name) {
+		return dataProvider.getData(name);
+	}
+
+	/**
 	 * Sets the template object with the given name.
 	 *
 	 * @param name
