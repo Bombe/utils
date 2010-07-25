@@ -133,6 +133,18 @@ public abstract class DataObject<D extends DataObject<D>> {
 	//
 
 	/**
+	 * Saves this data object to the database if it is dirty.
+	 *
+	 * @param database
+	 *            The database to store the object to
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public void save(Database database) throws DatabaseException {
+		save(database, false);
+	}
+
+	/**
 	 * Saves this data object to the database if it is dirty, or if the
 	 * {@code force} parameter is {@code true}.
 	 *
