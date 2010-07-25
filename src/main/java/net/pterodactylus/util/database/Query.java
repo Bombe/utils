@@ -251,7 +251,9 @@ public class Query {
 			}
 			writer.write(')');
 		} else if (type == Type.DELETE) {
-			/* TODO */
+			writer.write(" FROM ");
+			writer.write(table);
+			renderWhereClauses(writer);
 		}
 	}
 
