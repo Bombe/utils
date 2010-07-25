@@ -169,6 +169,21 @@ public abstract class DataObject<D extends DataObject<D>> {
 		clearDirtyFlag();
 	}
 
+	/**
+	 * Deletes this data object from the database. This object should not be
+	 * used afterwards, especially the {@link #save(Database)} methods should
+	 * NOT be called!
+	 *
+	 * @param database
+	 *            The database to delete the object from
+	 * @return {@code true} if the object was deleted, {@code false} otherwise
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public boolean delete(Database database) throws DatabaseException {
+		return DataObject.deleteById(database, dataObjectFactory, getId());
+	}
+
 	//
 	// STATIC METHODS
 	//
