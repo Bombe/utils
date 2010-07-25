@@ -95,7 +95,7 @@ public abstract class DataObject<D extends DataObject<D>> {
 	 */
 	protected void setProperty(String name, Object value) {
 		properties.put(name, value);
-		dirty |= getSaveFields().contains(new Field(name));
+		dirty = true;
 	}
 
 	/**
