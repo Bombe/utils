@@ -269,4 +269,44 @@ public abstract class DataObject<D extends DataObject<D>> {
 		return loadById(database, dataObjectFactory, id);
 	}
 
+	/**
+	 * Deletes the data object with the given ID from the database.
+	 *
+	 * @param <D>
+	 *            The type of the data object
+	 * @param database
+	 *            The database to delete the object from
+	 * @param dataObjectFactory
+	 *            The data object factory
+	 * @param id
+	 *            The ID of the object to delete
+	 * @return {@code true} if an object was deleted, {@code false} otherwise
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public static <D extends DataObject<D>> boolean deleteById(Database database, DataObjectFactory<D> dataObjectFactory, long id) throws DatabaseException {
+		return deleteByWhereClause(database, dataObjectFactory, new ValueFieldWhereClause(new ValueField(dataObjectFactory.getIdentityColumn(), new LongParameter(id)))) == 1;
+	}
+
+	/**
+	 * Deletes all objects from the database that match the given WHERE clause.
+	 *
+	 * @param <D>
+	 *            The type of the data object
+	 * @param database
+	 *            The database to delete the objects from
+	 * @param dataObjectFactory
+	 *            The data object factory
+	 * @param whereClause
+	 *            The WHERE clause to match for deletion
+	 * @return The number of deleted objects
+	 * @throws DatabaseException
+	 *             if a database error occurs
+	 */
+	public static <D extends DataObject<D>> int deleteByWhereClause(Database database, DataObjectFactory<D> dataObjectFactory, WhereClause whereClause) throws DatabaseException {
+		Query query = new Query(Type.DELETE, dataObjectFactory.getTable());
+		query.addWhereClause(whereClause);
+		return database.update(query);
+	}
+
 }
