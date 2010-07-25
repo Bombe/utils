@@ -217,25 +217,16 @@ public class Query {
 		} else if (type == Type.UPDATE) {
 			writer.write(' ');
 			writer.write(table);
-			writer.write(" SET (");
+			writer.write(" SET ");
 			boolean first = true;
 			for (ValueField valueField : valueFields) {
 				if (!first) {
 					writer.write(", ");
 				}
 				writer.write(valueField.getName());
+				writer.write(" = ?");
 				first = false;
 			}
-			writer.write(") VALUES (");
-			first = true;
-			for (int fieldIndex = 0; fieldIndex < valueFields.size(); ++fieldIndex) {
-				if (!first) {
-					writer.write(", ");
-				}
-				writer.write('?');
-				first = false;
-			}
-			writer.write(')');
 			renderWhereClauses(writer);
 		} else if (type == Type.INSERT) {
 			writer.write(" INTO ");
