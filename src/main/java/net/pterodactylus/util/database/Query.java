@@ -257,6 +257,7 @@ public class Query {
 				writer.write('?');
 				first = false;
 			}
+			writer.write(')');
 		} else if (type == Type.DELETE) {
 			/* TODO */
 		}
