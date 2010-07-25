@@ -157,7 +157,6 @@ public class Query {
 			/* ignore. */
 		}
 		String query = queryWriter.toString();
-		System.out.println(query);
 		PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		int index = 0;
 		if ((type == Type.UPDATE) || (type == Type.INSERT)) {
