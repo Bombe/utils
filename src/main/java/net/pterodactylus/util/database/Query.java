@@ -235,6 +235,7 @@ public class Query {
 				writer.write('?');
 				first = false;
 			}
+			writer.write(')');
 			renderWhereClauses(writer);
 		} else if (type == Type.INSERT) {
 			writer.write(" INTO ");
