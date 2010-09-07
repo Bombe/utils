@@ -78,7 +78,9 @@ public class StreamCopier {
 				throw new EOFException("stream reached eof");
 			}
 			destination.write(buffer, 0, read);
-			remaining -= read;
+			if (remaining > -1) {
+				remaining -= read;
+			}
 			total += read;
 		}
 		return total;
