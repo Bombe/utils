@@ -18,28 +18,56 @@
 package net.pterodactylus.util.database;
 
 /**
- * TODO
+ * A LIMIT clause limits the results that are returned.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Limit {
 
+	/** The index of the first result to retrieve, 0-based. */
 	private final long start;
+
+	/** The number of results to retrieve. */
 	private final long number;
 
+	/**
+	 * Creates a new limit clause that retrieves the given number of results.
+	 *
+	 * @param number
+	 *            The number of results to retrieve
+	 */
 	public Limit(long number) {
 		this(0, number);
 	}
 
+	/**
+	 * Creates a new limit clause that retrieves the given number of results,
+	 * starting at the given index.
+	 *
+	 * @param start
+	 *            The index of the first result to retrieve
+	 * @param number
+	 *            The number of results to retrieve
+	 */
 	public Limit(long start, long number) {
 		this.start = start;
 		this.number = number;
 	}
 
+	/**
+	 * Returns the index of the first result to retrieve.
+	 *
+	 * @return The index of the first result to retrieve
+	 */
 	public long start() {
 		return start;
 	}
 
+	/**
+	 * Returns the number of results to retreive.
+	 *
+	 * @return The number of results to retrieve
+	 */
 	public long number() {
 		return number;
 	}
