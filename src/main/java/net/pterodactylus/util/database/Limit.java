@@ -59,7 +59,7 @@ public class Limit {
 	 *
 	 * @return The index of the first result to retrieve
 	 */
-	public long start() {
+	public long getStart() {
 		return start;
 	}
 
@@ -68,7 +68,7 @@ public class Limit {
 	 *
 	 * @return The number of results to retrieve
 	 */
-	public long number() {
+	public long getNumber() {
 		return number;
 	}
 

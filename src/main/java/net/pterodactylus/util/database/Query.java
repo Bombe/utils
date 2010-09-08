@@ -228,11 +228,11 @@ public class Query {
 			}
 			if (limit != null) {
 				writer.write(" LIMIT ");
-				if (limit.start() != 0) {
-					writer.write(String.valueOf(limit.start()));
+				if (limit.getStart() != 0) {
+					writer.write(String.valueOf(limit.getStart()));
 					writer.write(", ");
 				}
-				writer.write(String.valueOf(limit.number()));
+				writer.write(String.valueOf(limit.getNumber()));
 			}
 		} else if (type == Type.UPDATE) {
 			writer.write(' ');
