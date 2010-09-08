@@ -75,6 +75,9 @@ public class Query {
 	/** The order fields for select queries. */
 	private final List<OrderField> orderFields = new ArrayList<OrderField>();
 
+	/** The limit, if any. */
+	private Limit limit;
+
 	/**
 	 * Creates a new query.
 	 *
@@ -137,6 +140,16 @@ public class Query {
 		for (OrderField orderField : orderFields) {
 			this.orderFields.add(orderField);
 		}
+	}
+
+	/**
+	 * Sets the limit for this query.
+	 *
+	 * @param limit
+	 *            The limit for this query
+	 */
+	public void setLimit(Limit limit) {
+		this.limit = limit;
 	}
 
 	/**
@@ -212,6 +225,14 @@ public class Query {
 					writer.write((orderField.getOrder() == Order.ASCENDING) ? " ASC" : " DESC");
 					first = false;
 				}
+			}
+			if (limit != null) {
+				writer.write(" LIMIT ");
+				if (limit.start() != 0) {
+					writer.write(String.valueOf(limit.start()));
+					writer.write(", ");
+				}
+				writer.write(String.valueOf(limit.number()));
 			}
 		} else if (type == Type.UPDATE) {
 			writer.write(' ');
