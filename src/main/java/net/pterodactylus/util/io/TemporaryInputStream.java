@@ -19,6 +19,7 @@ package net.pterodactylus.util.io;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -35,8 +36,13 @@ import java.util.Map;
  */
 public class TemporaryInputStream extends FilterInputStream {
 
-	/** Maps input streams to temporary files, for deletion on {@link #close()}. */
+	/**
+	 * Maps input streams to temporary files, for deletion on {@link #close()}.
+	 */
 	private static final Map<InputStream, File> streamFiles = new HashMap<InputStream, File>();
+
+	/** Counter for streams per file. */
+	private static final Map<File, Integer> fileCounts = new HashMap<File, Integer>();
 
 	/**
 	 * Creates a new temporary input stream.
@@ -50,6 +56,10 @@ public class TemporaryInputStream extends FilterInputStream {
 		super(createFileInputStream(sourceInputStream));
 	}
 
+	private TemporaryInputStream(File tempFile) throws FileNotFoundException {
+		super(new FileInputStream(tempFile));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -58,8 +68,26 @@ public class TemporaryInputStream extends FilterInputStream {
 		super.close();
 		File tempFile = streamFiles.remove(in);
 		if (tempFile != null) {
-			tempFile.delete();
+			synchronized (fileCounts) {
+				if (fileCounts.get(tempFile) > 0) {
+					fileCounts.put(tempFile, fileCounts.get(tempFile) - 1);
+				} else {
+					fileCounts.remove(tempFile);
+					tempFile.delete();
+				}
+			}
 		}
+	}
+
+	public InputStream reopen() throws IOException {
+		File tempFile = streamFiles.get(in);
+		if (tempFile != null) {
+			synchronized (fileCounts) {
+				fileCounts.put(tempFile, fileCounts.get(tempFile) + 1);
+			}
+			return new TemporaryInputStream(tempFile);
+		}
+		return null;
 	}
 
 	/**
@@ -89,6 +117,9 @@ public class TemporaryInputStream extends FilterInputStream {
 		try {
 			fileInputStream = new FileInputStream(tempFile);
 			streamFiles.put(fileInputStream, tempFile);
+			synchronized (fileCounts) {
+				fileCounts.put(tempFile, 0);
+			}
 			return fileInputStream;
 		} catch (IOException ioe1) {
 			Closer.close(fileInputStream);
