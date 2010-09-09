@@ -66,9 +66,9 @@ public class TemporaryInputStream extends FilterInputStream {
 	@Override
 	public void close() throws IOException {
 		super.close();
-		File tempFile = streamFiles.remove(in);
-		if (tempFile != null) {
-			synchronized (fileCounts) {
+		synchronized (fileCounts) {
+			File tempFile = streamFiles.remove(in);
+			if (tempFile != null) {
 				if (fileCounts.get(tempFile) > 0) {
 					fileCounts.put(tempFile, fileCounts.get(tempFile) - 1);
 				} else {
@@ -80,14 +80,14 @@ public class TemporaryInputStream extends FilterInputStream {
 	}
 
 	public InputStream reopen() throws IOException {
-		File tempFile = streamFiles.get(in);
-		if (tempFile != null) {
-			synchronized (fileCounts) {
+		synchronized (fileCounts) {
+			File tempFile = streamFiles.get(in);
+			if (tempFile != null) {
 				fileCounts.put(tempFile, fileCounts.get(tempFile) + 1);
+				return new TemporaryInputStream(tempFile);
 			}
-			return new TemporaryInputStream(tempFile);
+			throw new FileNotFoundException("Temporary file has already disappeared.");
 		}
-		return null;
 	}
 
 	/**
