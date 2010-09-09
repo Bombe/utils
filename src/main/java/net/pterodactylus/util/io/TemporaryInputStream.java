@@ -56,6 +56,14 @@ public class TemporaryInputStream extends FilterInputStream {
 		super(createFileInputStream(sourceInputStream));
 	}
 
+	/**
+	 * Creates a new temporary input stream from the given temporary file.
+	 *
+	 * @param tempFile
+	 *            The temporary file
+	 * @throws FileNotFoundException
+	 *             if the file can not be found
+	 */
 	private TemporaryInputStream(File tempFile) throws FileNotFoundException {
 		super(new FileInputStream(tempFile));
 	}
@@ -79,6 +87,15 @@ public class TemporaryInputStream extends FilterInputStream {
 		}
 	}
 
+	/**
+	 * Creates a new input stream from the temporary file that is backing this
+	 * input stream. If the file has already been removed, this method will
+	 * throw an exception.
+	 *
+	 * @return A new input stream
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
 	public InputStream reopen() throws IOException {
 		synchronized (fileCounts) {
 			File tempFile = streamFiles.get(in);
