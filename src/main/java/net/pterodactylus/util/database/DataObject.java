@@ -47,7 +47,7 @@ public abstract class DataObject<D extends DataObject<D>> {
 	private final DataObjectFactory<D> dataObjectFactory;
 
 	/** The ID of the data object. */
-	private final long id;
+	private long id;
 
 	/** The properties of this data object. */
 	private final Map<String, Object> properties = new HashMap<String, Object>();
@@ -157,7 +157,16 @@ public abstract class DataObject<D extends DataObject<D>> {
 	 *             if a database error occurs
 	 */
 	public void save(Database database, boolean force) throws DatabaseException {
-		if (!dirty && !force) {
+		if (id != -1 && !dirty && !force) {
+			return;
+		}
+		if (id == -1) {
+			Query query = new Query(Type.INSERT, dataObjectFactory.getTable());
+			for (ValueField saveField : getSaveFields()) {
+				query.addValueField(saveField);
+			}
+			id = database.insert(query);
+			clearDirtyFlag();
 			return;
 		}
 		Query query = new Query(Type.UPDATE, dataObjectFactory.getTable());
