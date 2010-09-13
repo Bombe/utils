@@ -64,6 +64,18 @@ public class AndWhereClause implements WhereClause {
 	}
 
 	/**
+	 * Adds the given WHERE clause.
+	 *
+	 * @param whereClause
+	 *            The WHERE clause to add
+	 * @return This WHERE clause (to allow method chaining)
+	 */
+	public AndWhereClause add(WhereClause whereClause) {
+		whereClauses.add(whereClause);
+		return this;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
