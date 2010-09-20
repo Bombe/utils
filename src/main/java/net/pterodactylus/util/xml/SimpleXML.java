@@ -432,6 +432,27 @@ public class SimpleXML {
 	}
 
 	/**
+	 * Returns the value of the first child node with the specified name, or the
+	 * default value if there is no child node with the given name.
+	 *
+	 * @param childName
+	 *            The name of the child node
+	 * @param defaultValue
+	 *            The default value to return if there is no child node with the
+	 *            given name
+	 * @return The value of the child node
+	 * @throws NullPointerException
+	 *             if the child node does not exist
+	 */
+	public String getValue(String childName, String defaultValue) {
+		SimpleXML childNode = getNode(childName);
+		if (childNode == null) {
+			return defaultValue;
+		}
+		return childNode.getValue();
+	}
+
+	/**
 	 * Creates a {@link Document} from this node and all its child nodes.
 	 *
 	 * @return The {@link Document} created from this node
