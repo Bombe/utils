@@ -544,7 +544,13 @@ public class SimpleXML {
 		for (int childIndex = 0, childCount = childNodes.getLength(); childIndex < childCount; childIndex++) {
 			Node childNode = childNodes.item(childIndex);
 			if ((childNode.getChildNodes().getLength() == 1) && (childNode.getFirstChild().getNodeName().equals("#text"))) {
-				xmlDocument.append(childNode.getNodeName(), childNode.getFirstChild().getNodeValue());
+				SimpleXML newXML = xmlDocument.append(childNode.getNodeName(), childNode.getFirstChild().getNodeValue());
+				NamedNodeMap childNodeAttributes = childNode.getAttributes();
+				for (int attributeIndex = 0, attributeCount = childNodeAttributes.getLength(); attributeIndex < attributeCount; attributeIndex++) {
+					Node attribute = childNodeAttributes.item(attributeIndex);
+					logger.log(Level.FINER, "adding attribute: " + attribute.getNodeName() + " = " + attribute.getNodeValue());
+					newXML.setAttribute(attribute.getNodeName(), attribute.getNodeValue());
+				}
 			} else {
 				if ((childNode.getNodeType() == Node.ELEMENT_NODE) || (childNode.getChildNodes().getLength() != 0)) {
 					SimpleXML newXML = xmlDocument.append(childNode.getNodeName());
