@@ -44,6 +44,9 @@ public class IntegerValue extends AbstractValue<Integer> {
 	 */
 	@Override
 	public Integer getValue() throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			return ((ExtendedConfigurationBackend) configuration.configurationBackend).getIntegerValue(attribute);
+		}
 		String value = null;
 		try {
 			value = configuration.configurationBackend.getValue(attribute);
@@ -63,6 +66,9 @@ public class IntegerValue extends AbstractValue<Integer> {
 	public Integer getValue(Integer defaultValue) {
 		String value = null;
 		try {
+			if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+				return ((ExtendedConfigurationBackend) configuration.configurationBackend).getIntegerValue(attribute);
+			}
 			value = configuration.configurationBackend.getValue(attribute);
 			int integerValue = Integer.valueOf(value);
 			return integerValue;
@@ -80,6 +86,9 @@ public class IntegerValue extends AbstractValue<Integer> {
 	 */
 	@Override
 	public void setValue(Integer newValue) throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			((ExtendedConfigurationBackend) configuration.configurationBackend).setIntegerValue(attribute, newValue);
+		}
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}
 

@@ -44,6 +44,9 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	 */
 	@Override
 	public Boolean getValue() throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			return ((ExtendedConfigurationBackend) configuration.configurationBackend).getBooleanValue(attribute);
+		}
 		String value = configuration.configurationBackend.getValue(attribute);
 		return Boolean.valueOf(("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value)));
 	}
@@ -56,6 +59,9 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	@Override
 	public Boolean getValue(Boolean defaultValue) {
 		try {
+			if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+				return ((ExtendedConfigurationBackend) configuration.configurationBackend).getBooleanValue(attribute);
+			}
 			String value = configuration.configurationBackend.getValue(attribute);
 			return Boolean.valueOf(("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value)));
 		} catch (ConfigurationException ce1) {
@@ -70,6 +76,9 @@ public class BooleanValue extends AbstractValue<Boolean> {
 	 */
 	@Override
 	public void setValue(Boolean newValue) throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			((ExtendedConfigurationBackend) configuration.configurationBackend).setBooleanValue(attribute, newValue);
+		}
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}
 

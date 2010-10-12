@@ -44,6 +44,9 @@ public class DoubleValue extends AbstractValue<Double> {
 	 */
 	@Override
 	public Double getValue() throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			return ((ExtendedConfigurationBackend) configuration.configurationBackend).getDoubleValue(attribute);
+		}
 		String value = null;
 		try {
 			value = configuration.configurationBackend.getValue(attribute);
@@ -63,6 +66,9 @@ public class DoubleValue extends AbstractValue<Double> {
 	public Double getValue(Double defaultValue) {
 		String value = null;
 		try {
+			if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+				return ((ExtendedConfigurationBackend) configuration.configurationBackend).getDoubleValue(attribute);
+			}
 			value = configuration.configurationBackend.getValue(attribute);
 			double doubleValue = Double.valueOf(value);
 			return doubleValue;
@@ -80,6 +86,9 @@ public class DoubleValue extends AbstractValue<Double> {
 	 */
 	@Override
 	public void setValue(Double newValue) throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			((ExtendedConfigurationBackend) configuration.configurationBackend).setDoubleValue(attribute, newValue);
+		}
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}
 

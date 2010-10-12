@@ -44,6 +44,9 @@ public class LongValue extends AbstractValue<Long> {
 	 */
 	@Override
 	public Long getValue() throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			return ((ExtendedConfigurationBackend) configuration.configurationBackend).getLongValue(attribute);
+		}
 		String value = null;
 		try {
 			value = configuration.configurationBackend.getValue(attribute);
@@ -63,6 +66,9 @@ public class LongValue extends AbstractValue<Long> {
 	public Long getValue(Long defaultValue) {
 		String value = null;
 		try {
+			if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+				return ((ExtendedConfigurationBackend) configuration.configurationBackend).getLongValue(attribute);
+			}
 			value = configuration.configurationBackend.getValue(attribute);
 			long longValue = Long.valueOf(value);
 			return longValue;
@@ -80,6 +86,9 @@ public class LongValue extends AbstractValue<Long> {
 	 */
 	@Override
 	public void setValue(Long newValue) throws ConfigurationException {
+		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
+			((ExtendedConfigurationBackend) configuration.configurationBackend).setLongValue(attribute, newValue);
+		}
 		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
 	}
 
