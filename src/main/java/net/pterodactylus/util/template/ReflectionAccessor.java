@@ -54,6 +54,15 @@ public class ReflectionAccessor implements Accessor {
 				/* swallow, method just doesn’t exist. */
 			}
 		}
+		if (method == null) {
+			try {
+				method = object.getClass().getMethod(member);
+			} catch (SecurityException e) {
+				/* TODO - logging. */
+			} catch (NoSuchMethodException e) {
+				/* swallow, method just doesn’t exist. */
+			}
+		}
 		if (method != null) {
 			try {
 				return method.invoke(object);
