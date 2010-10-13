@@ -40,6 +40,9 @@ public class Logging {
 	/** The log handler. */
 	private static final LogHandler logHandler = new LogHandler();
 
+	/** The console handler. */
+	private static ConsoleHandler consoleHandler = new ConsoleHandler();
+
 	static {
 		logHandler.setLevel(Level.ALL);
 	}
@@ -75,9 +78,8 @@ public class Logging {
 	 */
 	public static void setup(String hierarchyName) {
 		hierarchyRootName = hierarchyName;
-		Logger rootLogger = Logger.getLogger(hierarchyName);
+		Logger rootLogger = getRootLogger();
 		rootLogger.addHandler(logHandler);
-		Handler consoleHandler = new ConsoleHandler();
 		consoleHandler.setLevel(Level.ALL);
 		consoleHandler.setFormatter(new Formatter() {
 
@@ -124,6 +126,15 @@ public class Logging {
 	}
 
 	/**
+	 * Shuts this logging hierarchy down by removing all {@link Handler}s from
+	 * the root logger.
+	 */
+	public static void shutdown() {
+		getRootLogger().removeHandler(logHandler);
+		getRootLogger().removeHandler(consoleHandler);
+	}
+
+	/**
 	 * Returns a named logger from the logger hierarchy.
 	 *
 	 * @param name
@@ -153,8 +164,16 @@ public class Logging {
 	 *            The log level for the root logger
 	 */
 	public static void setRootLevel(Level rootLevel) {
-		Logger rootLogger = Logger.getLogger(hierarchyRootName);
-		rootLogger.setLevel(rootLevel);
+		getRootLogger().setLevel(rootLevel);
+	}
+
+	/**
+	 * Returns the root logger of this logging hierarchy.
+	 *
+	 * @return The hierarchy’s root logger
+	 */
+	private static Logger getRootLogger() {
+		return Logger.getLogger(hierarchyRootName);
 	}
 
 	/**
