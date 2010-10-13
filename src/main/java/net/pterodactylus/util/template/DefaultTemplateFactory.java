@@ -33,20 +33,8 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** The default instance. */
 	private static DefaultTemplateFactory instance;
 
-	/** Whether to add an {@link HtmlFilter} to created templates. */
-	private final boolean addHtmlFilter;
-
-	/** Whether to add a {@link ReplaceFilter} to created templates. */
-	private final boolean addReplaceFilter;
-
-	/** Whether to add a {@link StoreFilter} to created templates. */
-	private final boolean addStoreFilter;
-
-	/** Whether to add a {@link InsertFilter} to created templates. */
-	private final boolean addInsertFilter;
-
-	/** Whether to add a {@link DefaultFilter} to created templates. */
-	private final boolean addDefaultFilter;
+	/** Filters that will be added to all created templates. */
+	private final Map<String, Filter> filters = new HashMap<String, Filter>();
 
 	/** Accessors that will be added to all created templates. */
 	private final Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
@@ -113,11 +101,21 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	 *            templates, {@code false} otherwise
 	 */
 	public DefaultTemplateFactory(boolean addHtmlFilter, boolean addReplaceFilter, boolean addStoreFilter, boolean addInsertFilter, boolean addDefaultFilter) {
-		this.addHtmlFilter = addHtmlFilter;
-		this.addReplaceFilter = addReplaceFilter;
-		this.addStoreFilter = addStoreFilter;
-		this.addInsertFilter = addInsertFilter;
-		this.addDefaultFilter = addDefaultFilter;
+		if (addHtmlFilter) {
+			filters.put("html", new HtmlFilter());
+		}
+		if (addReplaceFilter) {
+			filters.put("replace", new ReplaceFilter());
+		}
+		if (addStoreFilter) {
+			filters.put("store", new StoreFilter());
+		}
+		if (addInsertFilter) {
+			filters.put("insert", new InsertFilter());
+		}
+		if (addDefaultFilter) {
+			filters.put("default", new DefaultFilter());
+		}
 	}
 
 	/**
@@ -150,20 +148,8 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	@Override
 	public Template createTemplate(Reader templateSource) {
 		Template template = new Template(templateSource);
-		if (addHtmlFilter) {
-			template.addFilter("html", new HtmlFilter());
-		}
-		if (addReplaceFilter) {
-			template.addFilter("replace", new ReplaceFilter());
-		}
-		if (addStoreFilter) {
-			template.addFilter("store", new StoreFilter());
-		}
-		if (addInsertFilter) {
-			template.addFilter("insert", new InsertFilter());
-		}
-		if (addDefaultFilter) {
-			template.addFilter("default", new DefaultFilter());
+		for (Entry<String, Filter> filterEntry : filters.entrySet()) {
+			template.addFilter(filterEntry.getKey(), filterEntry.getValue());
 		}
 		for (Entry<Class<?>, Accessor> accessorEntry : accessors.entrySet()) {
 			template.addAccessor(accessorEntry.getKey(), accessorEntry.getValue());
