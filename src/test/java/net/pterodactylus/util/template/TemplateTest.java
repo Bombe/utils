@@ -370,12 +370,14 @@ public class TemplateTest extends TestCase {
 		collection = new ArrayList<Object>();
 		collection.add(new Callable<String>() {
 
+			@Override
 			public String call() {
 				return "Yay!";
 			}
 		});
 		collection.add(new Callable<String>() {
 
+			@Override
 			public String call() {
 				return "Hooray!";
 			}
