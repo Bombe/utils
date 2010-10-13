@@ -18,6 +18,9 @@
 package net.pterodactylus.util.template;
 
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Default {@link TemplateFactory} implementation that creates {@link Template}s
@@ -44,6 +47,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 
 	/** Whether to add a {@link DefaultFilter} to created templates. */
 	private final boolean addDefaultFilter;
+
+	/** Accessors that will be added to all created templates. */
+	private final Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
 
 	/**
 	 * Creates a new default template factory that adds both an
@@ -115,6 +121,18 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	}
 
 	/**
+	 * Adds an accessor that will be added to all created templates.
+	 *
+	 * @param clazz
+	 *            The class to add the accessor for
+	 * @param accessor
+	 *            The accessor to add
+	 */
+	public void addAccessor(Class<?> clazz, Accessor accessor) {
+		accessors.put(clazz, accessor);
+	}
+
+	/**
 	 * Returns the static default instance of this template factory.
 	 *
 	 * @return The default template factory
@@ -146,6 +164,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		}
 		if (addDefaultFilter) {
 			template.addFilter("default", new DefaultFilter());
+		}
+		for (Entry<Class<?>, Accessor> accessorEntry : accessors.entrySet()) {
+			template.addAccessor(accessorEntry.getKey(), accessorEntry.getValue());
 		}
 		return template;
 	}
