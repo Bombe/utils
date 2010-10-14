@@ -131,6 +131,18 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	}
 
 	/**
+	 * Adds the given filter to all created templates.
+	 *
+	 * @param name
+	 *            The name of the filter
+	 * @param filter
+	 *            The filter to add
+	 */
+	public void addFilter(String name, Filter filter) {
+		filters.put(name, filter);
+	}
+
+	/**
 	 * Returns the static default instance of this template factory.
 	 *
 	 * @return The default template factory
