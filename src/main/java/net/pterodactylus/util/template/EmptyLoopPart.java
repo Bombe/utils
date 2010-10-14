@@ -49,7 +49,7 @@ class EmptyLoopPart extends ContainerPart {
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
-		if (!collection.isEmpty()) {
+		if ((collection != null) && !collection.isEmpty()) {
 			return;
 		}
 		super.render(dataProvider, writer);
