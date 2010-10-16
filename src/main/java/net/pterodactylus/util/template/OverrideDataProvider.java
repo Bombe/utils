@@ -19,7 +19,6 @@ package net.pterodactylus.util.template;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * {@link DataProvider} implementation that uses a parent data provider but can
@@ -79,10 +78,17 @@ class OverrideDataProvider extends DataProvider {
 		if (classAccessors.containsKey(clazz)) {
 			return classAccessors.get(clazz);
 		}
-		for (Entry<Class<?>, Accessor> classAccessor : classAccessors.entrySet()) {
-			if (classAccessor.getKey().isAssignableFrom(clazz)) {
-				return classAccessor.getValue();
+		for (Class<?> interfaceClass : clazz.getInterfaces()) {
+			if (classAccessors.containsKey(interfaceClass)) {
+				return classAccessors.get(interfaceClass);
 			}
+		}
+		Class<?> classToCheck = clazz.getSuperclass();
+		while (classToCheck != null) {
+			if (classAccessors.containsKey(classToCheck)) {
+				return classAccessors.get(classToCheck);
+			}
+			classToCheck = classToCheck.getSuperclass();
 		}
 		return parentDataProvider.findAccessor(clazz);
 	}
