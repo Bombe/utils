@@ -56,4 +56,18 @@ public class MultipleDataProvider extends DataProvider {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Accessor findAccessor(Class<?> clazz) {
+		for (DataProvider dataProvider : dataProviders) {
+			Accessor accessor = dataProvider.findAccessor(clazz);
+			if (accessor != null) {
+				return accessor;
+			}
+		}
+		return null;
+	}
+
 }
