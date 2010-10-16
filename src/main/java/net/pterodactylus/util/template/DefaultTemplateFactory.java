@@ -39,6 +39,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** Accessors that will be added to all created templates. */
 	private final Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
 
+	/** The template provider for all created templates. */
+	private TemplateProvider templateProvider;
+
 	/**
 	 * Creates a new default template factory that adds both an
 	 * {@link HtmlFilter} and a {@link ReplaceFilter} to created templates.
@@ -143,6 +146,16 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	}
 
 	/**
+	 * Sets the template provider that is set on all created templates.
+	 *
+	 * @param templateProvider
+	 *            The template provider to set
+	 */
+	public void setTemplateProvider(TemplateProvider templateProvider) {
+		this.templateProvider = templateProvider;
+	}
+
+	/**
 	 * Returns the static default instance of this template factory.
 	 *
 	 * @return The default template factory
@@ -165,6 +178,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		}
 		for (Entry<Class<?>, Accessor> accessorEntry : accessors.entrySet()) {
 			template.addAccessor(accessorEntry.getKey(), accessorEntry.getValue());
+		}
+		if (templateProvider != null) {
+			template.setTemplateProvider(templateProvider);
 		}
 		return template;
 	}
