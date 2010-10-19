@@ -42,6 +42,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** The template provider for all created templates. */
 	private TemplateProvider templateProvider;
 
+	/** Additional objects to set in all templates. */
+	private final Map<String, Object> templateObjects = new HashMap<String, Object>();
+
 	/**
 	 * Creates a new default template factory that adds both an
 	 * {@link HtmlFilter} and a {@link ReplaceFilter} to created templates.
@@ -156,6 +159,18 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	}
 
 	/**
+	 * Adds an object that will be stored in all created templates.
+	 *
+	 * @param name
+	 *            The name of the template variable
+	 * @param object
+	 *            The object to store
+	 */
+	public void addTemplateObject(String name, Object object) {
+		templateObjects.put(name, object);
+	}
+
+	/**
 	 * Returns the static default instance of this template factory.
 	 *
 	 * @return The default template factory
@@ -181,6 +196,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		}
 		if (templateProvider != null) {
 			template.setTemplateProvider(templateProvider);
+		}
+		for (Entry<String, Object> objectEntry : templateObjects.entrySet()) {
+			template.set(objectEntry.getKey(), objectEntry.getValue());
 		}
 		return template;
 	}
