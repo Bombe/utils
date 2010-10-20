@@ -60,6 +60,16 @@ public class MultipleDataProvider extends DataProvider {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void setData(String name, Object data) {
+		for (DataProvider dataProvider : dataProviders) {
+			dataProvider.setData(name, data);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected Accessor findAccessor(Class<?> clazz) {
 		for (DataProvider dataProvider : dataProviders) {
 			Accessor accessor = dataProvider.findAccessor(clazz);
