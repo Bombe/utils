@@ -58,7 +58,7 @@ public class UnmodifiableDataProvider extends DataProvider {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public DataStore getDataStore() {
+	protected DataStore getDataStore() {
 		/* TODO - return an unmodifiable data store here? */
 		return dataProvider.getDataStore();
 	}
