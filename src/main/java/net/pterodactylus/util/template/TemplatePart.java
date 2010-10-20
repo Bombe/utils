@@ -44,7 +44,7 @@ public class TemplatePart extends Part {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		template.render(new MultipleDataProvider(dataProvider, template.getDataProvider()), writer);
+		template.render(new MultipleDataProvider(template.getDataProvider(), new UnmodifiableDataProvider(dataProvider)), writer);
 	}
 
 }
