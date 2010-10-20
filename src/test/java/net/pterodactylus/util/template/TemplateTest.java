@@ -813,6 +813,7 @@ public class TemplateTest extends TestCase {
 	public void testTemplateInclusion() {
 		Template outerTemplate;
 		Template innerTemplate;
+		Template innerstTemplate;
 		StringWriter stringWriter;
 
 		outerTemplate = new Template(new StringReader("Line.\n<%include test>\nLine."));
@@ -840,7 +841,58 @@ public class TemplateTest extends TestCase {
 		outerTemplate.set("test", innerTemplate);
 		outerTemplate.set("a", "b");
 		outerTemplate.render(stringWriter);
-		assertEquals("Line.\nb\nLine.", stringWriter.toString());
+		assertEquals("Line.\na\nLine.", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("a: <%include inner>"));
+		innerTemplate = new Template(new StringReader("<% b.test>"));
+		stringWriter = new StringWriter();
+
+		outerTemplate.set("a", "a");
+		outerTemplate.set("inner", innerTemplate);
+		innerTemplate.set("b", new Integer(1));
+		innerTemplate.addAccessor(Integer.class, new Accessor() {
+
+			@Override
+			public Object get(DataProvider dataProvider, Object object, String member) {
+				return dataProvider.getData("a");
+			}
+		});
+		outerTemplate.render(stringWriter);
+		assertEquals("a: a", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate.addFilter("store", new StoreFilter());
+		innerTemplate = new Template(new StringReader("<% b>"));
+		stringWriter = new StringWriter();
+
+		outerTemplate.set("inner", innerTemplate);
+		outerTemplate.set("a", "a");
+		outerTemplate.render(stringWriter);
+		assertEquals("a: a", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate.addFilter("store", new StoreFilter());
+		innerTemplate = new Template(new StringReader("<% b>"));
+		stringWriter = new StringWriter();
+
+		outerTemplate.set("inner", innerTemplate);
+		outerTemplate.set("a", "a");
+		innerTemplate.set("b", "b");
+		outerTemplate.render(stringWriter);
+		assertEquals("a: b", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate.addFilter("store", new StoreFilter());
+		innerTemplate = new Template(new StringReader("<% b|store key=c><%include innerst>"));
+		innerTemplate.addFilter("store", new StoreFilter());
+		innerstTemplate = new Template(new StringReader("<% c>"));
+		stringWriter = new StringWriter();
+
+		outerTemplate.set("inner", innerTemplate);
+		innerTemplate.set("innerst", innerstTemplate);
+		outerTemplate.set("a", "a");
+		outerTemplate.render(stringWriter);
+		assertEquals("a: a", stringWriter.toString());
 	}
 
 	private void compare(List<String> actualWords, String... expectedWords) {
