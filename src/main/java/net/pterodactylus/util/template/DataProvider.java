@@ -53,6 +53,15 @@ public class DataProvider {
 	}
 
 	/**
+	 * Returns the data provider’s data store.
+	 *
+	 * @return The data store
+	 */
+	protected DataStore getDataStore() {
+		return dataStore;
+	}
+
+	/**
 	 * Adds an accessor for objects of the given class.
 	 *
 	 * @param clazz
@@ -106,14 +115,14 @@ public class DataProvider {
 	 */
 	public Object getData(String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
-			return dataStore.get(name);
+			return getDataStore().get(name);
 		}
 		StringTokenizer nameTokens = new StringTokenizer(name, ".");
 		Object object = null;
 		while (nameTokens.hasMoreTokens()) {
 			String nameToken = nameTokens.nextToken();
 			if (object == null) {
-				object = dataStore.get(nameToken);
+				object = getDataStore().get(nameToken);
 			} else {
 				Accessor accessor = findAccessor(object.getClass());
 				if (accessor != null) {
@@ -138,7 +147,7 @@ public class DataProvider {
 	 *            The data to store
 	 */
 	public void setData(String name, Object data) {
-		dataStore.set(name, data);
+		getDataStore().set(name, data);
 	}
 
 }
