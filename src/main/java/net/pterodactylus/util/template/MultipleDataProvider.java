@@ -20,6 +20,7 @@ package net.pterodactylus.util.template;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * {@link DataProvider} implementation that can get its data from multiple other
@@ -32,6 +33,9 @@ public class MultipleDataProvider extends DataProvider {
 	/** The source data providers. */
 	private final List<DataProvider> dataProviders = new ArrayList<DataProvider>();
 
+	/** The data stores. */
+	private final MultipleDataStore dataStore;
+
 	/**
 	 * Creates a new multiple data provider.
 	 *
@@ -40,6 +44,11 @@ public class MultipleDataProvider extends DataProvider {
 	 */
 	public MultipleDataProvider(DataProvider... dataProviders) {
 		this.dataProviders.addAll(Arrays.asList(dataProviders));
+		List<DataStore> dataStores = new ArrayList<DataStore>();
+		for (DataProvider dataProvider : dataProviders) {
+			dataStores.add(dataProvider.getDataStore());
+		}
+		this.dataStore = new MultipleDataStore(dataStores);
 	}
 
 	/**
@@ -47,13 +56,53 @@ public class MultipleDataProvider extends DataProvider {
 	 */
 	@Override
 	public Object getData(String name) throws TemplateException {
-		for (DataProvider dataProvider : dataProviders) {
-			Object object = dataProvider.getData(name);
-			if (object != null) {
-				return object;
+		if (name.indexOf('.') == -1) {
+			for (DataProvider dataProvider : dataProviders) {
+				Object data = dataProvider.getDataStore().get(name);
+				if (data != null) {
+					return data;
+				}
+			}
+			return null;
+		}
+		StringTokenizer nameTokens = new StringTokenizer(name, ".");
+		Object object = null;
+		while (nameTokens.hasMoreTokens()) {
+			String nameToken = nameTokens.nextToken();
+			if (object == null) {
+				for (DataProvider dataProvider : dataProviders) {
+					object = dataProvider.getDataStore().get(nameToken);
+					if (object != null) {
+						break;
+					}
+				}
+			} else {
+				Accessor accessor = null;
+				for (DataProvider dataProvider : dataProviders) {
+					accessor = dataProvider.findAccessor(object.getClass());
+					if (accessor != null) {
+						break;
+					}
+				}
+				if (accessor != null) {
+					object = accessor.get(this, object, nameToken);
+				} else {
+					throw new TemplateException("no accessor found for " + object.getClass());
+				}
+			}
+			if (object == null) {
+				return null;
 			}
 		}
-		return null;
+		return object;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected DataStore getDataStore() {
+		return dataStore;
 	}
 
 	/**
@@ -78,6 +127,53 @@ public class MultipleDataProvider extends DataProvider {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * A {@link DataStore} implementation that is backed by multiple other
+	 * {@link DataStore}s.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class MultipleDataStore implements DataStore {
+
+		/** The backing data stores. */
+		private List<DataStore> dataStores = new ArrayList<DataStore>();
+
+		/**
+		 * Creates a new multiple data store.
+		 *
+		 * @param dataStores
+		 *            The backing data stores
+		 */
+		public MultipleDataStore(List<DataStore> dataStores) {
+			this.dataStores.addAll(dataStores);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object get(String name) {
+			for (DataStore dataStore : dataStores) {
+				Object data = dataStore.get(name);
+				if (data != null) {
+					return data;
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void set(String name, Object data) {
+			for (DataStore dataStore : dataStores) {
+				dataStore.set(name, data);
+			}
+		}
+
 	}
 
 }
