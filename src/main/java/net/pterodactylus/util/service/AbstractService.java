@@ -38,6 +38,9 @@ public abstract class AbstractService implements Service, Runnable {
 	/** Listener support. */
 	private final ServiceListenerManager serviceListenerSupport = new ServiceListenerManager(this);
 
+	/** The shutdown hook. */
+	private final ShutdownHook shutdownHook = new ShutdownHook();
+
 	/** Counter for unnamed instances. */
 	private static int counter = 0;
 
@@ -61,6 +64,9 @@ public abstract class AbstractService implements Service, Runnable {
 
 	/** The service attributes. */
 	private final Map<String, Object> serviceAttributes = new HashMap<String, Object>();
+
+	/** Whether to register the shutdown hook. */
+	private final boolean registerShutdownHook;
 
 	/**
 	 * Constructs a new abstract service with an anonymous name.
@@ -116,12 +122,10 @@ public abstract class AbstractService implements Service, Runnable {
 	 *            The thread factory used to create the service thread
 	 */
 	protected AbstractService(String name, boolean registerShutdownHook, ThreadFactory threadFactory) {
+		this.registerShutdownHook = registerShutdownHook;
 		Validation.begin().isNotNull("name", name).isNotNull("threadFactory", threadFactory).check();
 		this.name = name;
 		this.threadFactory = threadFactory;
-		if (registerShutdownHook) {
-			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-		}
 	}
 
 	//
@@ -390,6 +394,9 @@ public abstract class AbstractService implements Service, Runnable {
 			logger.log(Level.WARNING, "will not start " + name + ", state is " + getState());
 			return;
 		}
+		if (registerShutdownHook) {
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+		}
 		serviceStart();
 		synchronized (syncObject) {
 			shouldStop = false;
@@ -464,6 +471,9 @@ public abstract class AbstractService implements Service, Runnable {
 		synchronized (syncObject) {
 			shouldStop = true;
 			syncObject.notify();
+		}
+		if (registerShutdownHook) {
+			Runtime.getRuntime().removeShutdownHook(shutdownHook);
 		}
 		serviceStop();
 	}
