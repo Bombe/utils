@@ -427,33 +427,7 @@ public class Template {
 							itemName = function.substring(1);
 							directText = true;
 						}
-						Map<Filter, Map<String, String>> allFilterParameters = new LinkedHashMap<Filter, Map<String, String>>();
-						if (tokens.hasNext() && (tokens.next() != null)) {
-							throw new TemplateException("expected \"|\" token");
-						}
-						while (tokens.hasNext()) {
-							String filterName = tokens.next();
-							Filter filter = filters.get(filterName);
-							if (filter == null) {
-								throw new TemplateException("unknown filter: " + filterName);
-							}
-							filter = new FilterWrapper(filter);
-							Map<String, String> filterParameters = new HashMap<String, String>();
-							while (tokens.hasNext()) {
-								String parameterToken = tokens.next();
-								if (parameterToken == null) {
-									break;
-								}
-								int equals = parameterToken.indexOf('=');
-								if (equals == -1) {
-									throw new TemplateException("found parameter without \"=\" sign");
-								}
-								String key = parameterToken.substring(0, equals).trim();
-								String value = parameterToken.substring(equals + 1);
-								filterParameters.put(key, value);
-							}
-							allFilterParameters.put(filter, filterParameters);
-						}
+						Map<Filter, Map<String, String>> allFilterParameters = parseFilters(tokens);
 						if (directText) {
 							parts.add(new FilteredTextPart(itemName, allFilterParameters.keySet(), allFilterParameters));
 						} else {
@@ -491,6 +465,58 @@ public class Template {
 			throw new TemplateException("Unbalanced template.");
 		}
 		return parts;
+	}
+
+	/**
+	 * Parses filters from the rest of the tokens.
+	 *
+	 * @param tokens
+	 *            The tokens to parse
+	 * @return The parsed filters
+	 */
+	private Map<Filter, Map<String, String>> parseFilters(Iterator<String> tokens) {
+		Map<Filter, Map<String, String>> allFilterParameters = new LinkedHashMap<Filter, Map<String, String>>();
+		if (tokens.hasNext() && (tokens.next() != null)) {
+			throw new TemplateException("expected \"|\" token");
+		}
+		while (tokens.hasNext()) {
+			String filterName = tokens.next();
+			Filter filter = filters.get(filterName);
+			if (filter == null) {
+				throw new TemplateException("unknown filter: " + filterName);
+			}
+			filter = new FilterWrapper(filter);
+			Map<String, String> filterParameters = parseParameters(tokens);
+			allFilterParameters.put(filter, filterParameters);
+		}
+		return allFilterParameters;
+	}
+
+	/**
+	 * Parses parameters from the given tokens.
+	 *
+	 * @param tokens
+	 *            The tokens to parse the parameters from
+	 * @return The parsed parameters
+	 * @throws TemplateException
+	 *             if an invalid parameter declaration is found
+	 */
+	private Map<String, String> parseParameters(Iterator<String> tokens) throws TemplateException {
+		Map<String, String> parameters = new HashMap<String, String>();
+		while (tokens.hasNext()) {
+			String parameterToken = tokens.next();
+			if (parameterToken == null) {
+				break;
+			}
+			int equals = parameterToken.indexOf('=');
+			if (equals == -1) {
+				throw new TemplateException("found parameter without \"=\" sign");
+			}
+			String key = parameterToken.substring(0, equals).trim();
+			String value = parameterToken.substring(equals + 1);
+			parameters.put(key, value);
+		}
+		return parameters;
 	}
 
 	/**
