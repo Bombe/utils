@@ -60,6 +60,9 @@ public class Template {
 	/** Filters for the template. */
 	private final Map<String, Filter> filters = new HashMap<String, Filter>();
 
+	/** Plugins for the template. */
+	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
+
 	/**
 	 * Creates a new template from the given input.
 	 *
@@ -115,6 +118,18 @@ public class Template {
 	 */
 	public void addFilter(String name, Filter filter) {
 		filters.put(name, filter);
+	}
+
+	/**
+	 * Adds a plugin with the given name.
+	 *
+	 * @param name
+	 *            The name of the plugin
+	 * @param plugin
+	 *            The plugin to add
+	 */
+	public void addPlugin(String name, Plugin plugin) {
+		plugins.put(name, plugin);
 	}
 
 	/**
@@ -414,6 +429,9 @@ public class Template {
 						if (includedTemplate != null) {
 							parts.add(new TemplatePart(includedTemplate));
 						}
+					} else if (plugins.containsKey(function)) {
+						Map<String, String> pluginParameters = parseParameters(tokens);
+						parts.add(new PluginPart(plugins.get(function), pluginParameters));
 					} else {
 						boolean directText = false;
 						String itemName = function;
