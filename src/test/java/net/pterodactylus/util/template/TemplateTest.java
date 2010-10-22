@@ -895,6 +895,27 @@ public class TemplateTest extends TestCase {
 		assertEquals("a: a", stringWriter.toString());
 	}
 
+	public void testTemplatePlugins() {
+		Template template;
+		StringWriter stringWriter;
+
+		template = new Template(new StringReader("<%double key=a><% a>"));
+		template.addPlugin("double", new Plugin() {
+
+			@Override
+			public void execute(DataProvider dataProvider, Map<String, String> parameters) {
+				String key = parameters.get("key");
+				dataProvider.setData(key, String.valueOf(dataProvider.getData(key)) + String.valueOf(dataProvider.getData(key)));
+			}
+
+		});
+		template.set("a", "test");
+		stringWriter = new StringWriter();
+
+		template.render(stringWriter);
+		assertEquals("testtest", stringWriter.toString());
+	}
+
 	private void compare(List<String> actualWords, String... expectedWords) {
 		assertEquals(expectedWords.length, actualWords.size());
 		int counter = 0;
