@@ -36,6 +36,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	/** Filters that will be added to all created templates. */
 	private final Map<String, Filter> filters = new HashMap<String, Filter>();
 
+	/** Plugins that will be added to all created templates. */
+	private final Map<String, Plugin> plugins = new HashMap<String, Plugin>();
+
 	/** Accessors that will be added to all created templates. */
 	private final Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
 
@@ -149,6 +152,18 @@ public class DefaultTemplateFactory implements TemplateFactory {
 	}
 
 	/**
+	 * Adds the given plugin to all created templates.
+	 *
+	 * @param name
+	 *            The name of the plugin
+	 * @param plugin
+	 *            The plugin to add
+	 */
+	public void addPlugin(String name, Plugin plugin) {
+		plugins.put(name, plugin);
+	}
+
+	/**
 	 * Sets the template provider that is set on all created templates.
 	 *
 	 * @param templateProvider
@@ -190,6 +205,9 @@ public class DefaultTemplateFactory implements TemplateFactory {
 		Template template = new Template(templateSource);
 		for (Entry<String, Filter> filterEntry : filters.entrySet()) {
 			template.addFilter(filterEntry.getKey(), filterEntry.getValue());
+		}
+		for (Entry<String, Plugin> pluginEntry : plugins.entrySet()) {
+			template.addPlugin(pluginEntry.getKey(), pluginEntry.getValue());
 		}
 		for (Entry<Class<?>, Accessor> accessorEntry : accessors.entrySet()) {
 			template.addAccessor(accessorEntry.getKey(), accessorEntry.getValue());
