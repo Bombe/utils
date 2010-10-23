@@ -23,7 +23,8 @@ import java.util.Map;
 import net.pterodactylus.util.collection.Pagination;
 
 /**
- * TODO
+ * {@link Plugin} implementation that takes care of paginating a {@link List} of
+ * items (parameter “list”).
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
