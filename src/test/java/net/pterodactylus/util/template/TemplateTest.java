@@ -699,6 +699,47 @@ public class TemplateTest extends TestCase {
 		assertEquals("test beao test", output);
 	}
 
+	public void testTemplatesWithIfAndFilter() {
+		Template template;
+		Filter filter;
+		StringWriter stringWriter;
+
+		filter = new Filter() {
+
+			@Override
+			public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+				return ((Integer) data) > 1;
+			}
+		};
+
+		template = new Template(new StringReader("<%if a|gt1>> 1<%else><= 1<%/if>"));
+		template.addFilter("gt1", filter);
+		stringWriter = new StringWriter();
+
+		template.set("a", 1);
+		template.render(stringWriter);
+		assertEquals("<= 1", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template.set("a", 2);
+		template.render(stringWriter);
+		assertEquals("> 1", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template = new Template(new StringReader("<%if a|match value=0>is 0<%else>is something<%/if>"));
+		template.addFilter("match", new MatchFilter());
+		template.set("a", 0);
+		template.render(stringWriter);
+		assertEquals("is 0", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template = new Template(new StringReader("<%if ! a|match value=0>is 0<%else>is something<%/if>"));
+		template.addFilter("match", new MatchFilter());
+		template.set("a", 0);
+		template.render(stringWriter);
+		assertEquals("is something", stringWriter.toString());
+	}
+
 	public void testStoreFilter() {
 		Template template;
 		String templateString;

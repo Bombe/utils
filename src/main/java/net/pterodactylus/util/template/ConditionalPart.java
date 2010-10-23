@@ -20,6 +20,8 @@ package net.pterodactylus.util.template;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * {@link ContainerPart} implementation that determines at render time whether
@@ -245,6 +247,61 @@ class ConditionalPart extends ContainerPart {
 	}
 
 	/**
+	 * {@link Condition} implementation that checks a given text for a
+	 * {@link Boolean} value.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class DataTextCondition implements Condition {
+
+		/** Whether to invert the result. */
+		private final boolean invert;
+
+		/** The text to check. */
+		private final String text;
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param text
+		 *            The text to check
+		 */
+		public DataTextCondition(String text) {
+			this(text, false);
+		}
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param text
+		 *            The text to check
+		 * @param invert
+		 *            {@code true} to invert the result, {@code false} otherwise
+		 */
+		public DataTextCondition(String text, boolean invert) {
+			this.invert = invert;
+			this.text = text;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			return Boolean.valueOf(text) ^ invert;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return "(" + text + " = " + !invert + ")";
+		}
+
+	}
+
+	/**
 	 * {@link Condition} implementation that asks the {@link DataProvider} for a
 	 * {@link Boolean} value and checks whether it’s {@code null} or not.
 	 *
@@ -287,6 +344,176 @@ class ConditionalPart extends ContainerPart {
 		@Override
 		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
 			return (dataProvider.getData(itemName) == null) ^ invert;
+		}
+
+	}
+
+	/**
+	 * {@link Condition} implementation that filters the value from the data
+	 * provider before checking whether it matches “true.”
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class FilterCondition implements Condition {
+
+		/** The name of the item. */
+		private final String itemName;
+
+		/** The filters. */
+		private final Collection<Filter> filters;
+
+		/** The filter parameters. */
+		private final Map<Filter, Map<String, String>> filterParameters;
+
+		/** Whether to invert the result. */
+		private final boolean invert;
+
+		/**
+		 * Creates a new filter condition.
+		 *
+		 * @param itemName
+		 *            The name of the item
+		 * @param filters
+		 *            The filters to run through
+		 * @param filterParameters
+		 *            The filter parameters
+		 */
+		public FilterCondition(String itemName, Collection<Filter> filters, Map<Filter, Map<String, String>> filterParameters) {
+			this(itemName, filters, filterParameters, false);
+		}
+
+		/**
+		 * Creates a new filter condition.
+		 *
+		 * @param itemName
+		 *            The name of the item
+		 * @param filters
+		 *            The filters to run through
+		 * @param filterParameters
+		 *            The filter parameters
+		 * @param invert
+		 *            {@code true} to invert the result
+		 */
+		public FilterCondition(String itemName, Collection<Filter> filters, Map<Filter, Map<String, String>> filterParameters, boolean invert) {
+			this.itemName = itemName;
+			this.filters = filters;
+			this.filterParameters = filterParameters;
+			this.invert = invert;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			Object data = dataProvider.getData(itemName);
+			for (Filter filter : filters) {
+				data = filter.format(dataProvider, data, filterParameters.get(filter));
+			}
+			return Boolean.valueOf(String.valueOf(data)) ^ invert;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("([").append(itemName).append("]");
+			for (Filter filter : filters) {
+				stringBuilder.append("|").append(filter.getClass().getSimpleName());
+				if (filterParameters.containsKey(filter)) {
+					for (Entry<String, String> filterParameter : filterParameters.get(filter).entrySet()) {
+						stringBuilder.append(" ").append(filterParameter.getKey()).append("=").append(filterParameter.getValue());
+					}
+				}
+			}
+			return stringBuilder.append(" = ").append(!invert).append(")").toString();
+		}
+
+	}
+
+	/**
+	 * {@link Condition} implementation that filters a given text before
+	 * checking whether it matches “true.”
+	 *
+	 * @author <a href="mailto:david.roden@sysart.de">David Roden</a>
+	 */
+	public static class FilterTextCondition implements Condition {
+
+		/** The text to filter. */
+		private final String text;
+
+		/** The filters. */
+		private final Collection<Filter> filters;
+
+		/** The filter parameters. */
+		private final Map<Filter, Map<String, String>> filterParameters;
+
+		/** Whether to invert the result. */
+		private final boolean invert;
+
+		/**
+		 * Creates a new filter text condition.
+		 *
+		 * @param text
+		 *            The text to filter
+		 * @param filters
+		 *            The filters to run through
+		 * @param filterParameters
+		 *            The filter parameters
+		 */
+		public FilterTextCondition(String text, Collection<Filter> filters, Map<Filter, Map<String, String>> filterParameters) {
+			this(text, filters, filterParameters, false);
+		}
+
+		/**
+		 * Creates a new filter text condition.
+		 *
+		 * @param text
+		 *            The text to filter
+		 * @param filters
+		 *            The filters to run through
+		 * @param filterParameters
+		 *            The filter parameters
+		 * @param invert
+		 *            {@code true} to invert the result
+		 */
+		public FilterTextCondition(String text, Collection<Filter> filters, Map<Filter, Map<String, String>> filterParameters, boolean invert) {
+			this.text = text;
+			this.filters = filters;
+			this.filterParameters = filterParameters;
+			this.invert = invert;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
+			Object data = text;
+			for (Filter filter : filters) {
+				data = filter.format(dataProvider, data, filterParameters.get(filter));
+			}
+			return Boolean.valueOf(String.valueOf(data)) ^ invert;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("(").append(text);
+			for (Filter filter : filters) {
+				stringBuilder.append("|").append(filter.getClass().getSimpleName());
+				if (filterParameters.containsKey(filter)) {
+					for (Entry<String, String> filterParameter : filterParameters.get(filter).entrySet()) {
+						stringBuilder.append(" ").append(filterParameter.getKey()).append("=").append(filterParameter.getValue());
+					}
+				}
+			}
+			return stringBuilder.append(" = ").append(!invert).append(")").toString();
 		}
 
 	}

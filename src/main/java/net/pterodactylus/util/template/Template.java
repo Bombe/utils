@@ -33,6 +33,9 @@ import java.util.Stack;
 import net.pterodactylus.util.template.ConditionalPart.AndCondition;
 import net.pterodactylus.util.template.ConditionalPart.Condition;
 import net.pterodactylus.util.template.ConditionalPart.DataCondition;
+import net.pterodactylus.util.template.ConditionalPart.DataTextCondition;
+import net.pterodactylus.util.template.ConditionalPart.FilterCondition;
+import net.pterodactylus.util.template.ConditionalPart.FilterTextCondition;
 import net.pterodactylus.util.template.ConditionalPart.NotCondition;
 import net.pterodactylus.util.template.ConditionalPart.NullDataCondition;
 import net.pterodactylus.util.template.ConditionalPart.OrCondition;
@@ -369,8 +372,17 @@ public class Template {
 								itemName = itemName.substring(1);
 							}
 						}
+						boolean directText = false;
+						if (itemName.startsWith("=")) {
+							if (checkForNull) {
+								throw new TemplateException("direct text ('=') with ifnull is not allowed");
+							}
+							itemName = itemName.substring(1);
+							directText = true;
+						}
+						Map<Filter, Map<String, String>> allFilterParameters = parseFilters(tokens);
 						partsStack.push(parts);
-						Condition condition = checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert);
+						Condition condition = allFilterParameters.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : (directText ? new DataTextCondition(itemName, invert) : new DataCondition(itemName, invert))) : (directText ? new FilterTextCondition(itemName, allFilterParameters.keySet(), allFilterParameters, invert) : new FilterCondition(itemName, allFilterParameters.keySet(), allFilterParameters, invert));
 						parts = new ConditionalPart(condition);
 						commandStack.push("if");
 						lastCondition.push(condition);
@@ -413,8 +425,9 @@ public class Template {
 								itemName = itemName.substring(1);
 							}
 						}
+						Map<Filter, Map<String, String>> allFilterParameters = parseFilters(tokens);
 						partsStack.peek().add(parts);
-						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert));
+						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), allFilterParameters.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert)) : new FilterCondition(itemName, allFilterParameters.keySet(), allFilterParameters, invert));
 						parts = new ConditionalPart(condition);
 						lastCondition.push(condition);
 						lastConditions.peek().add(condition);
