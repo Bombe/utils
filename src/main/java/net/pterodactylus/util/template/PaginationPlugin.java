@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.template;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class PaginationPlugin implements Plugin {
 		}
 		List<?> list = (List<?>) dataProvider.getData(listKey);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Pagination<?> pagination = new Pagination(list, pageSize).setPage(page);
+		Pagination<?> pagination = new Pagination((list == null) ? Collections.emptyList() : list, pageSize).setPage(page);
 		dataProvider.setData(paginationKey, pagination);
 	}
 }
