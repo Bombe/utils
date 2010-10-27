@@ -279,6 +279,7 @@ public class Template {
 							ContainerPart innerParts = parts;
 							parts = partsStack.pop();
 							lastCondition.pop();
+							lastConditions.pop();
 							parts.add(innerParts);
 							lastIfCommand.pop();
 						}
@@ -397,7 +398,7 @@ public class Template {
 							throw new TemplateException("else may only follow if or elseif");
 						}
 						partsStack.peek().add(parts);
-						Condition condition = new NotCondition(new OrCondition(lastConditions.pop()));
+						Condition condition = new NotCondition(new OrCondition(lastConditions.peek()));
 						parts = new ConditionalPart(condition);
 						lastIfCommand.pop();
 						lastIfCommand.push("else");
