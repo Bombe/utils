@@ -22,7 +22,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -42,6 +44,9 @@ public class Logging {
 
 	/** The console handler. */
 	private static ConsoleHandler consoleHandler = new ConsoleHandler();
+
+	/** Cache for logger’s classes. */
+	private static final Map<String, Class<?>> classCache = new HashMap<String, Class<?>>();
 
 	static {
 		logHandler.setLevel(Level.ALL);
@@ -154,6 +159,7 @@ public class Logging {
 	 * @return The logger
 	 */
 	public static Logger getLogger(Class<?> loggerClass) {
+		classCache.put(hierarchyRootName + "." + loggerClass.getName(), loggerClass);
 		return getLogger(loggerClass.getName());
 	}
 
@@ -174,6 +180,17 @@ public class Logging {
 	 */
 	private static Logger getRootLogger() {
 		return Logger.getLogger(hierarchyRootName);
+	}
+
+	/**
+	 * Returns the class that created the logger with the given name.
+	 *
+	 * @param loggerName
+	 *            The name of the logger
+	 * @return The class of the creating class, if available
+	 */
+	public static Class<?> getLoggerClass(String loggerName) {
+		return classCache.get(loggerName);
 	}
 
 	/**
