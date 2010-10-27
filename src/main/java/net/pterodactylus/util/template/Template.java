@@ -280,6 +280,7 @@ public class Template {
 							parts = partsStack.pop();
 							lastCondition.pop();
 							parts.add(innerParts);
+							lastIfCommand.pop();
 						}
 					} else if (function.equals("foreach")) {
 						if (!tokens.hasNext()) {
