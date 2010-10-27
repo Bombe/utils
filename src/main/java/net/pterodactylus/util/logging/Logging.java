@@ -85,6 +85,17 @@ public class Logging {
 		hierarchyRootName = hierarchyName;
 		Logger rootLogger = getRootLogger();
 		rootLogger.addHandler(logHandler);
+		rootLogger.setUseParentHandlers(false);
+		if (rootLogger.getLevel() == null) {
+			rootLogger.setLevel(Level.ALL);
+		}
+	}
+
+	/**
+	 * Initializes console logging.
+	 */
+	public static void setupConsoleLogging() {
+		Logger rootLogger = getRootLogger();
 		consoleHandler.setLevel(Level.ALL);
 		consoleHandler.setFormatter(new Formatter() {
 
@@ -124,10 +135,6 @@ public class Logging {
 			}
 		});
 		rootLogger.addHandler(consoleHandler);
-		rootLogger.setUseParentHandlers(false);
-		if (rootLogger.getLevel() == null) {
-			rootLogger.setLevel(Level.ALL);
-		}
 	}
 
 	/**
