@@ -298,7 +298,7 @@ public class HtmlFilter implements Filter {
 				continue;
 			}
 			if (c > 127) {
-				htmlOutput.append("&#").append(c);
+				htmlOutput.append("&#").append((int) c).append(';');
 				continue;
 			}
 			htmlOutput.append(c);
