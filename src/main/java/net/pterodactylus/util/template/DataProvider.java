@@ -97,6 +97,11 @@ public class DataProvider {
 			if (classAccessors.containsKey(classToCheck)) {
 				return classAccessors.get(classToCheck);
 			}
+			for (Class<?> interfaceClass : classToCheck.getInterfaces()) {
+				if (classAccessors.containsKey(interfaceClass)) {
+					return classAccessors.get(interfaceClass);
+				}
+			}
 			classToCheck = classToCheck.getSuperclass();
 		}
 		return null;
