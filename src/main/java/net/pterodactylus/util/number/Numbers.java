@@ -61,4 +61,41 @@ public class Numbers {
 		return defaultValue;
 	}
 
+	/**
+	 * Tries to parse the {@link String} representation of the given object (as
+	 * per {@link String#valueOf(Object)}) as a {@link Long}.
+	 *
+	 * @param object
+	 *            The object to parse
+	 * @return The parsed {@link Long}, or {@code null} if the object could not
+	 *         be parsed
+	 */
+	public static Long safeParseLong(Object object) {
+		return safeParseLong(object, null);
+	}
+
+	/**
+	 * Tries to parse the {@link String} representation of the given object (as
+	 * per {@link String#valueOf(Object)}) as a {@link Long}.
+	 *
+	 * @param object
+	 *            The object to parse
+	 * @param defaultValue
+	 *            The value to return if the object is {@code null} or can not
+	 *            be parsed as an {@link Long}
+	 * @return The parsed Long, or {@code null} if the object could not be
+	 *         parsed
+	 */
+	public static Long safeParseLong(Object object, Long defaultValue) {
+		if (object == null) {
+			return defaultValue;
+		}
+		try {
+			return Long.parseLong(String.valueOf(object));
+		} catch (NumberFormatException nfe1) {
+			/* ignore. */
+		}
+		return defaultValue;
+	}
+
 }
