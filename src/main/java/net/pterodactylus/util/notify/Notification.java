@@ -111,4 +111,13 @@ public interface Notification {
 	 */
 	public void render(Writer writer) throws IOException;
 
+	/**
+	 * Returns the content of this notification. The returned text should be
+	 * identical to the text {@link #render(Writer)} writes to the given writer.
+	 *
+	 * @return The content of this notification
+	 */
+	@Override
+	public String toString();
+
 }
