@@ -47,6 +47,7 @@ public class NotificationManager implements NotificationListener {
 	 */
 	public Set<Notification> getNotifications() {
 		synchronized (notifications) {
+			lastRetrievalTime = System.currentTimeMillis();
 			return new HashSet<Notification>(notifications.values());
 		}
 	}
