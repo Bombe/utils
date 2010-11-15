@@ -124,10 +124,7 @@ public class NotificationManager implements NotificationListener {
 	 */
 	@Override
 	public void notificationDismissed(Notification notification) {
-		synchronized (notifications) {
-			notifications.remove(notification.getId());
-			notification.removeNotificationListener(this);
-		}
+		removeNotification(notification);
 	}
 
 }
