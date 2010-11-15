@@ -50,6 +50,19 @@ public class TemplateNotification extends AbstractNotification {
 	 *
 	 * @param id
 	 *            The ID of the notification
+	 * @param template
+	 *            The template to render
+	 */
+	public TemplateNotification(String id, Template template) {
+		super(id);
+		this.template = template;
+	}
+
+	/**
+	 * Creates a new notification.
+	 *
+	 * @param id
+	 *            The ID of the notification
 	 * @param creationTime
 	 *            The creation time of the notification
 	 * @param lastUpdatedTime
