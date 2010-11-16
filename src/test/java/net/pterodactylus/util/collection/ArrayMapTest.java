@@ -17,6 +17,8 @@
 
 package net.pterodactylus.util.collection;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import junit.framework.TestCase;
@@ -64,6 +66,65 @@ public class ArrayMapTest extends TestCase {
 		map.clear();
 		assertEquals(0, map.size());
 		assertEquals(true, map.isEmpty());
+	}
+
+	/**
+	 * Runs benchmarks.
+	 *
+	 * @param arguments
+	 *            The command-line arguments (ignored)
+	 */
+	public static void main(String... arguments) {
+
+		Map<String, String> arrayMap = new ArrayMap<String, String>();
+		Map<String, String> hashMap = new HashMap<String, String>();
+		Object object = null;
+
+		System.out.println("Testing get() speed…");
+
+		for (int elements : new int[] { 10, 100, 1000, 10000, 100000 }) {
+			System.out.println("· " + elements + " elements");
+			fillMap(hashMap, elements);
+			fillMap(arrayMap, elements);
+
+			for (int gets : new int[] { 10, 100, 1000, 10000, 100000, 1000000 }) {
+				System.out.println("  · " + gets + " gets");
+
+				long start = System.nanoTime();
+				for (int i = 0; i < gets; ++i) {
+					object = arrayMap.get("object" + (i % elements));
+				}
+				long end = System.nanoTime();
+				System.out.println("    · arrayMap: " + (end - start) / 1000000.0 + " ms");
+
+				start = System.nanoTime();
+				for (int i = 0; i < gets; ++i) {
+					object = hashMap.get("object" + (i % elements));
+				}
+				end = System.nanoTime();
+				System.out.println("    · hashMap: " + (end - start) / 1000000.0 + " ms");
+			}
+		}
+
+		/* try to not let the compiler ignore everything. */
+		if (object != null) {
+			object = null;
+		}
+	}
+
+	/**
+	 * Clears the map and fills it with elements.
+	 *
+	 * @param map
+	 *            The map to fill
+	 * @param elements
+	 *            The number of elements
+	 */
+	private static void fillMap(Map<String, String> map, int elements) {
+		map.clear();
+		for (int i = 0; i < elements; ++i) {
+			map.put("object" + i, "value" + i);
+		}
 	}
 
 }
