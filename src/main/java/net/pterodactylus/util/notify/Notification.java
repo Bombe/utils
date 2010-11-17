@@ -21,13 +21,15 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 
+import net.pterodactylus.util.io.Renderable;
+
 /**
  * A notification can be used to keep track of things that a user needs to be
  * notified about.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Notification {
+public interface Notification extends Renderable {
 
 	/** Sorts notifications by creation time, oldest first. */
 	public static final Comparator<Notification> CREATED_TIME_SORTER = new Comparator<Notification>() {
@@ -109,15 +111,7 @@ public interface Notification {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	public void render(Writer writer) throws IOException;
-
-	/**
-	 * Returns the content of this notification. The returned text should be
-	 * identical to the text {@link #render(Writer)} writes to the given writer.
-	 *
-	 * @return The content of this notification
-	 */
 	@Override
-	public String toString();
+	public void render(Writer writer) throws IOException;
 
 }
