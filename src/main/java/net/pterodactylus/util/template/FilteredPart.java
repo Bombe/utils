@@ -22,6 +22,8 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 
+import net.pterodactylus.util.io.Renderable;
+
 /**
  * {@link Part} implementation that runs the output of another part through one
  * or more {@link Filter}s.
@@ -66,7 +68,11 @@ class FilteredPart extends Part {
 			data = output = filter.format(dataProvider, data, allFilterParameters.get(filter));
 		}
 		try {
-			writer.write((output != null) ? String.valueOf(output) : "");
+			if (output instanceof Renderable) {
+				((Renderable) output).render(writer);
+			} else {
+				writer.write((output != null) ? String.valueOf(output) : "");
+			}
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}

@@ -22,6 +22,8 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 
+import net.pterodactylus.util.io.Renderable;
+
 /**
  * {@link Part} implementation that runs a predefined text through one or more
  * {@link Filter}s.
@@ -65,7 +67,11 @@ class FilteredTextPart extends Part {
 			output = filter.format(dataProvider, output, allFilterParameters.get(filter));
 		}
 		try {
-			writer.write((output != null) ? String.valueOf(output) : "");
+			if (output instanceof Renderable) {
+				((Renderable) output).render(writer);
+			} else {
+				writer.write((output != null) ? String.valueOf(output) : "");
+			}
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}

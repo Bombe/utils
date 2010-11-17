@@ -20,6 +20,8 @@ package net.pterodactylus.util.template;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.pterodactylus.util.io.Renderable;
+
 /**
  * A {@link Part} whose content is dynamically fetched from a
  * {@link DataProvider}.
@@ -48,7 +50,11 @@ class DataProviderPart extends Part {
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		Object output = dataProvider.getData(name);
 		try {
-			writer.write((output != null) ? String.valueOf(output) : "");
+			if (output instanceof Renderable) {
+				((Renderable) output).render(writer);
+			} else {
+				writer.write((output != null) ? String.valueOf(output) : "");
+			}
 		} catch (IOException ioe1) {
 			throw new TemplateException("Can not render part.", ioe1);
 		}
