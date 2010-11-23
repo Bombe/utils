@@ -164,6 +164,15 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	public void putValue(String attribute, String value) throws ConfigurationException {
 		synchronized (values) {
 			values.put(attribute, value);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void save() throws ConfigurationException {
+		synchronized (values) {
 			saveValues();
 		}
 	}

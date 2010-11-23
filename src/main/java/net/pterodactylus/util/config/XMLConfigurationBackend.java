@@ -179,6 +179,14 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 		writeConfigurationFile();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void save() throws ConfigurationException {
+		writeConfigurationFile();
+	}
+
 	//
 	// PRIVATE METHODS
 	//

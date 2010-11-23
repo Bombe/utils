@@ -48,4 +48,12 @@ public interface ConfigurationBackend {
 	 */
 	public void putValue(String attribute, String value) throws ConfigurationException;
 
+	/**
+	 * Saves the configuration.
+	 *
+	 * @throws ConfigurationException
+	 *             if the configuration could not be saved
+	 */
+	public void save() throws ConfigurationException;
+
 }

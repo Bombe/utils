@@ -72,6 +72,14 @@ public class CachingConfigurationBackend implements ConfigurationBackend {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void save() throws ConfigurationException {
+		realConfigurationBackend.save();
+	}
+
+	/**
 	 * Clears the current cache, causing the all further lookups to be repeated.
 	 */
 	public synchronized void clear() {

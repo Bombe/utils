@@ -136,4 +136,16 @@ public class Configuration {
 		return stringValue;
 	}
 
+	/**
+	 * Saves the configuration. This request is usually forwarded to the
+	 * {@link ConfigurationBackend}.
+	 *
+	 * @see ConfigurationBackend#save()
+	 * @throws ConfigurationException
+	 *             if the configuration can not be saved
+	 */
+	public void save() throws ConfigurationException {
+		configurationBackend.save();
+	}
+
 }
