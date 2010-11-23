@@ -178,6 +178,9 @@ public class StringEscaper {
 	 * @return The escaped word
 	 */
 	public static String escapeWord(String word) {
+		if (word == null) {
+			return "";
+		}
 		if (word.length() == 0) {
 			return "\"\"";
 		}
