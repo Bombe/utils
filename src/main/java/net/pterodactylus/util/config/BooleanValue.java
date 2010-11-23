@@ -79,7 +79,7 @@ public class BooleanValue extends AbstractValue<Boolean> {
 		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
 			((ExtendedConfigurationBackend) configuration.configurationBackend).setBooleanValue(attribute, newValue);
 		}
-		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
+		configuration.configurationBackend.putValue(attribute, (newValue != null) ? String.valueOf(newValue) : null);
 	}
 
 }

@@ -89,7 +89,7 @@ public class LongValue extends AbstractValue<Long> {
 		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
 			((ExtendedConfigurationBackend) configuration.configurationBackend).setLongValue(attribute, newValue);
 		}
-		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
+		configuration.configurationBackend.putValue(attribute, (newValue != null) ? String.valueOf(newValue) : null);
 	}
 
 }

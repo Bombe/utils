@@ -89,7 +89,7 @@ public class IntegerValue extends AbstractValue<Integer> {
 		if (configuration.configurationBackend instanceof ExtendedConfigurationBackend) {
 			((ExtendedConfigurationBackend) configuration.configurationBackend).setIntegerValue(attribute, newValue);
 		}
-		configuration.configurationBackend.putValue(attribute, String.valueOf(newValue));
+		configuration.configurationBackend.putValue(attribute, (newValue != null) ? String.valueOf(newValue) : null);
 	}
 
 }
