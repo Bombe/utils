@@ -192,16 +192,17 @@ public class StringEscaper {
 		boolean containsDoubleQuote = word.indexOf('"') != -1;
 		boolean containsBackslash = word.indexOf('\\') != -1;
 		boolean containsSpace = word.indexOf(' ') != -1;
+		boolean containsLineBreak = word.indexOf('\n') != -1;
 		if (!containsSingleQuote && !containsDoubleQuote && !containsBackslash && !containsSpace) {
-			return word;
+			return word.replace("\n", "\\n");
 		}
 		if (!containsDoubleQuote && !containsBackslash) {
-			return "\"" + word + "\"";
+			return "\"" + word.replace("\n", "\\n") + "\"";
 		}
-		if (!containsSingleQuote) {
-			return "'" + word + "'";
+		if (!containsSingleQuote && !containsLineBreak) {
+			return "'" + word.replace("\n", "\\n") + "'";
 		}
-		return word.replace("\\", "\\\\").replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
+		return word.replace("\\", "\\\\").replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'").replace("\n", "\\n");
 	}
 
 	/**
