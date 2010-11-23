@@ -149,7 +149,9 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	 */
 	@Override
 	public String getValue(String attribute) {
-		return values.get(attribute);
+		synchronized (values) {
+			return values.get(attribute);
+		}
 	}
 
 	/**
@@ -160,8 +162,10 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	 */
 	@Override
 	public void putValue(String attribute, String value) throws ConfigurationException {
-		values.put(attribute, value);
-		saveValues();
+		synchronized (values) {
+			values.put(attribute, value);
+			saveValues();
+		}
 	}
 
 	//
