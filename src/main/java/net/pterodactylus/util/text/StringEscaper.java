@@ -145,7 +145,11 @@ public class StringEscaper {
 					}
 				}
 			} else {
-				currentWord.append(c);
+				if (backslashed && (c == 'n')) {
+					currentWord.append('\n');
+				} else {
+					currentWord.append(c);
+				}
 				backslashed = false;
 			}
 		}
