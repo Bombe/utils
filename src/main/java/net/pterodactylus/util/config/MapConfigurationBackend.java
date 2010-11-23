@@ -219,16 +219,20 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 				} else {
 					key = line.substring(0, equals);
 				}
-				key = StringEscaper.parseLine(key).get(0);
-				List<String> words = StringEscaper.parseLine(line.substring(key.length() + 1).trim());
-				StringBuilder value = new StringBuilder();
-				for (String word : words) {
-					if (value.length() > 0) {
-						value.append(' ');
+				if (line.substring(key.length() + 1).trim().length() == 0) {
+					values.put(key, null);
+				} else {
+					key = StringEscaper.parseLine(key).get(0);
+					List<String> words = StringEscaper.parseLine(line.substring(key.length() + 1).trim());
+					StringBuilder value = new StringBuilder();
+					for (String word : words) {
+						if (value.length() > 0) {
+							value.append(' ');
+						}
+						value.append(word);
 					}
-					value.append(word);
+					values.put(key, value.toString());
 				}
-				values.put(key, value.toString());
 			}
 			this.values.putAll(values);
 		} catch (FileNotFoundException fnfe1) {
