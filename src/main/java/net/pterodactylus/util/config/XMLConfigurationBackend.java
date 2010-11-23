@@ -214,9 +214,9 @@ public class XMLConfigurationBackend implements ConfigurationBackend {
 	 * @param attribute
 	 *            The complete name of the node
 	 * @param create
-	 *            {@code true} to create the node if it doesn’t exist, {@code
-	 *            false} to throw a {@link ConfigurationException} if it doesn’t
-	 *            exist
+	 *            {@code true} to create the node if it doesn’t exist,
+	 *            {@code false} to throw a {@link ConfigurationException} if it
+	 *            doesn’t exist
 	 * @return The node, if found
 	 * @throws ConfigurationException
 	 *             if the node could not be found
