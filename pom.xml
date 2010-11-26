@@ -4,6 +4,7 @@
 	<artifactId>utils</artifactId>
 	<version>0.7</version>
 	<name>utils</name>
+	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
 	<distributionManagement>
 		<repository>
