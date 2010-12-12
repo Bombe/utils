@@ -161,6 +161,7 @@ public class Closer {
 	 */
 	public static void close(OutputStream outputStream) {
 		if (outputStream != null) {
+			flush(outputStream);
 			try {
 				outputStream.close();
 			} catch (IOException ioe1) {
@@ -195,6 +196,7 @@ public class Closer {
 	 */
 	public static void close(Writer writer) {
 		if (writer != null) {
+			flush(writer);
 			try {
 				writer.close();
 			} catch (IOException ioe1) {
