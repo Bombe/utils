@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.io;
 
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -243,6 +244,24 @@ public class Closer {
 		} catch (InvocationTargetException e1) {
 			/* ignore. */
 		}
+	}
+
+	/**
+	 * Flushes the given flushable, swallowing any {@link IOException} that may
+	 * occur.
+	 *
+	 * @param flushable
+	 *            The flushable
+	 */
+	public static void flush(Flushable flushable) {
+		if (flushable != null) {
+			try {
+				flushable.flush();
+			} catch (IOException ioe1) {
+				/* ignore. */
+			}
+		}
+
 	}
 
 }
