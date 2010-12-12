@@ -229,6 +229,7 @@ public class Closer {
 	 *            The object to call the close() method on
 	 */
 	public static void close(Object object) {
+		flush(object);
 		if (object == null) {
 			return;
 		}
@@ -263,7 +264,33 @@ public class Closer {
 				/* ignore. */
 			}
 		}
+	}
 
+	/**
+	 * Flushes the given object by calling a method called “flush” without
+	 * parameters, swallowing any {@link IOException} that may occur.
+	 *
+	 * @param object
+	 *            The object to flush
+	 */
+	public static void flush(Object object) {
+		if (object == null) {
+			return;
+		}
+		try {
+			Method flushMethod = object.getClass().getMethod("flush");
+			flushMethod.invoke(object);
+		} catch (SecurityException se1) {
+			logger.log(Level.WARNING, "Could not call flush() method on " + object, se1);
+		} catch (NoSuchMethodException e1) {
+			/* ignore. */
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Illegal argument for flush() method on " + object, iae1);
+		} catch (IllegalAccessException iae1) {
+			logger.log(Level.WARNING, "Could not call flush() method on " + object, iae1);
+		} catch (InvocationTargetException e1) {
+			/* ignore. */
+		}
 	}
 
 }
