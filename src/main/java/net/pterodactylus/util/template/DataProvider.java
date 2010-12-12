@@ -17,7 +17,6 @@
 
 package net.pterodactylus.util.template;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -31,25 +30,30 @@ public class DataProvider {
 	/** Object store. */
 	private final DataStore dataStore;
 
-	/** Accessors. */
-	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
+	/** The accessor bundle. */
+	private final AccessorLocator accessorLocator;
 
 	/**
 	 * Creates a new data provider.
+	 *
+	 * @param accessorLocator
+	 *            The accessor locator
 	 */
-	public DataProvider() {
-		this(new DataStore.MapDataStore());
+	public DataProvider(AccessorLocator accessorLocator) {
+		this(accessorLocator, new DataStore.MapDataStore());
 	}
 
 	/**
 	 * Creates a new data provider using the given data store as backend.
 	 *
+	 * @param accessorLocator
+	 *            The accessor locator
 	 * @param dataStore
 	 *            The data store
 	 */
-	public DataProvider(DataStore dataStore) {
+	public DataProvider(AccessorLocator accessorLocator, DataStore dataStore) {
 		this.dataStore = dataStore;
-		classAccessors.put(Map.class, Accessor.MAP_ACCESSOR);
+		this.accessorLocator = accessorLocator;
 	}
 
 	/**
@@ -62,49 +66,12 @@ public class DataProvider {
 	}
 
 	/**
-	 * Adds an accessor for objects of the given class.
+	 * Returns the accessor locator used by this data provider.
 	 *
-	 * @param clazz
-	 *            The class of the objects to handle with the accessor
-	 * @param accessor
-	 *            The accessor to handle the objects with
+	 * @return The accessor locator
 	 */
-	public void addAccessor(Class<?> clazz, Accessor accessor) {
-		classAccessors.put(clazz, accessor);
-	}
-
-	/**
-	 * Finds an accessor that can handle the given class. If
-	 * {@link #classAccessors} does not contain a perfect match, a match to a
-	 * superclass or superinterface is searched.
-	 *
-	 * @param clazz
-	 *            The class to get an accessor for
-	 * @return The accessor for the given class, or {@code null} if no accessor
-	 *         could be found
-	 */
-	protected Accessor findAccessor(Class<?> clazz) {
-		if (classAccessors.containsKey(clazz)) {
-			return classAccessors.get(clazz);
-		}
-		for (Class<?> interfaceClass : clazz.getInterfaces()) {
-			if (classAccessors.containsKey(interfaceClass)) {
-				return classAccessors.get(interfaceClass);
-			}
-		}
-		Class<?> classToCheck = clazz.getSuperclass();
-		while (classToCheck != null) {
-			if (classAccessors.containsKey(classToCheck)) {
-				return classAccessors.get(classToCheck);
-			}
-			for (Class<?> interfaceClass : classToCheck.getInterfaces()) {
-				if (classAccessors.containsKey(interfaceClass)) {
-					return classAccessors.get(interfaceClass);
-				}
-			}
-			classToCheck = classToCheck.getSuperclass();
-		}
-		return null;
+	protected AccessorLocator getAccessorLocator() {
+		return accessorLocator;
 	}
 
 	/**
@@ -129,7 +96,7 @@ public class DataProvider {
 			if (object == null) {
 				object = getDataStore().get(nameToken);
 			} else {
-				Accessor accessor = findAccessor(object.getClass());
+				Accessor accessor = accessorLocator.findAccessor(object.getClass());
 				if (accessor != null) {
 					object = accessor.get(this, object, nameToken);
 				} else {

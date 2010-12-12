@@ -28,12 +28,6 @@ import java.util.Map;
  */
 class OverrideDataProvider extends DataProvider {
 
-	/** The parent data provider. */
-	private final DataProvider parentDataProvider;
-
-	/** Accessors. */
-	private final Map<Class<?>, Accessor> classAccessors = new HashMap<Class<?>, Accessor>();
-
 	/**
 	 * Creates a new override data provider.
 	 *
@@ -45,8 +39,7 @@ class OverrideDataProvider extends DataProvider {
 	 *            The object
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, String name, Object object) {
-		super(new OverrideDataStore(parentDataProvider, name, object));
-		this.parentDataProvider = parentDataProvider;
+		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, name, object));
 	}
 
 	/**
@@ -58,39 +51,19 @@ class OverrideDataProvider extends DataProvider {
 	 *            The override objects
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, Map<String, Object> overrideObjects) {
-		super(new OverrideDataStore(parentDataProvider, overrideObjects));
-		this.parentDataProvider = parentDataProvider;
+		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, overrideObjects));
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Adds an accessor.
+	 *
+	 * @param clazz
+	 *            The class to add the accessor for
+	 * @param accessor
+	 *            The accessor
 	 */
-	@Override
 	public void addAccessor(Class<?> clazz, Accessor accessor) {
-		classAccessors.put(clazz, accessor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Accessor findAccessor(Class<?> clazz) {
-		if (classAccessors.containsKey(clazz)) {
-			return classAccessors.get(clazz);
-		}
-		for (Class<?> interfaceClass : clazz.getInterfaces()) {
-			if (classAccessors.containsKey(interfaceClass)) {
-				return classAccessors.get(interfaceClass);
-			}
-		}
-		Class<?> classToCheck = clazz.getSuperclass();
-		while (classToCheck != null) {
-			if (classAccessors.containsKey(classToCheck)) {
-				return classAccessors.get(classToCheck);
-			}
-			classToCheck = classToCheck.getSuperclass();
-		}
-		return parentDataProvider.findAccessor(clazz);
+		getAccessorLocator().addAccessor(clazz, accessor);
 	}
 
 	/**
@@ -152,6 +125,14 @@ class OverrideDataProvider extends DataProvider {
 		@Override
 		public void set(String name, Object data) {
 			parentDataProvider.setData(name, data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DataStore clone() {
+			return new OverrideDataStore(parentDataProvider, overrideDataStore);
 		}
 
 	}
