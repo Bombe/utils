@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.io;
 
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -160,6 +161,7 @@ public class Closer {
 	 */
 	public static void close(OutputStream outputStream) {
 		if (outputStream != null) {
+			flush(outputStream);
 			try {
 				outputStream.close();
 			} catch (IOException ioe1) {
@@ -194,6 +196,7 @@ public class Closer {
 	 */
 	public static void close(Writer writer) {
 		if (writer != null) {
+			flush(writer);
 			try {
 				writer.close();
 			} catch (IOException ioe1) {
@@ -226,6 +229,7 @@ public class Closer {
 	 *            The object to call the close() method on
 	 */
 	public static void close(Object object) {
+		flush(object);
 		if (object == null) {
 			return;
 		}
@@ -240,6 +244,50 @@ public class Closer {
 			logger.log(Level.WARNING, "Illegal argument for close() method on " + object, iae1);
 		} catch (IllegalAccessException iae1) {
 			logger.log(Level.WARNING, "Could not call close() method on " + object, iae1);
+		} catch (InvocationTargetException e1) {
+			/* ignore. */
+		}
+	}
+
+	/**
+	 * Flushes the given flushable, swallowing any {@link IOException} that may
+	 * occur.
+	 *
+	 * @param flushable
+	 *            The flushable
+	 */
+	public static void flush(Flushable flushable) {
+		if (flushable != null) {
+			try {
+				flushable.flush();
+			} catch (IOException ioe1) {
+				/* ignore. */
+			}
+		}
+	}
+
+	/**
+	 * Flushes the given object by calling a method called “flush” without
+	 * parameters, swallowing any {@link IOException} that may occur.
+	 *
+	 * @param object
+	 *            The object to flush
+	 */
+	public static void flush(Object object) {
+		if (object == null) {
+			return;
+		}
+		try {
+			Method flushMethod = object.getClass().getMethod("flush");
+			flushMethod.invoke(object);
+		} catch (SecurityException se1) {
+			logger.log(Level.WARNING, "Could not call flush() method on " + object, se1);
+		} catch (NoSuchMethodException e1) {
+			/* ignore. */
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Illegal argument for flush() method on " + object, iae1);
+		} catch (IllegalAccessException iae1) {
+			logger.log(Level.WARNING, "Could not call flush() method on " + object, iae1);
 		} catch (InvocationTargetException e1) {
 			/* ignore. */
 		}

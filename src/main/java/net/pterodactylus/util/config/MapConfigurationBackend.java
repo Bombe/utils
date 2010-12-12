@@ -244,6 +244,10 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 				}
 			}
 			this.values.putAll(values);
+		} catch (ConfigurationException ce1) {
+			if (!ignoreMissing) {
+				throw ce1;
+			}
 		} catch (FileNotFoundException fnfe1) {
 			if (!ignoreMissing) {
 				throw new ConfigurationException("Could not find configuration file “" + configurationFile.getName() + "”!", fnfe1);
@@ -252,9 +256,13 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 			/* impossible, I’d say. */
 			logger.log(Level.SEVERE, "JVM does not support UTF-8!");
 		} catch (IOException ioe1) {
-			throw new ConfigurationException("Could not read configuration from “" + configurationFile.getName() + "”!", ioe1);
+			if (!ignoreMissing) {
+				throw new ConfigurationException("Could not read configuration from “" + configurationFile.getName() + "”!", ioe1);
+			}
 		} catch (TextException te1) {
-			throw new ConfigurationException("Could not parse configuration value!", te1);
+			if (!ignoreMissing) {
+				throw new ConfigurationException("Could not parse configuration value!", te1);
+			}
 		} finally {
 			Closer.close(bufferedReader);
 			Closer.close(inputStreamReader);
