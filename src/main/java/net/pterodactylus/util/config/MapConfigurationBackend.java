@@ -287,6 +287,9 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 				bufferedWriter.write(StringEscaper.escapeWord(value.getValue()));
 				bufferedWriter.newLine();
 			}
+			bufferedWriter.flush();
+			outputStreamWriter.flush();
+			configurationOutputStream.flush();
 		} catch (FileNotFoundException fnfe1) {
 			throw new ConfigurationException("Could not create configuration file “" + configurationFile.getName() + "”!", fnfe1);
 		} catch (UnsupportedEncodingException uee1) {
