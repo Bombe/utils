@@ -244,6 +244,10 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 				}
 			}
 			this.values.putAll(values);
+		} catch (ConfigurationException ce1) {
+			if (!ignoreMissing) {
+				throw ce1;
+			}
 		} catch (FileNotFoundException fnfe1) {
 			if (!ignoreMissing) {
 				throw new ConfigurationException("Could not find configuration file “" + configurationFile.getName() + "”!", fnfe1);
