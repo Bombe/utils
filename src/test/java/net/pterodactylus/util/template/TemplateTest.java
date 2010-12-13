@@ -940,6 +940,7 @@ public class TemplateTest extends TestCase {
 	/**
 	 * Tests template inclusion with the “<%include>” directive.
 	 */
+	@SuppressWarnings("synthetic-access")
 	public void testTemplateInclusion() {
 		Template outerTemplate;
 		Template innerTemplate;
@@ -1023,6 +1024,18 @@ public class TemplateTest extends TestCase {
 		outerTemplate.set("a", "a");
 		outerTemplate.render(stringWriter);
 		assertEquals("a: a", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("items: <%include itemTemplate>"));
+		innerTemplate = new Template(new StringReader("<%foreach items item><%item.name><%/foreach>"));
+		outerTemplate.set("itemTemplate", innerTemplate);
+		Collection<Item> items = new ArrayList<Item>();
+		items.add(new Item("foo"));
+		items.add(new Item("bar"));
+		outerTemplate.set("items", items);
+		outerTemplate.addAccessor(Item.class, new ItemAccessor());
+		stringWriter = new StringWriter();
+		outerTemplate.render(stringWriter);
+		assertEquals("items: foobar", stringWriter.toString());
 	}
 
 	public void testTemplatePlugins() {
@@ -1062,6 +1075,54 @@ public class TemplateTest extends TestCase {
 		@Override
 		public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
+		}
+
+	}
+
+	/**
+	 * Small container class used in some of the tests.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class Item {
+
+		/** The name of this item. */
+		private final String name;
+
+		/**
+		 * Creates a new item.
+		 *
+		 * @param name
+		 *            The name of the item
+		 */
+		public Item(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * Returns the name of this item.
+		 *
+		 * @return The name of this item
+		 */
+		public String getName() {
+			return name;
+		}
+
+	}
+
+	/**
+	 * {@link Accessor} implementation for {@link Item}s.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class ItemAccessor implements Accessor {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Object get(DataProvider dataProvider, Object object, String member) {
+			return ((Item) object).getName();
 		}
 
 	}
