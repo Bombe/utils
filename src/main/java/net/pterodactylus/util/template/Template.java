@@ -166,7 +166,7 @@ public class Template {
 	 * @return A new data provider
 	 */
 	public DataProvider createDataProvider() {
-		return new DataProvider(accessorLocator, dataProvider.getDataStore().clone());
+		return new DataProvider(new AccessorLocator(accessorLocator), dataProvider.getDataStore().clone());
 	}
 
 	/**
