@@ -199,7 +199,7 @@ public class MultipleDataProvider extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Accessor findAccessor(Class<?> clazz) {
+		public Accessor findAccessor(Class<?> clazz) {
 			for (DataProvider dataProvider : dataProviders) {
 				Accessor accessor = dataProvider.getAccessorLocator().findAccessor(clazz);
 				if (accessor != null) {
