@@ -48,7 +48,16 @@ public class AccessorLocator {
 	 *            The accessor locator to copy
 	 */
 	public AccessorLocator(AccessorLocator accessorLocator) {
-		classAccessors.putAll(accessorLocator.classAccessors);
+		classAccessors.putAll(accessorLocator.getAccessors());
+	}
+
+	/**
+	 * Returns all accessors of this accessor locator.
+	 *
+	 * @return All accessors of this locator
+	 */
+	public Map<Class<?>, Accessor> getAccessors() {
+		return Collections.unmodifiableMap(classAccessors);
 	}
 
 	/**
@@ -73,7 +82,7 @@ public class AccessorLocator {
 	 * @return The accessor for the given class, or {@code null} if no accessor
 	 *         could be found
 	 */
-	protected Accessor findAccessor(Class<?> clazz) {
+	public Accessor findAccessor(Class<?> clazz) {
 		if (classAccessors.containsKey(clazz)) {
 			return classAccessors.get(clazz);
 		}

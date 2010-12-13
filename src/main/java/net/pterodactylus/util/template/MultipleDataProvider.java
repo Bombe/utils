@@ -19,7 +19,10 @@ package net.pterodactylus.util.template;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -199,7 +202,21 @@ public class MultipleDataProvider extends DataProvider {
 		 * {@inheritDoc}
 		 */
 		@Override
-		protected Accessor findAccessor(Class<?> clazz) {
+		public Map<Class<?>, Accessor> getAccessors() {
+			Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
+			List<DataProvider> dataProviders = new ArrayList<DataProvider>(this.dataProviders);
+			Collections.reverse(dataProviders);
+			for (DataProvider dataProvider : dataProviders) {
+				accessors.putAll(dataProvider.getAccessorLocator().getAccessors());
+			}
+			return accessors;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Accessor findAccessor(Class<?> clazz) {
 			for (DataProvider dataProvider : dataProviders) {
 				Accessor accessor = dataProvider.getAccessorLocator().findAccessor(clazz);
 				if (accessor != null) {
@@ -210,4 +227,5 @@ public class MultipleDataProvider extends DataProvider {
 		}
 
 	}
+
 }
