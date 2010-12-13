@@ -190,7 +190,7 @@ public class Template {
 	 *             if the template can not be parsed
 	 */
 	public synchronized void render(Writer writer) throws TemplateException {
-		render(new DataProvider(accessorLocator, dataProvider.getDataStore().clone()), writer);
+		render(createDataProvider(), writer);
 	}
 
 	/**
