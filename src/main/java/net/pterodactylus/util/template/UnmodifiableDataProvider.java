@@ -35,23 +35,8 @@ public class UnmodifiableDataProvider extends DataProvider {
 	 *            The data provider to wrap
 	 */
 	public UnmodifiableDataProvider(DataProvider dataProvider) {
+		super(dataProvider.getAccessorLocator());
 		this.dataProvider = dataProvider;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void addAccessor(Class<?> clazz, Accessor accessor) {
-		/* ignore. */
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Accessor findAccessor(Class<?> clazz) {
-		return dataProvider.findAccessor(clazz);
 	}
 
 	/**

@@ -84,7 +84,7 @@ class LoopPart extends ContainerPart {
 		overrideObjects.put(loopName, loopStructure);
 		for (Object object : collection) {
 			overrideObjects.put(itemName, object);
-			DataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
+			OverrideDataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
 			loopDataProvider.addAccessor(LoopStructure.class, LOOP_STRUCTURE_ACCESSOR);
 			for (Part part : parts) {
 				part.render(loopDataProvider, writer);

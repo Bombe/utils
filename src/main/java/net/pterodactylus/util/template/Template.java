@@ -48,8 +48,11 @@ import net.pterodactylus.util.template.ConditionalPart.OrCondition;
  */
 public class Template {
 
+	/** The accessor bundle. */
+	private final AccessorLocator accessorLocator = new AccessorLocator();
+
 	/** The template’s default data store. */
-	private DataProvider dataProvider = new DataProvider();
+	private DataProvider dataProvider = new DataProvider(accessorLocator);
 
 	/** The template’s default template provider. */
 	private TemplateProvider templateProvider = new DataTemplateProvider(dataProvider);
@@ -108,7 +111,7 @@ public class Template {
 	 *            The accessor to add
 	 */
 	public void addAccessor(Class<?> clazz, Accessor accessor) {
-		dataProvider.addAccessor(clazz, accessor);
+		accessorLocator.addAccessor(clazz, accessor);
 	}
 
 	/**
@@ -155,6 +158,18 @@ public class Template {
 	}
 
 	/**
+	 * Creates a new data provider that contains the accessor locator of this
+	 * template and a copy of the data store of this template. The returned data
+	 * provider should be used with {@link #render(DataProvider, Writer)} to
+	 * ensure thread-safety.
+	 *
+	 * @return A new data provider
+	 */
+	public DataProvider createDataProvider() {
+		return new DataProvider(new AccessorLocator(accessorLocator), dataProvider.getDataStore().clone());
+	}
+
+	/**
 	 * Parses the input of the template if it wasn’t already parsed.
 	 *
 	 * @throws TemplateException
@@ -175,7 +190,7 @@ public class Template {
 	 *             if the template can not be parsed
 	 */
 	public synchronized void render(Writer writer) throws TemplateException {
-		render(dataProvider, writer);
+		render(createDataProvider(), writer);
 	}
 
 	/**

@@ -19,7 +19,10 @@ package net.pterodactylus.util.template;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -43,6 +46,7 @@ public class MultipleDataProvider extends DataProvider {
 	 *            The source data providers
 	 */
 	public MultipleDataProvider(DataProvider... dataProviders) {
+		super(new MultipleAccessorLocator(dataProviders));
 		this.dataProviders.addAll(Arrays.asList(dataProviders));
 		List<DataStore> dataStores = new ArrayList<DataStore>();
 		for (DataProvider dataProvider : dataProviders) {
@@ -79,7 +83,7 @@ public class MultipleDataProvider extends DataProvider {
 			} else {
 				Accessor accessor = null;
 				for (DataProvider dataProvider : dataProviders) {
-					accessor = dataProvider.findAccessor(object.getClass());
+					accessor = dataProvider.getAccessorLocator().findAccessor(object.getClass());
 					if (accessor != null) {
 						break;
 					}
@@ -113,20 +117,6 @@ public class MultipleDataProvider extends DataProvider {
 		for (DataProvider dataProvider : dataProviders) {
 			dataProvider.setData(name, data);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Accessor findAccessor(Class<?> clazz) {
-		for (DataProvider dataProvider : dataProviders) {
-			Accessor accessor = dataProvider.findAccessor(clazz);
-			if (accessor != null) {
-				return accessor;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -172,6 +162,68 @@ public class MultipleDataProvider extends DataProvider {
 			for (DataStore dataStore : dataStores) {
 				dataStore.set(name, data);
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public DataStore clone() {
+			return new MultipleDataStore(dataStores);
+		}
+
+	}
+
+	/**
+	 * {@link AccessorLocator} implementation that defers
+	 * {@link AccessorLocator#findAccessor(Class)} requests to multiple
+	 * {@link DataProvider}s.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class MultipleAccessorLocator extends AccessorLocator {
+
+		/** The source data providers. */
+		private final List<DataProvider> dataProviders = new ArrayList<DataProvider>();
+
+		/**
+		 * Creates a new multiple accessor locator.
+		 *
+		 * @param dataProviders
+		 *            The data providers to delegate requests to
+		 */
+		public MultipleAccessorLocator(DataProvider... dataProviders) {
+			for (DataProvider dataProvider : dataProviders) {
+				this.dataProviders.add(dataProvider);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Map<Class<?>, Accessor> getAccessors() {
+			Map<Class<?>, Accessor> accessors = new HashMap<Class<?>, Accessor>();
+			List<DataProvider> dataProviders = new ArrayList<DataProvider>(this.dataProviders);
+			Collections.reverse(dataProviders);
+			for (DataProvider dataProvider : dataProviders) {
+				accessors.putAll(dataProvider.getAccessorLocator().getAccessors());
+			}
+			return accessors;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Accessor findAccessor(Class<?> clazz) {
+			for (DataProvider dataProvider : dataProviders) {
+				Accessor accessor = dataProvider.getAccessorLocator().findAccessor(clazz);
+				if (accessor != null) {
+					return accessor;
+				}
+			}
+			return null;
 		}
 
 	}

@@ -47,6 +47,13 @@ public interface DataStore {
 	public void set(String name, Object data);
 
 	/**
+	 * Returns a clone of this data store.
+	 *
+	 * @return A clone of this data store
+	 */
+	public DataStore clone();
+
+	/**
 	 * Default {@link Map}-based implementation of a {@link DataStore}.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -55,6 +62,24 @@ public interface DataStore {
 
 		/** The backing store. */
 		private final Map<String, Object> objectStore = new HashMap<String, Object>();
+
+		/**
+		 * Creates a new {@link Map}-based data store.
+		 */
+		public MapDataStore() {
+			/* do nothing. */
+		}
+
+		/**
+		 * Creates a new {@link Map}-based data store, copying all entries from
+		 * the given map.
+		 *
+		 * @param dataStore
+		 *            The data store to copy
+		 */
+		public MapDataStore(MapDataStore dataStore) {
+			objectStore.putAll(dataStore.objectStore);
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -70,6 +95,14 @@ public interface DataStore {
 		@Override
 		public void set(String name, Object data) {
 			objectStore.put(name, data);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public MapDataStore clone() {
+			return new MapDataStore(this);
 		}
 
 	}
