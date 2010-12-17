@@ -260,8 +260,8 @@ public class HtmlFilter implements Filter {
 		htmlEntities.put('™', "trade");
 		htmlEntities.put('Ú', "Uacute");
 		htmlEntities.put('ú', "uacute");
-		htmlEntities.put('⇑', "hArr");
-		htmlEntities.put('↑', "harr");
+		htmlEntities.put('⇑', "uArr");
+		htmlEntities.put('↑', "uarr");
 		htmlEntities.put('Û', "Ucirc");
 		htmlEntities.put('û', "ucirc");
 		htmlEntities.put('Ù', "Ugrave");
