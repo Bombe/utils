@@ -145,10 +145,10 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 					cacheLock.writeLock().unlock();
 				}
 			}
+			logger.log(Level.FINE, "Retrieved Value for Key “%1$s”.", key);
 			return (value != null) ? value.getItem() : null;
 		} finally {
 			cacheLock.readLock().unlock();
-			logger.log(Level.FINE, "Retrieved Value for Key “%1$s”.", key);
 		}
 	}
 
