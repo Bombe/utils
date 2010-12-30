@@ -156,7 +156,7 @@ public class StringEscaper {
 			}
 		}
 		if (inSingleQuote || inDoubleQuote || backslashed) {
-			throw new TextException("open quote");
+			throw new TextException("open quote in line: " + line);
 		}
 		if (currentWord.length() > 0) {
 			words.add(currentWord.toString());
