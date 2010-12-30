@@ -147,6 +147,8 @@ public class StringEscaper {
 			} else {
 				if (backslashed && (c == 'n')) {
 					currentWord.append('\n');
+				} else if (backslashed && (c == 'r')) {
+					currentWord.append('\r');
 				} else {
 					currentWord.append(c);
 				}
@@ -154,7 +156,7 @@ public class StringEscaper {
 			}
 		}
 		if (inSingleQuote || inDoubleQuote || backslashed) {
-			throw new TextException("open quote");
+			throw new TextException("open quote in line: " + line);
 		}
 		if (currentWord.length() > 0) {
 			words.add(currentWord.toString());
@@ -194,15 +196,15 @@ public class StringEscaper {
 		boolean containsSpace = word.indexOf(' ') != -1;
 		boolean containsLineBreak = word.indexOf('\n') != -1;
 		if (!containsSingleQuote && !containsDoubleQuote && !containsBackslash && !containsSpace) {
-			return word.replace("\n", "\\n");
+			return word.replace("\n", "\\n").replace("\r", "\\r");
 		}
 		if (!containsDoubleQuote && !containsBackslash) {
-			return "\"" + word.replace("\n", "\\n") + "\"";
+			return "\"" + word.replace("\n", "\\n").replace("\r", "\\r") + "\"";
 		}
 		if (!containsSingleQuote && !containsLineBreak) {
-			return "'" + word.replace("\n", "\\n") + "'";
+			return "'" + word.replace("\n", "\\n").replace("\r", "\\r") + "'";
 		}
-		return word.replace("\\", "\\\\").replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'").replace("\n", "\\n");
+		return word.replace("\\", "\\\\").replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'").replace("\n", "\\n").replace("\r", "\\r");
 	}
 
 	/**
