@@ -131,6 +131,22 @@ public class Validation {
 	}
 
 	/**
+	 * Checks if the given object is <code>null</code>.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param object
+	 *            The object to check
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isNull(String objectName, Object object) {
+		if (object != null) {
+			addFailedCheck(objectName + " should be null");
+		}
+		return this;
+	}
+
+	/**
 	 * Checks if <code>value</code> is less than <code>upperBound</code>.
 	 *
 	 * @param objectName
