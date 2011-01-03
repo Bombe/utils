@@ -511,7 +511,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isInstanceOf(String objectName, Object object, Class<?> clazz) {
-		if (!object.getClass().isAssignableFrom(clazz)) {
+		if (!clazz.isAssignableFrom(object.getClass())) {
 			addFailedCheck(objectName + " should be a kind of " + clazz.getName() + " but is " + object.getClass().getName());
 		}
 		return this;
