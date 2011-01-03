@@ -157,6 +157,24 @@ public class Validation {
 	 *            The upper bound to check <code>value</code> against
 	 * @return This {@link Validation} object to allow method chaining
 	 */
+	public Validation isLess(String objectName, long value, long upperBound) {
+		if (value >= upperBound) {
+			addFailedCheck(objectName + " should be < " + upperBound + " but was " + value);
+		}
+		return this;
+	}
+
+	/**
+	 * Checks if <code>value</code> is less than <code>upperBound</code>.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param value
+	 *            The value to check
+	 * @param upperBound
+	 *            The upper bound to check <code>value</code> against
+	 * @return This {@link Validation} object to allow method chaining
+	 */
 	public Validation isLess(String objectName, double value, double upperBound) {
 		if (value >= upperBound) {
 			addFailedCheck(objectName + " should be < " + upperBound + " but was " + value);
