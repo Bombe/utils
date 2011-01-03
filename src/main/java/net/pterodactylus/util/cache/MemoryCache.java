@@ -35,7 +35,7 @@ import net.pterodactylus.util.logging.Logging;
  *            The type of the value
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class MemoryCache<K, V> extends AbstractCache<K, V> {
+public class MemoryCache<K, V> extends AbstractCache<K, V> implements WritableCache<K, V> {
 
 	/** The logger. */
 	private static Logger logger = Logging.getLogger(MemoryCache.class.getName());
@@ -149,6 +149,19 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> {
 			return (value != null) ? value.getItem() : null;
 		} finally {
 			cacheLock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void put(K key, V value) {
+		cacheLock.writeLock().lock();
+		try {
+			cachedValues.put(key, new DefaultCacheItem<V>(value));
+		} finally {
+			cacheLock.writeLock().unlock();
 		}
 	}
 
