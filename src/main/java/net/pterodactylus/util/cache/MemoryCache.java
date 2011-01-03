@@ -40,25 +40,8 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> implements WritableCa
 	/** The logger. */
 	private static Logger logger = Logging.getLogger(MemoryCache.class.getName());
 
-	/** The number of values to cache. */
-	private volatile int cacheSize;
-
 	/** The cache for the values. */
-	private final Map<K, CacheItem<V>> cachedValues = new LinkedHashMap<K, CacheItem<V>>() {
-
-		/**
-		 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
-		 */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		protected boolean removeEldestEntry(Map.Entry<K, CacheItem<V>> eldest) {
-			if (super.size() > cacheSize) {
-				eldest.getValue().remove();
-				return true;
-			}
-			return false;
-		}
-	};
+	private final Map<K, CacheItem<V>> cachedValues;
 
 	/** The lock for cache accesses. */
 	private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
@@ -81,9 +64,34 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> implements WritableCa
 	 * @param cacheSize
 	 *            The number of values to cache
 	 */
-	public MemoryCache(ValueRetriever<K, V> valueRetriever, int cacheSize) {
+	public MemoryCache(ValueRetriever<K, V> valueRetriever, final int cacheSize) {
+		this(valueRetriever, new LinkedHashMap<K, CacheItem<V>>() {
+
+			/**
+			 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
+			 */
+			@Override
+			protected boolean removeEldestEntry(Map.Entry<K, CacheItem<V>> eldest) {
+				if (super.size() > cacheSize) {
+					eldest.getValue().remove();
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	/**
+	 * Creates a new memory cache, using the given map as storage backend.
+	 *
+	 * @param valueRetriever
+	 *            The value retriever
+	 * @param storage
+	 *            The backing storage
+	 */
+	public MemoryCache(ValueRetriever<K, V> valueRetriever, Map<K, CacheItem<V>> storage) {
 		super(valueRetriever);
-		this.cacheSize = cacheSize;
+		this.cachedValues = storage;
 	}
 
 	/**
