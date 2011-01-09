@@ -176,7 +176,7 @@ public class Version implements Comparable<Version> {
 	@Override
 	public int compareTo(Version version) {
 		int lengthDiff = numbers.length - version.numbers.length;
-		for (int index = 0; index < Math.abs(lengthDiff); index++) {
+		for (int index = 0; index < Math.min(numbers.length, version.numbers.length); index++) {
 			int diff = numbers[index] - version.numbers[index];
 			if (diff != 0) {
 				return diff;
