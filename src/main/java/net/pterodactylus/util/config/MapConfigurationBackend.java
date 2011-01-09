@@ -35,8 +35,10 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.text.SimpleStringEscaper;
 import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
 
@@ -209,39 +211,20 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 			bufferedReader = new BufferedReader(inputStreamReader);
 			Map<String, String> values = new HashMap<String, String>();
 			String line;
+			boolean firstLine = true;
+			int mapConfigurationBackendVersion = 0;
 			while ((line = bufferedReader.readLine()) != null) {
+				if (firstLine) {
+					if (line.equals("# MapConfigurationBackend.Version=1")) {
+						mapConfigurationBackendVersion = 1;
+					}
+					firstLine = false;
+				}
 				if (line.startsWith("#") || line.startsWith(";") || (line.trim().length() == 0)) {
 					continue;
 				}
-				int colon = line.indexOf(':');
-				int equals = line.indexOf('=');
-				if ((colon == -1) && (equals == -1)) {
-					throw new ConfigurationException("Line without “:” or “=” found: " + line);
-				}
-				String key;
-				if (colon != -1) {
-					if (equals != -1) {
-						key = line.substring(0, Math.min(colon, equals));
-					} else {
-						key = line.substring(0, colon);
-					}
-				} else {
-					key = line.substring(0, equals);
-				}
-				if (line.substring(key.length() + 1).trim().length() == 0) {
-					values.put(key, null);
-				} else {
-					key = StringEscaper.parseLine(key).get(0);
-					List<String> words = StringEscaper.parseLine(line.substring(key.length() + 1).trim());
-					StringBuilder value = new StringBuilder();
-					for (String word : words) {
-						if (value.length() > 0) {
-							value.append(' ');
-						}
-						value.append(word);
-					}
-					values.put(key, value.toString());
-				}
+				Pair<String, String> keyValuePair = parseKeyValuePair(line, mapConfigurationBackendVersion);
+				values.put(keyValuePair.getLeft(), keyValuePair.getRight());
 			}
 			this.values.putAll(values);
 		} catch (ConfigurationException ce1) {
@@ -289,10 +272,15 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 			configurationOutputStream = new FileOutputStream(configurationFile);
 			outputStreamWriter = new OutputStreamWriter(configurationOutputStream, "UTF-8");
 			bufferedWriter = new BufferedWriter(outputStreamWriter);
+			bufferedWriter.write("# MapConfigurationBackend.Version=1");
+			bufferedWriter.newLine();
 			for (Entry<String, String> value : values.entrySet()) {
 				bufferedWriter.write(StringEscaper.escapeWord(value.getKey()));
-				bufferedWriter.write(": ");
-				bufferedWriter.write(StringEscaper.escapeWord(value.getValue()));
+				bufferedWriter.write(":");
+				if (value.getValue() != null) {
+					bufferedWriter.write(' ');
+					bufferedWriter.write(SimpleStringEscaper.escapeString(value.getValue()));
+				}
 				bufferedWriter.newLine();
 			}
 		} catch (FileNotFoundException fnfe1) {
@@ -307,6 +295,67 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 			Closer.close(outputStreamWriter);
 			Closer.close(configurationOutputStream);
 		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Parses the given line depending on the given version of the map
+	 * configuration backend.
+	 *
+	 * @param line
+	 *            The line to parse into a key-value pair
+	 * @param mapConfigurationBackendVersion
+	 *            The map configuration backend version
+	 * @return The key value pair
+	 * @throws ConfigurationException
+	 *             if the line does not contain a valid key-value pair
+	 * @throws TextException
+	 *             if the line can not be parsed
+	 */
+	private Pair<String, String> parseKeyValuePair(String line, int mapConfigurationBackendVersion) throws ConfigurationException, TextException {
+		int colon = line.indexOf(':');
+		int equals = line.indexOf('=');
+		if ((colon == -1) && (equals == -1)) {
+			throw new ConfigurationException("Line without “:” or “=” found: " + line);
+		}
+		String key;
+		if (colon != -1) {
+			if (equals != -1) {
+				key = line.substring(0, Math.min(colon, equals));
+			} else {
+				key = line.substring(0, colon);
+			}
+		} else {
+			key = line.substring(0, equals);
+		}
+		if (mapConfigurationBackendVersion == 0) {
+			if (line.substring(key.length() + 1).trim().length() == 0) {
+				return new Pair<String, String>(key, null);
+			}
+			key = StringEscaper.parseLine(key).get(0);
+			StringBuilder value = new StringBuilder();
+			List<String> words = StringEscaper.parseLine(line.substring(key.length() + 1).trim());
+			for (String word : words) {
+				if (value.length() > 0) {
+					value.append(' ');
+				}
+				value.append(word);
+			}
+			values.put(key, value.toString());
+			return new Pair<String, String>(key, value.toString());
+		}
+		if (mapConfigurationBackendVersion == 1) {
+			String value = line.substring(key.length() + 1);
+			if (value.length() == 0) {
+				return new Pair<String, String>(key, null);
+			}
+			value = SimpleStringEscaper.unescapeString(value.substring(1));
+			return new Pair<String, String>(key, value);
+		}
+		throw new ConfigurationException("Invalid MapConfigurationBackendVersion: " + mapConfigurationBackendVersion);
 	}
 
 }
