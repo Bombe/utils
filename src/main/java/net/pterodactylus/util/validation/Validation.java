@@ -131,6 +131,40 @@ public class Validation {
 	}
 
 	/**
+	 * Checks if the given object is <code>null</code>.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param object
+	 *            The object to check
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isNull(String objectName, Object object) {
+		if (object != null) {
+			addFailedCheck(objectName + " should be null");
+		}
+		return this;
+	}
+
+	/**
+	 * Checks if <code>value</code> is less than <code>upperBound</code>.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param value
+	 *            The value to check
+	 * @param upperBound
+	 *            The upper bound to check <code>value</code> against
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isLess(String objectName, long value, long upperBound) {
+		if (value >= upperBound) {
+			addFailedCheck(objectName + " should be < " + upperBound + " but was " + value);
+		}
+		return this;
+	}
+
+	/**
 	 * Checks if <code>value</code> is less than <code>upperBound</code>.
 	 *
 	 * @param objectName
@@ -477,7 +511,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isInstanceOf(String objectName, Object object, Class<?> clazz) {
-		if (!object.getClass().isAssignableFrom(clazz)) {
+		if (!clazz.isAssignableFrom(object.getClass())) {
 			addFailedCheck(objectName + " should be a kind of " + clazz.getName() + " but is " + object.getClass().getName());
 		}
 		return this;
