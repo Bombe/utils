@@ -35,8 +35,7 @@ public class Pair<S, T> {
 	protected final T right;
 
 	/**
-	 * Creates a new pair consisting of the two values. None of the values may
-	 * be {@code null}.
+	 * Creates a new pair consisting of the two values.
 	 *
 	 * @param left
 	 *            The left value
@@ -44,9 +43,6 @@ public class Pair<S, T> {
 	 *            The right value
 	 */
 	public Pair(S left, T right) {
-		if ((left == null) || (right == null)) {
-			throw new NullPointerException("null is not allowed in a pair");
-		}
 		this.left = left;
 		this.right = right;
 	}
@@ -78,7 +74,7 @@ public class Pair<S, T> {
 			return false;
 		}
 		Pair<?, ?> pair = (Pair<?, ?>) obj;
-		return left.equals(pair.left) && right.equals(pair.right);
+		return (((left == null) && ((pair.left == null) || (pair.left.equals(left)))) || ((left != null) && left.equals(pair.left))) && (((right == null) && ((pair.right == null) || (pair.right.equals(right)))) || ((right != null) && right.equals(pair.right)));
 	}
 
 	/**
@@ -86,8 +82,8 @@ public class Pair<S, T> {
 	 */
 	@Override
 	public int hashCode() {
-		int leftHashCode = left.hashCode();
-		return ((leftHashCode << 16) | (leftHashCode >>> 16)) ^ ~right.hashCode();
+		int leftHashCode = (left != null) ? left.hashCode() : 0x12345678;
+		return ((leftHashCode << 16) | (leftHashCode >>> 16)) ^ ~((right != null) ? right.hashCode() : 0x0fedcba9);
 	}
 
 	/**
