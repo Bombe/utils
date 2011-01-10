@@ -75,8 +75,17 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		Collection<?> collection = (Collection<?>) dataProvider.getData(collectionName);
-		if ((collection == null) || collection.isEmpty()) {
+		Object collectionObject = dataProvider.getData(collectionName);
+		Collection<?> collection;
+		if (collectionObject instanceof Collection<?>) {
+			collection = (Collection<?>) collectionObject;
+			if (collection.isEmpty()) {
+				return;
+			}
+		} else if (collectionObject instanceof Map<?, ?>) {
+			Map<?, ?> map = (Map<?, ?>) collectionObject;
+			collection = map.entrySet();
+		} else {
 			return;
 		}
 		LoopStructure loopStructure = new LoopStructure(collection.size());
