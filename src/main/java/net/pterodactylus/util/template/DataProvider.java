@@ -85,6 +85,23 @@ public class DataProvider {
 	 * @throws TemplateException
 	 *             if the name or some objects can not be parsed or evaluated
 	 */
+	public Object get(String name) throws TemplateException {
+		return getData(name);
+	}
+
+	/**
+	 * Returns the object stored under the given name. The name can contain
+	 * hierarchical structures separated by a dot (“.”), such as “loop.count” in
+	 * which case a {@link Map} must be stored under “loop”.
+	 *
+	 * @param name
+	 *            The name of the object to get
+	 * @return The object
+	 * @throws TemplateException
+	 *             if the name or some objects can not be parsed or evaluated
+	 * @deprecated Use {@link #get(String)} instead
+	 */
+	@Deprecated
 	public Object getData(String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
 			return getDataStore().get(name);
@@ -118,6 +135,20 @@ public class DataProvider {
 	 * @param data
 	 *            The data to store
 	 */
+	public void set(String name, Object data) {
+		setData(name, data);
+	}
+
+	/**
+	 * Sets data in this data provider.
+	 *
+	 * @param name
+	 *            The key under which to store the data
+	 * @param data
+	 *            The data to store
+	 * @deprecated Use {@link #set(String, Object)} instead
+	 */
+	@Deprecated
 	public void setData(String name, Object data) {
 		getDataStore().set(name, data);
 	}
