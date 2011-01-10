@@ -36,7 +36,7 @@ public class ReplaceFilter implements Filter {
 		String replacementKey = parameters.get("replacementKey");
 		String replacement = parameters.get("replacement");
 		if (replacement == null) {
-			replacement = String.valueOf(dataProvider.getData(replacementKey));
+			replacement = String.valueOf(dataProvider.get(replacementKey));
 		}
 		return input.replace(needle, replacement);
 	}

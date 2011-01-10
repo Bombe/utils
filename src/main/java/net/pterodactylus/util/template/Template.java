@@ -87,7 +87,7 @@ public class Template {
 	 * @return The object, or {@code null} if no object could be found
 	 */
 	public Object get(String name) {
-		return dataProvider.getData(name);
+		return dataProvider.get(name);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Template {
 	 *            The object to store in the template
 	 */
 	public void set(String name, Object object) {
-		dataProvider.setData(name, object);
+		dataProvider.set(name, object);
 	}
 
 	/**

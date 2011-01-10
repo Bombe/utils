@@ -37,7 +37,7 @@ public class MatchFilter implements Filter {
 		String key = parameters.get("key");
 		Object value = parameters.get("value");
 		if (value == null) {
-			value = dataProvider.getData(key);
+			value = dataProvider.get(key);
 		}
 		if (value instanceof String) {
 			return value.equals(String.valueOf(data));

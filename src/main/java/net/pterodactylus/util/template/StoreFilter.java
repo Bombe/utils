@@ -33,7 +33,7 @@ public class StoreFilter implements Filter {
 	@Override
 	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 		String key = parameters.get("key");
-		dataProvider.setData(key, data);
+		dataProvider.set(key, data);
 		return "";
 	}
 

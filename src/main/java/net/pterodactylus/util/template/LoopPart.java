@@ -75,7 +75,7 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object collectionObject = dataProvider.getData(collectionName);
+		Object collectionObject = dataProvider.get(collectionName);
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
 			collection = (Collection<?>) collectionObject;
