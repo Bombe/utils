@@ -19,6 +19,7 @@ package net.pterodactylus.util.template;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * {@link DataProvider} implementation that uses a parent data provider but can
@@ -74,6 +75,9 @@ class OverrideDataProvider extends DataProvider {
 	 */
 	private static class OverrideDataStore implements DataStore {
 
+		/** The override data provider. */
+		private OverrideDataProvider overrideDataProvider;
+
 		/** The parent data provider. */
 		private final DataProvider parentDataProvider;
 
@@ -109,14 +113,50 @@ class OverrideDataProvider extends DataProvider {
 		}
 
 		/**
+		 * Sets the override data provider to use internally, e.g. to find
+		 * {@link Accessor}s.
+		 *
+		 * @param overrideDataProvider
+		 *            The override data provider to use
+		 */
+		private void setOverrideDataProvider(OverrideDataProvider overrideDataProvider) {
+			this.overrideDataProvider = overrideDataProvider;
+		}
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Object get(String name) {
-			if (overrideDataStore.containsKey(name)) {
-				return overrideDataStore.get(name);
+			if (name.indexOf('.') == -1) {
+				if (overrideDataStore.containsKey(name)) {
+					return overrideDataStore.get(name);
+				}
+				return parentDataProvider.get(name);
 			}
-			return parentDataProvider.get(name);
+			StringTokenizer nameTokens = new StringTokenizer(name, ".");
+			Object object = null;
+			while (nameTokens.hasMoreTokens()) {
+				String nameToken = nameTokens.nextToken();
+				if (object == null) {
+					if (overrideDataStore.containsKey(name)) {
+						object = overrideDataStore.get(name);
+					} else {
+						object = parentDataProvider.get(name);
+					}
+				} else {
+					Accessor accessor = overrideDataProvider.getAccessorLocator().findAccessor(object.getClass());
+					if (accessor != null) {
+						object = accessor.get(overrideDataProvider, object, nameToken);
+					} else {
+						throw new TemplateException("no accessor found for " + object.getClass());
+					}
+				}
+				if (object == null) {
+					return null;
+				}
+			}
+			return object;
 		}
 
 		/**
@@ -132,7 +172,9 @@ class OverrideDataProvider extends DataProvider {
 		 */
 		@Override
 		public DataStore clone() {
-			return new OverrideDataStore(parentDataProvider, overrideDataStore);
+			OverrideDataStore dataStore = new OverrideDataStore(parentDataProvider, overrideDataStore);
+			dataStore.setOverrideDataProvider(overrideDataProvider);
+			return dataStore;
 		}
 
 	}
