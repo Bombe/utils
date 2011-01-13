@@ -19,6 +19,7 @@ package net.pterodactylus.util.template;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * {@link Accessor} implementation that checks the object for a method that
@@ -69,7 +70,19 @@ public class ReflectionAccessor implements Accessor {
 			} catch (IllegalArgumentException iae1) {
 				/* TODO - logging. */
 			} catch (IllegalAccessException iae1) {
-				/* TODO - logging. */
+				if (Modifier.isPublic(method.getModifiers()) && !Modifier.isPublic(object.getClass().getModifiers())) {
+					method.setAccessible(true);
+					/* now try again. */
+					try {
+						return method.invoke(object);
+					} catch (IllegalArgumentException e) {
+						/* TODO - logging. */
+					} catch (IllegalAccessException e) {
+						/* TODO - logging. */
+					} catch (InvocationTargetException e) {
+						/* TODO - logging. */
+					}
+				}
 			} catch (InvocationTargetException ite1) {
 				/* TODO - logging. */
 			}
