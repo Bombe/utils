@@ -23,8 +23,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import junit.framework.TestCase;
@@ -210,6 +212,30 @@ public class TemplateTest extends TestCase {
 		template.render(dataProvider, outputWriter);
 		output = outputWriter.toString();
 		assertEquals("Items: first, second, last.", output);
+	}
+
+	/**
+	 * Tests iteration over a {@link Map}’s {@link Map#entrySet() entries} and
+	 * access to both {@link Entry#getKey() key} and {@link Entry#getValue()}.
+	 */
+	public void testTemplateWithMap() {
+		Template template;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+		Map<String, String> map;
+
+		templateString = "<%foreach map entry><%entry.key>=<%entry.value><%if !loop.last>, <%/if><%/foreach>";
+		outputWriter = new StringWriter();
+		template = new Template(new StringReader(templateString));
+		map = new LinkedHashMap<String, String>();
+		map.put("a", "1");
+		map.put("b", "2");
+		template.set("map", map);
+		template.addAccessor(Object.class, new ReflectionAccessor());
+		template.render(outputWriter);
+		output = outputWriter.toString();
+		assertEquals("a=1, b=2", output);
 	}
 
 	/**
