@@ -1,5 +1,5 @@
 /*
- * utils - ReplaceFilter.java - Copyright © 2010 David Roden
+ * utils - VersionTest.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.template;
+package net.pterodactylus.util.version;
 
-import java.util.Map;
+import junit.framework.TestCase;
 
 /**
- * {@link Filter} implementation that replaces parts of a value.
+ * JUnit test case for {@link Version}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ReplaceFilter implements Filter {
+public class VersionTest extends TestCase {
 
 	/**
-	 * {@inheritDoc}
+	 * Tests {@link Version#compareTo(Version)}.
 	 */
-	@Override
-	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
-		String input = String.valueOf(data);
-		String needle = parameters.get("needle");
-		String replacementKey = parameters.get("replacementKey");
-		String replacement = parameters.get("replacement");
-		if (replacement == null) {
-			replacement = String.valueOf(dataProvider.get(replacementKey));
-		}
-		return input.replace(needle, replacement);
+	public void testCompareTo() {
+		Version version1;
+		Version version2;
+
+		version1 = new Version(0, 3, 6, 4);
+		version2 = new Version(0, 3, 6, 5);
+		assertTrue(version2.compareTo(version1) > 0);
 	}
 
 }

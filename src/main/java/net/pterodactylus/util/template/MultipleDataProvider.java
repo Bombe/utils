@@ -115,7 +115,7 @@ public class MultipleDataProvider extends DataProvider {
 	@Override
 	public void setData(String name, Object data) {
 		for (DataProvider dataProvider : dataProviders) {
-			dataProvider.setData(name, data);
+			dataProvider.set(name, data);
 		}
 	}
 

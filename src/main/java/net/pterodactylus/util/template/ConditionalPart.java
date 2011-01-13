@@ -241,7 +241,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-			return Boolean.valueOf(String.valueOf(dataProvider.getData(itemName))) ^ invert;
+			return Boolean.valueOf(String.valueOf(dataProvider.get(itemName))) ^ invert;
 		}
 
 	}
@@ -343,7 +343,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-			return (dataProvider.getData(itemName) == null) ^ invert;
+			return (dataProvider.get(itemName) == null) ^ invert;
 		}
 
 	}
@@ -406,7 +406,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(DataProvider dataProvider) throws TemplateException {
-			Object data = dataProvider.getData(itemName);
+			Object data = dataProvider.get(itemName);
 			for (Filter filter : filters) {
 				data = filter.format(dataProvider, data, filterParameters.get(filter));
 			}

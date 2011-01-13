@@ -46,7 +46,7 @@ public class PaginationPlugin implements Plugin {
 		if (paginationKey == null) {
 			paginationKey = "pagination";
 		}
-		String pageString = String.valueOf(dataProvider.getData(pageKey));
+		String pageString = String.valueOf(dataProvider.get(pageKey));
 		int page = 0;
 		try {
 			page = Integer.parseInt(pageString);
@@ -59,9 +59,9 @@ public class PaginationPlugin implements Plugin {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
-		List<?> list = (List<?>) dataProvider.getData(listKey);
+		List<?> list = (List<?>) dataProvider.get(listKey);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Pagination<?> pagination = new Pagination((list == null) ? Collections.emptyList() : list, pageSize).setPage(page);
-		dataProvider.setData(paginationKey, pagination);
+		dataProvider.set(paginationKey, pagination);
 	}
 }

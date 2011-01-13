@@ -134,6 +134,36 @@ public class Version implements Comparable<Version> {
 		return versionString.toString();
 	}
 
+	/**
+	 * Parses a version from the given string.
+	 *
+	 * @param versionString
+	 *            The version string to parse
+	 * @return The parsed version, or <code>null</code> if the string could not
+	 *         be parsed
+	 */
+	public static Version parse(String versionString) {
+		String[] componentStrings = versionString.split("\\.");
+		int[] components = new int[componentStrings.length];
+		String appendix = null;
+		int index = -1;
+		for (String componentString : componentStrings) {
+			try {
+				if (index == (componentStrings.length - 2)) {
+					int dash = componentString.indexOf('-');
+					if (dash > -1) {
+						appendix = componentString.substring(dash + 1);
+						componentString = componentString.substring(0, dash);
+					}
+				}
+				components[++index] = Integer.parseInt(componentString);
+			} catch (NumberFormatException nfe1) {
+				return null;
+			}
+		}
+		return new Version(appendix, components);
+	}
+
 	//
 	// INTERFACE Comparable<Version>
 	//
@@ -146,7 +176,7 @@ public class Version implements Comparable<Version> {
 	@Override
 	public int compareTo(Version version) {
 		int lengthDiff = numbers.length - version.numbers.length;
-		for (int index = 0; index < Math.abs(lengthDiff); index++) {
+		for (int index = 0; index < Math.min(numbers.length, version.numbers.length); index++) {
 			int diff = numbers[index] - version.numbers[index];
 			if (diff != 0) {
 				return diff;

@@ -90,6 +90,18 @@ public class TemplateNotification extends AbstractNotification {
 		return template;
 	}
 
+	/**
+	 * Sets a template variable.
+	 *
+	 * @param name
+	 *            The name of the variable
+	 * @param value
+	 *            The value of the variable
+	 */
+	public void set(String name, Object value) {
+		template.set(name, value);
+	}
+
 	//
 	// NOTIFICATION METHODS
 	//

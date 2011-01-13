@@ -43,7 +43,7 @@ public class DataTemplateProvider implements TemplateProvider {
 	 */
 	@Override
 	public Template getTemplate(String templateName) {
-		Object templateObject = dataProvider.getData(templateName);
+		Object templateObject = dataProvider.get(templateName);
 		return (templateObject instanceof Template) ? (Template) templateObject : null;
 	}
 

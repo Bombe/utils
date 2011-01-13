@@ -116,7 +116,7 @@ class OverrideDataProvider extends DataProvider {
 			if (overrideDataStore.containsKey(name)) {
 				return overrideDataStore.get(name);
 			}
-			return parentDataProvider.getData(name);
+			return parentDataProvider.get(name);
 		}
 
 		/**
@@ -124,7 +124,7 @@ class OverrideDataProvider extends DataProvider {
 		 */
 		@Override
 		public void set(String name, Object data) {
-			parentDataProvider.setData(name, data);
+			parentDataProvider.set(name, data);
 		}
 
 		/**

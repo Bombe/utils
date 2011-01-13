@@ -53,7 +53,7 @@ public class UnmodifiableDataProvider extends DataProvider {
 	 */
 	@Override
 	public Object getData(String name) throws TemplateException {
-		return dataProvider.getData(name);
+		return dataProvider.get(name);
 	}
 
 	/**
