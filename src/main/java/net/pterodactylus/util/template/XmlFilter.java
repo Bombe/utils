@@ -50,6 +50,9 @@ public class XmlFilter implements Filter {
 			if (xmlEntities.containsKey(c)) {
 				xmlOutput.append('&').append(xmlEntities.get(c)).append(';');
 				continue;
+			} else if (((c >= 1) && (c <= 8)) || ((c >= 0xb) && (c <= 0xc)) || ((c >= 0xe) && (c <= 0x1f)) || ((c >= 0x7f) && (c <= 0x84)) || ((c >= 0x86) && (c <= 0x9f))) {
+				/* invalid in XML, skip. */
+				continue;
 			}
 			xmlOutput.append(c);
 		}

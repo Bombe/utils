@@ -115,6 +115,32 @@ public class Validation {
 	}
 
 	/**
+	 * Checks if the given value is {@code true}.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param value
+	 *            The value to check
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation is(String objectName, boolean value) {
+		return isEqual(objectName, value, true);
+	}
+
+	/**
+	 * Checks if the given value is {@code false}.
+	 *
+	 * @param objectName
+	 *            The object’s name
+	 * @param value
+	 *            The value to check
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isNot(String objectName, boolean value) {
+		return isEqual(objectName, value, false);
+	}
+
+	/**
 	 * Checks if the given object is not <code>null</code>.
 	 *
 	 * @param objectName
