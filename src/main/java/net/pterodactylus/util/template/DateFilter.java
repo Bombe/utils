@@ -25,7 +25,9 @@ import java.util.Map;
 
 /**
  * {@link Filter} implementation that formats a date. The date may be given
- * either as a {@link Date} or a {@link Long} object.
+ * either as a {@link Date} or a {@link Long} object. If the object that is
+ * filitered is neither a {@link Long} or a {@link Date}, the object is returned
+ * unfiltered.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -38,7 +40,7 @@ public class DateFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 		String format = parameters.get("format");
 		DateFormat dateFormat = getDateFormat(format);
 		if (data instanceof Date) {
@@ -46,7 +48,7 @@ public class DateFilter implements Filter {
 		} else if (data instanceof Long) {
 			return dateFormat.format(new Date((Long) data));
 		}
-		return "";
+		return data;
 	}
 
 	//
