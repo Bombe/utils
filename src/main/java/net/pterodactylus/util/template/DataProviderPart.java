@@ -28,7 +28,7 @@ import net.pterodactylus.util.io.Renderable;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class DataProviderPart extends Part {
+class DataProviderPart implements Part {
 
 	/** The name of the object to get. */
 	private final String name;

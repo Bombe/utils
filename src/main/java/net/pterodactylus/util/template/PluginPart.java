@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class PluginPart extends Part {
+class PluginPart implements Part {
 
 	/** The plugin to execute. */
 	private final Plugin plugin;

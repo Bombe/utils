@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class ContainerPart extends Part implements Iterable<Part> {
+class ContainerPart implements Part, Iterable<Part> {
 
 	/** The parts this part contains. */
 	protected final List<Part> parts = new ArrayList<Part>();

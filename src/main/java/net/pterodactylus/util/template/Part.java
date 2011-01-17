@@ -25,7 +25,7 @@ import java.io.Writer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-abstract class Part {
+public interface Part {
 
 	/**
 	 * Renders this part.

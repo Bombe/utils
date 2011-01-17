@@ -30,7 +30,7 @@ import net.pterodactylus.util.io.Renderable;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class FilteredPart extends Part {
+class FilteredPart implements Part {
 
 	/** The name of the data object to filter. */
 	private final String name;

@@ -25,7 +25,7 @@ import java.io.Writer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class TextPart extends Part {
+class TextPart implements Part {
 
 	/** The text of the part. */
 	private final String text;

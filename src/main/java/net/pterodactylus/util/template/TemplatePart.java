@@ -24,7 +24,7 @@ import java.io.Writer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePart extends Part {
+public class TemplatePart implements Part {
 
 	/** The template to include. */
 	private final Template template;
