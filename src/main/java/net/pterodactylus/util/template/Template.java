@@ -150,7 +150,7 @@ public class Template implements Part {
 	 *
 	 * @return The template’s data provider
 	 */
-	DataProvider getDataProvider() {
+	public DataProvider getDataProvider() {
 		return dataProvider;
 	}
 
