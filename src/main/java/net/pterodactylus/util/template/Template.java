@@ -54,9 +54,6 @@ public class Template implements Part {
 	/** The template’s default data store. */
 	private DataProvider dataProvider = new DataProvider(accessorLocator);
 
-	/** The template’s default template provider. */
-	private TemplateProvider templateProvider = new DataTemplateProvider(dataProvider);
-
 	/** The input of the template. */
 	private final Reader input;
 
@@ -145,7 +142,7 @@ public class Template implements Part {
 	 *            The new template provider
 	 */
 	public void setTemplateProvider(TemplateProvider templateProvider) {
-		this.templateProvider = templateProvider;
+		dataProvider.setTemplateProvider(templateProvider);
 	}
 
 	/**
@@ -166,7 +163,7 @@ public class Template implements Part {
 	 * @return A new data provider
 	 */
 	public DataProvider createDataProvider() {
-		return new DataProvider(new AccessorLocator(accessorLocator), dataProvider.getDataStore().clone());
+		return new DataProvider(new AccessorLocator(accessorLocator), dataProvider.getDataStore().clone(), dataProvider.getTemplateProvider());
 	}
 
 	/**

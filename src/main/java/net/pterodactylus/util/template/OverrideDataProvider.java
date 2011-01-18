@@ -39,7 +39,7 @@ class OverrideDataProvider extends DataProvider {
 	 *            The object
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, String name, Object object) {
-		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, name, object));
+		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, name, object), parentDataProvider.getTemplateProvider());
 	}
 
 	/**
@@ -51,7 +51,7 @@ class OverrideDataProvider extends DataProvider {
 	 *            The override objects
 	 */
 	public OverrideDataProvider(DataProvider parentDataProvider, Map<String, Object> overrideObjects) {
-		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, overrideObjects));
+		super(new AccessorLocator(parentDataProvider.getAccessorLocator()), new OverrideDataStore(parentDataProvider, overrideObjects), parentDataProvider.getTemplateProvider());
 	}
 
 	/**

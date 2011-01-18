@@ -33,6 +33,9 @@ public class DataProvider {
 	/** The accessor bundle. */
 	private final AccessorLocator accessorLocator;
 
+	/** The template provider. */
+	private volatile TemplateProvider templateProvider;
+
 	/**
 	 * Creates a new data provider.
 	 *
@@ -40,7 +43,7 @@ public class DataProvider {
 	 *            The accessor locator
 	 */
 	public DataProvider(AccessorLocator accessorLocator) {
-		this(accessorLocator, new DataStore.MapDataStore());
+		this(accessorLocator, new DataStore.MapDataStore(), new DataTemplateProvider());
 	}
 
 	/**
@@ -50,10 +53,13 @@ public class DataProvider {
 	 *            The accessor locator
 	 * @param dataStore
 	 *            The data store
+	 * @param templateProvider
+	 *            The template provider
 	 */
-	public DataProvider(AccessorLocator accessorLocator, DataStore dataStore) {
+	public DataProvider(AccessorLocator accessorLocator, DataStore dataStore, TemplateProvider templateProvider) {
 		this.dataStore = dataStore;
 		this.accessorLocator = accessorLocator;
+		this.templateProvider = templateProvider;
 	}
 
 	/**
@@ -72,6 +78,42 @@ public class DataProvider {
 	 */
 	protected AccessorLocator getAccessorLocator() {
 		return accessorLocator;
+	}
+
+	/**
+	 * Returns the current template provider.
+	 *
+	 * @return The current template provider
+	 */
+	protected TemplateProvider getTemplateProvider() {
+		return templateProvider;
+	}
+
+	/**
+	 * Sets the new template provider.
+	 *
+	 * @param templateProvider
+	 *            The new template provider
+	 */
+	public void setTemplateProvider(TemplateProvider templateProvider) {
+		this.templateProvider = templateProvider;
+	}
+
+	/**
+	 * Retrieves the template with the given name from the
+	 * {@link #getTemplateProvider() current template provider} and returns it.
+	 *
+	 * @param templateName
+	 *            The name of the template
+	 * @return The retrieved template, or {@code null} if a template could not
+	 *         be found
+	 */
+	public Part getTemplate(String templateName) {
+		if (templateProvider != null) {
+			Part template = templateProvider.getTemplate(this, templateName);
+			return template;
+		}
+		return null;
 	}
 
 	/**

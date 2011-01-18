@@ -31,11 +31,13 @@ public interface TemplateProvider {
 	/**
 	 * Retrieves the template with the given name.
 	 *
+	 * @param dataProvider
+	 *            The data provider
 	 * @param templateName
 	 *            The name of the template
 	 * @return The template with the given name, or {@code null} if there is no
 	 *         template with the requested name
 	 */
-	public Template getTemplate(String templateName);
+	public Part getTemplate(DataProvider dataProvider, String templateName);
 
 }

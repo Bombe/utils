@@ -59,6 +59,20 @@ public class MultipleDataProvider extends DataProvider {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Part getTemplate(String templateName) {
+		for (DataProvider dataProvider : dataProviders) {
+			Part template = dataProvider.getTemplate(templateName);
+			if (template != null) {
+				return template;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Object getData(String name) throws TemplateException {
 		if (name.indexOf('.') == -1) {
 			for (DataProvider dataProvider : dataProviders) {

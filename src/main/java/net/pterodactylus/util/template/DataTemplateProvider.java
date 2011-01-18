@@ -25,26 +25,13 @@ package net.pterodactylus.util.template;
  */
 public class DataTemplateProvider implements TemplateProvider {
 
-	/** The data provider. */
-	private final DataProvider dataProvider;
-
-	/**
-	 * Creates a new {@link DataProvider}-based {@link TemplateProvider}.
-	 *
-	 * @param dataProvider
-	 *            The underlying data provider
-	 */
-	public DataTemplateProvider(DataProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Template getTemplate(String templateName) {
+	public Part getTemplate(DataProvider dataProvider, String templateName) {
 		Object templateObject = dataProvider.get(templateName);
-		return (templateObject instanceof Template) ? (Template) templateObject : null;
+		return (templateObject instanceof Part) ? (Part) templateObject : null;
 	}
 
 }
