@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import net.pterodactylus.util.template.DataProvider;
+import net.pterodactylus.util.template.MultipleDataProvider;
 import net.pterodactylus.util.template.Part;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
@@ -124,7 +125,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		template.render(dataProvider, writer);
+		template.render(new MultipleDataProvider(template.getDataProvider(), dataProvider), writer);
 	}
 
 }
