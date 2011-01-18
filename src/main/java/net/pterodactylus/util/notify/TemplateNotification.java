@@ -18,18 +18,19 @@
 package net.pterodactylus.util.notify;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 
-import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.template.DataProvider;
+import net.pterodactylus.util.template.Part;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateException;
 
 /**
  * {@link Template}-based implementation of a {@link Notification}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplateNotification extends AbstractNotification {
+public class TemplateNotification extends AbstractNotification implements Part {
 
 	/** The template to render. */
 	private final Template template;
@@ -115,23 +116,15 @@ public class TemplateNotification extends AbstractNotification {
 	}
 
 	//
-	// OBJECT METHODS
+	// PART METHODS
 	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		StringWriter stringWriter = new StringWriter();
-		try {
-			render(stringWriter);
-		} catch (IOException ioe1) {
-			/* A StringWriter never throws. */
-		} finally {
-			Closer.close(stringWriter);
-		}
-		return stringWriter.toString();
+	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+		template.render(dataProvider, writer);
 	}
 
 }
