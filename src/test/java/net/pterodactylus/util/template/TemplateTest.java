@@ -1079,6 +1079,45 @@ public class TemplateTest extends TestCase {
 		assertEquals("items: foobar", stringWriter.toString());
 	}
 
+	public void testTemplateInclusionWithParameters() {
+		Template outerTemplate;
+		Template innerTemplate;
+		Template innerstTemplate;
+		StringWriter stringWriter;
+
+		outerTemplate = new Template(new StringReader("<%include t a=b>"));
+		innerTemplate = new Template(new StringReader("<%a>"));
+		outerTemplate.set("a", "1");
+		outerTemplate.set("b", "2");
+		outerTemplate.set("t", innerTemplate);
+
+		stringWriter = new StringWriter();
+		outerTemplate.render(stringWriter);
+		assertEquals("2", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("<%include t a==2>"));
+		innerTemplate = new Template(new StringReader("<%a>"));
+		outerTemplate.set("a", "1");
+		outerTemplate.set("b", "2");
+		outerTemplate.set("t", innerTemplate);
+
+		stringWriter = new StringWriter();
+		outerTemplate.render(stringWriter);
+		assertEquals("2", stringWriter.toString());
+
+		outerTemplate = new Template(new StringReader("<%include t a==2>"));
+		innerTemplate = new Template(new StringReader("<%include t a==1>"));
+		innerstTemplate = new Template(new StringReader("<%a>"));
+		outerTemplate.set("a", "1");
+		outerTemplate.set("b", "2");
+		outerTemplate.set("t", innerTemplate);
+		innerTemplate.set("t", innerstTemplate);
+
+		stringWriter = new StringWriter();
+		outerTemplate.render(stringWriter);
+		assertEquals("1", stringWriter.toString());
+	}
+
 	public void testTemplatePlugins() {
 		Template template;
 		StringWriter stringWriter;
