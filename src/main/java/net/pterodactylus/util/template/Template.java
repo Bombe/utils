@@ -46,7 +46,7 @@ import net.pterodactylus.util.template.ConditionalPart.OrCondition;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Template {
+public class Template implements Part {
 
 	/** The accessor bundle. */
 	private final AccessorLocator accessorLocator = new AccessorLocator();
@@ -203,6 +203,7 @@ public class Template {
 	 * @throws TemplateException
 	 *             if the template can not be parsed
 	 */
+	@Override
 	public synchronized void render(DataProvider dataProvider, Writer writer) throws TemplateException {
 		parse();
 		parsedTemplate.render(dataProvider, writer);
