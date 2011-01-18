@@ -18,6 +18,9 @@
 package net.pterodactylus.util.template;
 
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A {@link Part} that includes a complete {@link Template}.
@@ -27,16 +30,22 @@ import java.io.Writer;
 public class TemplatePart implements Part {
 
 	/** The template to include. */
-	private final Template template;
+	private final String templateName;
+
+	/** The parameters. */
+	private final Map<String, String> parameters;
 
 	/**
 	 * Creates a new template part.
 	 *
-	 * @param template
-	 *            The template to render
+	 * @param templateName
+	 *            The name of the template to render
+	 * @param parameters
+	 *            The parameters for the included template
 	 */
-	public TemplatePart(Template template) {
-		this.template = template;
+	public TemplatePart(String templateName, Map<String, String> parameters) {
+		this.templateName = templateName;
+		this.parameters = parameters;
 	}
 
 	/**
@@ -44,7 +53,19 @@ public class TemplatePart implements Part {
 	 */
 	@Override
 	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		template.render(new MultipleDataProvider(template.getDataProvider(), new UnmodifiableDataProvider(dataProvider)), writer);
+		Part template = dataProvider.getTemplate(templateName);
+		if (template != null) {
+			Map<String, Object> overrideObjects = new HashMap<String, Object>();
+			for (Entry<String, String> parameter : parameters.entrySet()) {
+				if (parameter.getValue().startsWith("=")) {
+					overrideObjects.put(parameter.getKey(), parameter.getValue().substring(1));
+				} else {
+					overrideObjects.put(parameter.getKey(), dataProvider.get(parameter.getValue()));
+				}
+			}
+			OverrideDataProvider overrideDataProvider = new OverrideDataProvider((template instanceof Template) ? ((Template) template).getDataProvider() : dataProvider, overrideObjects);
+			template.render(new MultipleDataProvider(overrideDataProvider, new UnmodifiableDataProvider(dataProvider)), writer);
+		}
 	}
 
 }

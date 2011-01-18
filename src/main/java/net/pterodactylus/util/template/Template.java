@@ -453,10 +453,8 @@ public class Template implements Part {
 							throw new TemplateException("include requires one parameter");
 						}
 						String templateName = tokens.next();
-						Template includedTemplate = templateProvider.getTemplate(templateName);
-						if (includedTemplate != null) {
-							parts.add(new TemplatePart(includedTemplate));
-						}
+						Map<String, String> parameters = parseParameters(tokens);
+						parts.add(new TemplatePart(templateName, parameters));
 					} else if (plugins.containsKey(function)) {
 						Map<String, String> pluginParameters = parseParameters(tokens);
 						parts.add(new PluginPart(plugins.get(function), pluginParameters));
