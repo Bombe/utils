@@ -40,7 +40,7 @@ public class DateFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String format = parameters.get("format");
 		DateFormat dateFormat = getDateFormat(format);
 		if (data instanceof Date) {

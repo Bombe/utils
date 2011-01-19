@@ -25,18 +25,21 @@ import java.io.Writer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class TextPart implements Part {
+class TextPart extends AbstractPart {
 
 	/** The text of the part. */
 	private final String text;
 
 	/**
-	 * Creates a new text part.
-	 *
+	 * @param line
+	 *            The line number of the tag, if any
+	 * @param column
+	 *            The column number of the tag, if any Creates a new text part.
 	 * @param text
 	 *            The text of the part
 	 */
-	public TextPart(String text) {
+	public TextPart(int line, int column, String text) {
+		super(line, column);
 		this.text = text;
 	}
 
@@ -44,11 +47,11 @@ class TextPart implements Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		try {
 			writer.write(text);
 		} catch (IOException ioe1) {
-			throw new TemplateException("Can not render part.", ioe1);
+			throw new TemplateException(getLine(), getColumn(), "Can not render part.", ioe1);
 		}
 	}
 

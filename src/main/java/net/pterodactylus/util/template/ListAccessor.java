@@ -27,18 +27,16 @@ import java.util.List;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ListAccessor implements Accessor {
+public class ListAccessor extends ReflectionAccessor {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		List<?> list = (List<?>) object;
-		if ("size".equals(member)) {
-			return list.size();
-		} else if ("isEmpty".equals(member)) {
-			return list.isEmpty();
+		if ("size".equals(member) || "empty".equals(member)) {
+			return super.get(templateContext, object, member);
 		}
 		int index = -1;
 		try {

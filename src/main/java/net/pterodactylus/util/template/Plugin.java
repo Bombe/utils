@@ -21,8 +21,8 @@ import java.util.Map;
 
 /**
  * Defines a template plugin. A plugin can be called just like the built-in
- * functions, e.g. “<%plugin>”. It also can have parameters just like a filter,
- * e.g. “<%plugin parameter=value>”.
+ * functions, e.g. “<%:plugin>”. It also can have parameters just like a filter,
+ * e.g. “<%:plugin parameter=value>”.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -31,11 +31,11 @@ public interface Plugin {
 	/**
 	 * Executes the plugin.
 	 *
-	 * @param dataProvider
-	 *            The data provider
+	 * @param templateContext
+	 *            The template context
 	 * @param parameters
 	 *            The plugin parameters
 	 */
-	public void execute(DataProvider dataProvider, Map<String, String> parameters);
+	public void execute(TemplateContext templateContext, Map<String, String> parameters);
 
 }

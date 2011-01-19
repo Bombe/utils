@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * {@link Filter} implementation that compares (for
  * {@link Object#equals(Object) equality}) the data either with a {@link String}
- * (given as parameter “value”) or an object from the {@link DataProvider}
+ * (given as parameter “value”) or an object from the {@link TemplateContext}
  * (whose name is given as parameter “key”).
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -33,11 +33,11 @@ public class MatchFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String key = parameters.get("key");
 		Object value = parameters.get("value");
 		if (value == null) {
-			value = dataProvider.get(key);
+			value = templateContext.get(key);
 		}
 		if (value instanceof String) {
 			return value.equals(String.valueOf(data));

@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * {@link Filter} implementation that works like a {@link ReplaceFilter}, only
  * that the actual replacement value is read from a template variable, which can
- * be set either using {@link Template#set(String, Object)} or using a
+ * be set either using {@link TemplateContext#set(String, Object)} or using a
  * {@link StoreFilter}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -33,9 +33,9 @@ public class InsertFilter extends ReplaceFilter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
-		parameters.put("replacement", String.valueOf(dataProvider.get(parameters.get("key"))));
-		return super.format(dataProvider, data, parameters);
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+		parameters.put("replacement", String.valueOf(templateContext.get(parameters.get("key"))));
+		return super.format(templateContext, data, parameters);
 	}
 
 }

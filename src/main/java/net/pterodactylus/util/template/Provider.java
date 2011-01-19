@@ -1,5 +1,5 @@
 /*
- * utils - TemplateFactory.java - Copyright © 2010 David Roden
+ * utils - Provider.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,29 @@
 
 package net.pterodactylus.util.template;
 
-import java.io.Reader;
-
 /**
- * Interface for factories that can create templates with pre-defined settings,
- * e.g. a template factory that creates templates with a default
- * {@link HtmlFilter} added.
+ * A provider is used to load templates that are included in other templates
+ * when rendering a template.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface TemplateFactory {
+public interface Provider {
 
 	/**
-	 * Creates a template that is read from the given source.
-	 *
-	 * @param templateSource
-	 *            The source of the template
-	 * @return A template that is created from the given source
+	 * Provider that gets a {@link Template} from the {@link TemplateContext}.
 	 */
-	public Template createTemplate(Reader templateSource);
+	public static final Provider TEMPLATE_CONTEXT_PROVIDER = new TemplateContextProvider();
+
+	/**
+	 * Retrieves the template with the given name.
+	 *
+	 * @param templateContext
+	 *            The template context
+	 * @param templateName
+	 *            The name of the template
+	 * @return The template with the given name, or {@code null} if there is no
+	 *         template with the requested name
+	 */
+	public Template getTemplate(TemplateContext templateContext, String templateName);
 
 }

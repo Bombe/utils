@@ -26,11 +26,31 @@ package net.pterodactylus.util.template;
  */
 public class TemplateException extends RuntimeException {
 
+	/** The line number of the erroneous tag, if any. */
+	private final int line;
+
+	/** The column number of the erroneous tag, if any. */
+	private final int column;
+
 	/**
 	 * Creates a new template exception.
 	 */
 	public TemplateException() {
+		this(0, 0);
+	}
+
+	/**
+	 * Creates a new template exception.
+	 *
+	 * @param line
+	 *            The line number of the erroneous tag, if any
+	 * @param column
+	 *            The column number of the erroneous tag, if any
+	 */
+	public TemplateException(int line, int column) {
 		super();
+		this.line = line;
+		this.column = column;
 	}
 
 	/**
@@ -40,8 +60,23 @@ public class TemplateException extends RuntimeException {
 	 *            The message of the exception
 	 */
 	public TemplateException(String message) {
-		super(message);
+		this(0, 0, message);
+	}
 
+	/**
+	 * Creates a new template exception.
+	 *
+	 * @param line
+	 *            The line number of the erroneous tag, if any
+	 * @param column
+	 *            The column number of the erroneous tag, if any
+	 * @param message
+	 *            The message of the exception
+	 */
+	public TemplateException(int line, int column, String message) {
+		super(message + " (line " + line + ", column " + column + ")");
+		this.line = line;
+		this.column = column;
 	}
 
 	/**
@@ -51,8 +86,23 @@ public class TemplateException extends RuntimeException {
 	 *            The cause of the exception
 	 */
 	public TemplateException(Throwable cause) {
-		super(cause);
+		this(0, 0, cause);
+	}
 
+	/**
+	 * Creates a new template exception.
+	 *
+	 * @param line
+	 *            The line number of the erroneous tag, if any
+	 * @param column
+	 *            The column number of the erroneous tag, if any
+	 * @param cause
+	 *            The cause of the exception
+	 */
+	public TemplateException(int line, int column, Throwable cause) {
+		super(cause);
+		this.line = line;
+		this.column = column;
 	}
 
 	/**
@@ -64,8 +114,49 @@ public class TemplateException extends RuntimeException {
 	 *            The cause of the exception
 	 */
 	public TemplateException(String message, Throwable cause) {
-		super(message, cause);
+		this(0, 0, message, cause);
+	}
 
+	/**
+	 * Creates a new template exception.
+	 *
+	 * @param line
+	 *            The line number of the erroneous tag, if any
+	 * @param column
+	 *            The column number of the erroneous tag, if any
+	 * @param message
+	 *            The message of the exception
+	 * @param cause
+	 *            The cause of the exception
+	 */
+	public TemplateException(int line, int column, String message, Throwable cause) {
+		super(message + " (line " + line + ", column " + column + ")", cause);
+		this.line = line;
+		this.column = column;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the line number of the erroneous tag, if any. Line numbers start
+	 * at {@code 1}.
+	 *
+	 * @return The line number of the erroneous tag, if any
+	 */
+	public int getLine() {
+		return line;
+	}
+
+	/**
+	 * Returns the column number of the erroneous tag, if any. Column numbers
+	 * start at {@code 1}.
+	 *
+	 * @return The column number of the erroneous tag, if any
+	 */
+	public int getColumn() {
+		return column;
 	}
 
 }

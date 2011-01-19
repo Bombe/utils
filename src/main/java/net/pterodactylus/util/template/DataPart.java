@@ -24,11 +24,11 @@ import net.pterodactylus.util.io.Renderable;
 
 /**
  * A {@link Part} whose content is dynamically fetched from a
- * {@link DataProvider}.
+ * {@link TemplateContext}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class DataProviderPart implements Part {
+class DataPart extends AbstractPart {
 
 	/** The name of the object to get. */
 	private final String name;
@@ -36,10 +36,15 @@ class DataProviderPart implements Part {
 	/**
 	 * Creates a new data provider part.
 	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 * @param name
 	 *            The name of the object
 	 */
-	public DataProviderPart(String name) {
+	public DataPart(int line, int column, String name) {
+		super(line, column);
 		this.name = name;
 	}
 
@@ -47,8 +52,8 @@ class DataProviderPart implements Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object output = dataProvider.get(name);
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		Object output = templateContext.get(name);
 		try {
 			if (output instanceof Renderable) {
 				((Renderable) output).render(writer);
@@ -56,7 +61,7 @@ class DataProviderPart implements Part {
 				writer.write((output != null) ? String.valueOf(output) : "");
 			}
 		} catch (IOException ioe1) {
-			throw new TemplateException("Can not render part.", ioe1);
+			throw new TemplateException(getLine(), getColumn(), "Can not render part.", ioe1);
 		}
 	}
 

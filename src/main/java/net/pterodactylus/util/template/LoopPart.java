@@ -29,9 +29,8 @@ import java.util.Map;
  */
 class LoopPart extends ContainerPart {
 
-	/** Accessor for {@link LoopStructure}s. */
-	@SuppressWarnings("synthetic-access")
-	private final Accessor LOOP_STRUCTURE_ACCESSOR = new LoopStructureAccessor();
+	/** Reflection accessor used to iterator over the {@link LoopStructure}. */
+	private static final ReflectionAccessor REFLECTION_ACCESSOR = new ReflectionAccessor();
 
 	/** The name of the collection to loop over. */
 	private final String collectionName;
@@ -45,18 +44,26 @@ class LoopPart extends ContainerPart {
 	/**
 	 * Creates a new loop part.
 	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 * @param collectionName
 	 *            The name of the collection
 	 * @param itemName
 	 *            The name under which to store the current item
 	 */
-	public LoopPart(String collectionName, String itemName) {
-		this(collectionName, itemName, "loop");
+	public LoopPart(int line, int column, String collectionName, String itemName) {
+		this(line, column, collectionName, itemName, "loop");
 	}
 
 	/**
 	 * Creates a new loop part.
 	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 * @param collectionName
 	 *            The name of the collection
 	 * @param itemName
@@ -64,7 +71,8 @@ class LoopPart extends ContainerPart {
 	 * @param loopName
 	 *            The name of the loop
 	 */
-	public LoopPart(String collectionName, String itemName, String loopName) {
+	public LoopPart(int line, int column, String collectionName, String itemName, String loopName) {
+		super(line, column);
 		this.collectionName = collectionName;
 		this.itemName = itemName;
 		this.loopName = loopName;
@@ -74,8 +82,8 @@ class LoopPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object collectionObject = dataProvider.get(collectionName);
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		Object collectionObject = templateContext.get(collectionName);
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
 			collection = (Collection<?>) collectionObject;
@@ -92,12 +100,11 @@ class LoopPart extends ContainerPart {
 		Map<String, Object> overrideObjects = new HashMap<String, Object>();
 		overrideObjects.put(loopName, loopStructure);
 		for (Object object : collection) {
-			overrideObjects.put(itemName, object);
-			OverrideDataProvider loopDataProvider = new OverrideDataProvider(dataProvider, overrideObjects);
-			loopDataProvider.addAccessor(LoopStructure.class, LOOP_STRUCTURE_ACCESSOR);
-			for (Part part : parts) {
-				part.render(loopDataProvider, writer);
-			}
+			TemplateContext loopContext = new TemplateContext(templateContext);
+			loopContext.addAccessor(LoopStructure.class, REFLECTION_ACCESSOR);
+			loopContext.set(loopName, loopStructure);
+			loopContext.set(itemName, object);
+			super.render(loopContext, writer);
 			loopStructure.incCount();
 		}
 	}
@@ -130,6 +137,7 @@ class LoopPart extends ContainerPart {
 		 *
 		 * @return The size of the loop
 		 */
+		@SuppressWarnings("unused")
 		public int getSize() {
 			return size;
 		}
@@ -140,6 +148,7 @@ class LoopPart extends ContainerPart {
 		 * @return The current counter of the loop, in the range from {@code 0}
 		 *         to {@link #getSize() getSize() - 1}
 		 */
+		@SuppressWarnings("unused")
 		public int getCount() {
 			return count;
 		}
@@ -157,6 +166,7 @@ class LoopPart extends ContainerPart {
 		 * @return {@code true} if the curren iteration is the first one,
 		 *         {@code false} otherwise
 		 */
+		@SuppressWarnings("unused")
 		public boolean isFirst() {
 			return count == 0;
 		}
@@ -164,9 +174,10 @@ class LoopPart extends ContainerPart {
 		/**
 		 * Returns whether the current iteration if the last one.
 		 *
-		 * @return {@code true} if the curren iteration is the last one, {@code
-		 *         false} otherwise
+		 * @return {@code true} if the curren iteration is the last one,
+		 *         {@code false} otherwise
 		 */
+		@SuppressWarnings("unused")
 		public boolean isLast() {
 			return count == (size - 1);
 		}
@@ -178,6 +189,7 @@ class LoopPart extends ContainerPart {
 		 * @return {@code true} if the loop count is odd, {@code false}
 		 *         otherwise
 		 */
+		@SuppressWarnings("unused")
 		public boolean isOdd() {
 			return (count & 1) == 1;
 		}
@@ -189,40 +201,9 @@ class LoopPart extends ContainerPart {
 		 * @return {@code true} if the loop count is even, {@code false}
 		 *         otherwise
 		 */
+		@SuppressWarnings("unused")
 		public boolean isEven() {
 			return (count & 1) == 0;
-		}
-
-	}
-
-	/**
-	 * {@link Accessor} implementation that handles a {@link LoopStructure},
-	 * allowing access via the members “size”, “count”, “first”, and “last”.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private static class LoopStructureAccessor implements Accessor {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public Object get(DataProvider dataProvider, Object object, String member) {
-			LoopStructure loopStructure = (LoopStructure) object;
-			if ("size".equals(member)) {
-				return loopStructure.getSize();
-			} else if ("count".equals(member)) {
-				return loopStructure.getCount();
-			} else if ("first".equals(member)) {
-				return loopStructure.isFirst();
-			} else if ("last".equals(member)) {
-				return loopStructure.isLast();
-			} else if ("odd".equals(member)) {
-				return loopStructure.isOdd();
-			} else if ("even".equals(member)) {
-				return loopStructure.isEven();
-			}
-			return null;
 		}
 
 	}

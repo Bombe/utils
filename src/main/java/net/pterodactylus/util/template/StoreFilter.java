@@ -20,8 +20,8 @@ package net.pterodactylus.util.template;
 import java.util.Map;
 
 /**
- * Filter that temporarily stores the output of the chain in a
- * {@link ThreadLocal}. It is used in conjunction with {@link InsertFilter}.
+ * Filter that stores the output of the chain in the {@link TemplateContext}. It
+ * is used in conjunction with {@link InsertFilter}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -31,9 +31,9 @@ public class StoreFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String key = parameters.get("key");
-		dataProvider.set(key, data);
+		templateContext.set(key, data);
 		return "";
 	}
 

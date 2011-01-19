@@ -19,10 +19,10 @@ package net.pterodactylus.util.template;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import net.pterodactylus.util.io.Renderable;
+import net.pterodactylus.util.template.TemplateParser.FilterDefinition;
 
 /**
  * {@link Part} implementation that runs a predefined text through one or more
@@ -30,50 +30,53 @@ import net.pterodactylus.util.io.Renderable;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class FilteredTextPart implements Part {
+class FilteredTextPart extends AbstractPart {
 
 	/** The text to filter. */
 	private final String text;
 
 	/** The filters to apply. */
-	private final Collection<Filter> filters;
-
-	/** Parameters for all filters. */
-	private final Map<Filter, Map<String, String>> allFilterParameters;
+	private final List<FilterDefinition> filterDefinitions;
 
 	/**
 	 * Creates a new filtered part.
 	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 * @param text
 	 *            The text to filter
-	 * @param filters
+	 * @param filterDefinitions
 	 *            The filters to apply
-	 * @param allFilterParameters
-	 *            Parameters for all filters
 	 */
-	public FilteredTextPart(String text, Collection<Filter> filters, Map<Filter, Map<String, String>> allFilterParameters) {
+	public FilteredTextPart(int line, int column, String text, List<FilterDefinition> filterDefinitions) {
+		super(line, column);
 		this.text = text;
-		this.filters = filters;
-		this.allFilterParameters = allFilterParameters;
+		this.filterDefinitions = filterDefinitions;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		Object output = text;
-		for (Filter filter : filters) {
-			output = filter.format(dataProvider, output, allFilterParameters.get(filter));
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		Object data = text;
+		for (FilterDefinition filterDefinition : filterDefinitions) {
+			Filter filter = templateContext.getFilter(filterDefinition.getName());
+			if (filter == null) {
+				throw new TemplateException(getLine(), getColumn(), "Filter “" + filterDefinition.getName() + "” not found.");
+			}
+			data = filter.format(templateContext, data, filterDefinition.getParameters());
 		}
 		try {
-			if (output instanceof Renderable) {
-				((Renderable) output).render(writer);
+			if (data instanceof Renderable) {
+				((Renderable) data).render(writer);
 			} else {
-				writer.write((output != null) ? String.valueOf(output) : "");
+				writer.write((data != null) ? String.valueOf(data) : "");
 			}
 		} catch (IOException ioe1) {
-			throw new TemplateException("Can not render part.", ioe1);
+			throw new TemplateException(getLine(), getColumn(), "Can not render part.", ioe1);
 		}
 	}
 

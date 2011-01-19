@@ -27,25 +27,35 @@ import java.util.List;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class ContainerPart implements Part, Iterable<Part> {
+class ContainerPart extends AbstractPart implements Iterable<Part> {
 
 	/** The parts this part contains. */
 	protected final List<Part> parts = new ArrayList<Part>();
 
 	/**
 	 * Creates a new container part that contains the given parts
+	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 */
-	public ContainerPart() {
-		/* do nothing. */
+	public ContainerPart(int line, int column) {
+		super(line, column);
 	}
 
 	/**
 	 * /** Creates a new container part that contains the given parts
 	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
 	 * @param parts
 	 *            The parts the container part contains
 	 */
-	public ContainerPart(List<Part> parts) {
+	public ContainerPart(int line, int column, List<Part> parts) {
+		super(line, column);
 		this.parts.addAll(parts);
 	}
 
@@ -63,9 +73,9 @@ class ContainerPart implements Part, Iterable<Part> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		for (Part part : parts) {
-			part.render(dataProvider, writer);
+			part.render(templateContext, writer);
 		}
 	}
 

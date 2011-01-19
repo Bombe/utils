@@ -20,10 +20,9 @@ package net.pterodactylus.util.notify;
 import java.io.IOException;
 import java.io.Writer;
 
-import net.pterodactylus.util.template.DataProvider;
-import net.pterodactylus.util.template.MultipleDataProvider;
 import net.pterodactylus.util.template.Part;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
 
 /**
@@ -88,20 +87,8 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 *
 	 * @return The template that renders this notification
 	 */
-	public Template getTemplate() {
-		return template;
-	}
-
-	/**
-	 * Sets a template variable.
-	 *
-	 * @param name
-	 *            The name of the variable
-	 * @param value
-	 *            The value of the variable
-	 */
-	public void set(String name, Object value) {
-		template.set(name, value);
+	public TemplateContext getTemplateContext() {
+		return new TemplateContext(template.getInitialContext());
 	}
 
 	//
@@ -113,7 +100,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	@Override
 	public void render(Writer writer) throws IOException {
-		template.render(writer);
+		template.render(new TemplateContext(template.getInitialContext()), writer);
 	}
 
 	//
@@ -124,8 +111,8 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		template.render(new MultipleDataProvider(template.getDataProvider(), dataProvider), writer);
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		template.render(templateContext.mergeContext(template.getInitialContext()), writer);
 	}
 
 }

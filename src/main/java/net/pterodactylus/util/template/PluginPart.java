@@ -25,10 +25,10 @@ import java.util.Map;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-class PluginPart implements Part {
+class PluginPart extends AbstractPart {
 
-	/** The plugin to execute. */
-	private final Plugin plugin;
+	/** The name of the plugin to execute. */
+	private final String pluginName;
 
 	/** The plugin parameters. */
 	private final Map<String, String> pluginParameters;
@@ -36,13 +36,18 @@ class PluginPart implements Part {
 	/**
 	 * Creates a new plugin part.
 	 *
-	 * @param plugin
-	 *            The plugin to execute
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
+	 * @param pluginName
+	 *            The name of the plugin to execute
 	 * @param pluginParameters
 	 *            The plugin parameters
 	 */
-	public PluginPart(Plugin plugin, Map<String, String> pluginParameters) {
-		this.plugin = plugin;
+	public PluginPart(int line, int column, String pluginName, Map<String, String> pluginParameters) {
+		super(line, column);
+		this.pluginName = pluginName;
 		this.pluginParameters = pluginParameters;
 	}
 
@@ -50,8 +55,12 @@ class PluginPart implements Part {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		plugin.execute(dataProvider, pluginParameters);
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		Plugin plugin = templateContext.getPlugin(pluginName);
+		if (plugin == null) {
+			throw new TemplateException(getLine(), getColumn(), "Plugin “" + pluginName + "” not found.");
+		}
+		plugin.execute(templateContext, pluginParameters);
 	}
 
 }
