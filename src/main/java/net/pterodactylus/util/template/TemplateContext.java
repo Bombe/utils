@@ -146,7 +146,7 @@ public class TemplateContext {
 		TemplateContext context = this;
 		while ((context != null) && (accessor == null)) {
 			Class<?> classToCheck = clazz;
-			while (classToCheck != null) {
+			while ((classToCheck != null) && (accessor == null)) {
 				if (context.accessors.containsKey(classToCheck)) {
 					accessor = context.accessors.get(classToCheck);
 					break;
