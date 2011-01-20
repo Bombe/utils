@@ -41,6 +41,42 @@
  * template.
  * </p>
  *
+ * <h3>Rendering Templates</h3>
+ *
+ * <p>
+ * To render a {@link net.pterodactylus.util.template.Template} you need a
+ * {@link net.pterodactylus.util.template.TemplateContext}.
+ * </p>
+ *
+ * <pre>
+ * Template template = TemplateParser.parse(new Filter("template.html"));
+ * TemplateContext templateContext = new TemplateContext();
+ * StringWriter writer = new StringWriter();
+ * template.render(templateContext, writer);
+ * </pre>
+ *
+ * <p>
+ * Templates do not hold their own data anymore. To achieve thread safety
+ * without having to synchronize on the whole template, the {@code TemplateContext}
+ * was introduced. Its intended lifetime is restricted to a single rendering
+ * pass. A {@link net.pterodactylus.util.template.TemplateContextFactory} can
+ * be used to easily create {@code TemplateContext}s that hold the desired
+ * {@link net.pterodactylus.util.template.Filter}s,
+ * {@link net.pterodactylus.util.template.Plugin}s,
+ * {@link net.pterodactylus.util.template.Accessor}s,
+ * {@link net.pterodactylus.util.template.Provider}s, and objects. Template
+ * contexts can have parent contexts and use those recursively when any kind
+ * of data is requested.
+ * </p>
+ *
+ * <p>
+ * A template has an initial template context. It can be used to set values in the
+ * template that never change during the lifetime of the template. Any values that
+ * are set on the template are merged into the template context that is used for
+ * the current rendering pass, overwriting all other values set in that context
+ * or its parent contexts.
+ * </p>
+ *
  * <h3>Setting Template Variables</h3>
  *
  * <p>
@@ -49,10 +85,11 @@
  * </p>
  *
  * <pre>
- * Template template = new Template(new FileReader("template.html"));
- * template.set("variable", "value");
- * template.set("items", Arrays.asList("foo", "bar", "baz"));
- * template.render(outputWriter);
+ * Template template = TempalteParser.parse(new FileReader("template.html"));
+ * TemplateContext templateContext = templateContextFactory.createTemplateContext();
+ * templateContext.set("variable", "value");
+ * templateContext.set("items", Arrays.asList("foo", "bar", "baz"));
+ * template.render(templateContext, outputWriter);
  * </pre>
  *
  * <h3>Looping Over Collections</h3>
@@ -73,6 +110,32 @@
  * </pre>
  *
  * This will output the value of each item in the collection.
+ *
+ * <h4>Looping Over Maps</h4>
+ *
+ * <p>
+ * It is also possible to loop over {@link java.util.Map}s. The syntax is identical:
+ * </p>
+ *
+ * <pre>
+ * &lt;ul&gt;
+ * &lt;%foreach itemValues itemValue&gt;
+ * &lt;li&gt;
+ * &lt;% itemValue.key&gt;: &lt;% itemValue.value&gt;
+ * &lt;/li&gt;
+ * &lt;%/foreach&gt;
+ * &lt;/ul&gt;
+ * </pre>
+ *
+ * <p>
+ * Instead of looping only over the keys or the values of the {@code Map},
+ * the loop will iterate over the {@link java.util.Map.Entry}s of the map,
+ * requiring you to access the keys by using the “key” property, and the
+ * value by using the “value” property. (This requires that you install
+ * a {@link net.pterodactylus.util.template.ReflectionAccessor} on your
+ * template context, or a similar {@link net.pterodactylus.util.template.Accessor}
+ * that allows to access the {@link java.util.Map.Entry}.)
+ * </p>
  *
  * <h3>Loop Properties</h3>
  *
@@ -98,7 +161,8 @@
  * </pre>
  *
  * <p>
- * The loop properties that can be accessed in this way are: {@code first},
+ * The loop properties that can be accessed in this way are: {@code size},
+ * {@code count} (running index from 0 to (size - 1)), {@code first},
  * {@code last}, {@code notfirst}, {@code notlast}, {@code odd}, {@code even}.
  * </p>
  *
@@ -107,7 +171,7 @@
  * <p>
  * Template variable names can specify a hierarchy: “item.index” specifies the
  * member “index” of the value of template variable “item”. The default
- * template implementation can only handle getting members of template
+ * template context implementation can only handle getting members of template
  * variables that contain instances of  {@link java.util.Map}; it is possible
  * to define member accessors for your own types (see below).
  * </p>
@@ -149,12 +213,33 @@
  *
  * <pre>
  * public class ItemAccessor implements Accessor {
- *     private final Item item;
- *     public ItemAccessor(Item item) { this.item = item; }
- *     public int getID() { return item.getID(); }
- *     public String getName() { return item.getName(); }
+ * 	public Object get(TemplateContext templateContext, Object object, String member) {
+ * 		Item item = (Item) object;
+ * 		if ("name".equals(member)) { return item.getName(); }
+ * 		if ("id".equals(member)) { return item.getId(); }
+ * 		return null;
+ * 	}
  * }
  * </pre>
+ *
+ * <h4>The Reflection Accessor</h4>
+ *
+ * <p>
+ * A very convenient accessor (and good base for custom accessors) is the
+ * {@link net.pterodactylus.util.template.ReflectionAccessor}. It uses
+ * reflection to find members of an object. Accessing the member “fooData”
+ * would look for the methods “getFooData()”, “isFooData()”, “fooData()”, and
+ * call the first method it can locate without parameters. The value returned
+ * by the method is the value returned to the template.
+ * </p>
+ *
+ * <p>
+ * When writing custom {@link net.pterodactylus.util.template.Accessor}s
+ * it is very convenient to subclass
+ * {@link net.pterodactylus.util.template.ReflectionAccessor} and only add
+ * members that are not present in the original class, defaulting to calling
+ * “super.get()” when a “standard” member is requested.
+ * </p>
  *
  * <h3>Conditional Execution</h3>
  *
@@ -189,6 +274,11 @@
  * renderer almost infinitely more complex (and very not-light-weight-anymore).
  * </p>
  *
+ * <p>
+ * It is also possible to react on the result of a
+ * {@link net.pterodactylus.util.template.Filter}; see below.
+ * </p>
+ *
  * <h3>Filtering Output</h3>
  *
  * <p>
@@ -200,8 +290,8 @@
  * </p>
  *
  * <pre>
- * Template template = new Template(templateReader);
- * template.addFilter("html", new HtmlFilter());
+ * TemplateContext templateContext = templateContextFactory.createTemplateContext();
+ * templateContext.addFilter("html", new HtmlFilter());
  * </pre>
  *
  * <p>
@@ -223,10 +313,25 @@
  * &lt;div&gt;Your name is &lt;% name|html|replace needle=Frank replacement=Steve&gt;, right?&lt;/div&gt;
  * </pre>
  *
+ * <p>
+ * It is also possible to use a filter in an &lt;%if&gt; construct.
+ * </p>
+ *
+ * <pre>
+ * &lt;%if name|match value=Frank&gt;You’re Frank!&lt;%else&gt;You’re not Frank.&lt;%/if&gt;
+ * </pre>
+ *
+ * <p>
+ * The {@link java.lang.String} conversion of the final filter result has to
+ * match “true” in order to be evaluated as {@code true}, so not only
+ * {@link java.lang.Boolean}s but any other object can result in an
+ * if-branch being executed.
+ * </p>
+ *
  * <h3>Storing Values in the Template</h3>
  *
  * <p>
- * Sometimes it can be necessary to store a value in the template for later
+ * Sometimes it can be necessary to store a value in the template context for later
  * use. In conjunction with a replacement filter this can be used to include
  * template variables in strings that are output by other filters, e.g. an
  * i18n filter.
