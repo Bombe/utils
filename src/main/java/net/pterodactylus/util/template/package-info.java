@@ -45,7 +45,7 @@
  *
  * <p>
  * Variables in a template are set using the
- * {@link net.pterodactylus.util.template.Template#set(String, Object)} method.
+ * {@link net.pterodactylus.util.template.TemplateContext#set(String, Object)} method.
  * </p>
  *
  * <pre>
