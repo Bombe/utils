@@ -1,5 +1,5 @@
 /*
- * utils - TemplateFactory.java - Copyright © 2010 David Roden
+ * utils - FormatFilter.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,24 @@
 
 package net.pterodactylus.util.template;
 
-import java.io.Reader;
+import java.util.Formatter;
+import java.util.Map;
 
 /**
- * Interface for factories that can create templates with pre-defined settings,
- * e.g. a template factory that creates templates with a default
- * {@link HtmlFilter} added.
+ * {@link Filter} implementation that formats the given data according to a
+ * given format, as per {@link Formatter}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface TemplateFactory {
+public class FormatFilter implements Filter {
 
 	/**
-	 * Creates a template that is read from the given source.
-	 *
-	 * @param templateSource
-	 *            The source of the template
-	 * @return A template that is created from the given source
+	 * {@inheritDoc}
 	 */
-	public Template createTemplate(Reader templateSource);
+	@Override
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+		String format = parameters.get("format");
+		return String.format(format, data);
+	}
 
 }

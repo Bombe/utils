@@ -1,5 +1,5 @@
 /*
- * utils - DataTemplateProvider.java - Copyright © 2010 David Roden
+ * utils - Provider.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,33 +18,28 @@
 package net.pterodactylus.util.template;
 
 /**
- * {@link TemplateProvider} implementation that retrieves a {@link Template}
- * from a {@link DataProvider}.
+ * A provider is used to load templates that are included in other templates
+ * when rendering a template.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class DataTemplateProvider implements TemplateProvider {
-
-	/** The data provider. */
-	private final DataProvider dataProvider;
+public interface Provider {
 
 	/**
-	 * Creates a new {@link DataProvider}-based {@link TemplateProvider}.
+	 * Provider that gets a {@link Template} from the {@link TemplateContext}.
+	 */
+	public static final Provider TEMPLATE_CONTEXT_PROVIDER = new TemplateContextProvider();
+
+	/**
+	 * Retrieves the template with the given name.
 	 *
-	 * @param dataProvider
-	 *            The underlying data provider
+	 * @param templateContext
+	 *            The template context
+	 * @param templateName
+	 *            The name of the template
+	 * @return The template with the given name, or {@code null} if there is no
+	 *         template with the requested name
 	 */
-	public DataTemplateProvider(DataProvider dataProvider) {
-		this.dataProvider = dataProvider;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Template getTemplate(String templateName) {
-		Object templateObject = dataProvider.get(templateName);
-		return (templateObject instanceof Template) ? (Template) templateObject : null;
-	}
+	public Template getTemplate(TemplateContext templateContext, String templateName);
 
 }

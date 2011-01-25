@@ -35,7 +35,7 @@ public class PaginationPlugin implements Plugin {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(DataProvider dataProvider, Map<String, String> parameters) {
+	public void execute(TemplateContext templateContext, Map<String, String> parameters) {
 		String listKey = parameters.get("list");
 		String pageSizeString = parameters.get("pagesize");
 		String pageKey = parameters.get("page");
@@ -46,7 +46,7 @@ public class PaginationPlugin implements Plugin {
 		if (paginationKey == null) {
 			paginationKey = "pagination";
 		}
-		String pageString = String.valueOf(dataProvider.get(pageKey));
+		String pageString = String.valueOf(templateContext.get(pageKey));
 		int page = 0;
 		try {
 			page = Integer.parseInt(pageString);
@@ -59,9 +59,9 @@ public class PaginationPlugin implements Plugin {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
-		List<?> list = (List<?>) dataProvider.get(listKey);
+		List<?> list = (List<?>) templateContext.get(listKey);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Pagination<?> pagination = new Pagination((list == null) ? Collections.emptyList() : list, pageSize).setPage(page);
-		dataProvider.set(paginationKey, pagination);
+		templateContext.set(paginationKey, pagination);
 	}
 }

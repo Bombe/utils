@@ -18,18 +18,19 @@
 package net.pterodactylus.util.notify;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 
-import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.template.Part;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateException;
 
 /**
  * {@link Template}-based implementation of a {@link Notification}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplateNotification extends AbstractNotification {
+public class TemplateNotification extends AbstractNotification implements Part {
 
 	/** The template to render. */
 	private final Template template;
@@ -86,20 +87,8 @@ public class TemplateNotification extends AbstractNotification {
 	 *
 	 * @return The template that renders this notification
 	 */
-	public Template getTemplate() {
-		return template;
-	}
-
-	/**
-	 * Sets a template variable.
-	 *
-	 * @param name
-	 *            The name of the variable
-	 * @param value
-	 *            The value of the variable
-	 */
-	public void set(String name, Object value) {
-		template.set(name, value);
+	public TemplateContext getTemplateContext() {
+		return new TemplateContext(template.getInitialContext());
 	}
 
 	//
@@ -111,27 +100,19 @@ public class TemplateNotification extends AbstractNotification {
 	 */
 	@Override
 	public void render(Writer writer) throws IOException {
-		template.render(writer);
+		template.render(new TemplateContext(template.getInitialContext()), writer);
 	}
 
 	//
-	// OBJECT METHODS
+	// PART METHODS
 	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString() {
-		StringWriter stringWriter = new StringWriter();
-		try {
-			render(stringWriter);
-		} catch (IOException ioe1) {
-			/* A StringWriter never throws. */
-		} finally {
-			Closer.close(stringWriter);
-		}
-		return stringWriter.toString();
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		template.render(templateContext.mergeContext(template.getInitialContext()), writer);
 	}
 
 }

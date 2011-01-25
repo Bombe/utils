@@ -25,18 +25,18 @@ import java.io.Writer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-abstract class Part {
+public interface Part {
 
 	/**
 	 * Renders this part.
 	 *
-	 * @param dataProvider
-	 *            The data provider for the part
+	 * @param templateContext
+	 *            The template context for the part
 	 * @param writer
 	 *            The writer to render the part to
 	 * @throws TemplateException
 	 *             if a template variable can not be parsed
 	 */
-	public abstract void render(DataProvider dataProvider, Writer writer) throws TemplateException;
+	public abstract void render(TemplateContext templateContext, Writer writer) throws TemplateException;
 
 }

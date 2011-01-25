@@ -36,7 +36,7 @@ public class ReflectionAccessor implements Accessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Method method = null;
 		String methodName = member.substring(0, 1).toUpperCase() + member.substring(1);
 		try {

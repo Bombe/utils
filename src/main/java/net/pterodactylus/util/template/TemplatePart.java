@@ -18,33 +18,58 @@
 package net.pterodactylus.util.template;
 
 import java.io.Writer;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A {@link Part} that includes a complete {@link Template}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePart extends Part {
+public class TemplatePart extends AbstractPart {
 
 	/** The template to include. */
-	private final Template template;
+	private final String templateName;
+
+	/** The parameters. */
+	private final Map<String, String> parameters;
 
 	/**
 	 * Creates a new template part.
 	 *
-	 * @param template
-	 *            The template to render
+	 * @param line
+	 *            The line number of the tag, if any
+	 * @param column
+	 *            The column number of the tag, if any
+	 * @param templateName
+	 *            The name of the template to render
+	 * @param parameters
+	 *            The parameters for the included template
 	 */
-	public TemplatePart(Template template) {
-		this.template = template;
+	public TemplatePart(int line, int column, String templateName, Map<String, String> parameters) {
+		super(line, column);
+		this.templateName = templateName;
+		this.parameters = parameters;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(DataProvider dataProvider, Writer writer) throws TemplateException {
-		template.render(new MultipleDataProvider(template.getDataProvider(), new UnmodifiableDataProvider(dataProvider)), writer);
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		Template template = templateContext.getTemplate(templateName);
+		if (template == null) {
+			throw new TemplateException(getLine(), getColumn());
+		}
+		TemplateContext includedContext = new TemplateContext(templateContext).mergeContext(template.getInitialContext());
+		for (Entry<String, String> parameter : parameters.entrySet()) {
+			if (parameter.getValue().startsWith("=")) {
+				includedContext.set(parameter.getKey(), parameter.getValue().substring(1));
+			} else {
+				includedContext.set(parameter.getKey(), templateContext.get(parameter.getValue()));
+			}
+		}
+		template.render(includedContext, writer);
 	}
 
 }
