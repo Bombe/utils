@@ -558,4 +558,36 @@ public class TemplateParser {
 
 	}
 
+	/**
+	 * Convenience class that wraps around a {@link List} of
+	 * {@link FilterDefinition}s and can filter an object through all the
+	 * filters it contains.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class Filters extends ArrayList<FilterDefinition> {
+
+		/**
+		 * Filters the given object through all filters.
+		 *
+		 * @param templateContext
+		 *            The template context
+		 * @param data
+		 *            The data to filter
+		 * @return The filtered data
+		 */
+		public Object filter(TemplateContext templateContext, Object data) {
+			Object output = data;
+			for (FilterDefinition filterDefinition : this) {
+				Filter filter = templateContext.getFilter(filterDefinition.getName());
+				if (filter == null) {
+					throw new TemplateException("Filter “" + filterDefinition.getName() + "” not found.");
+				}
+				output = filter.format(templateContext, data, filterDefinition.getParameters());
+			}
+			return output;
+		}
+
+	}
+
 }
