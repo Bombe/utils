@@ -174,8 +174,15 @@ public class TemplateParser {
 						if (tokens.hasNext()) {
 							loopName = tokens.next();
 						}
+						Filters filters;
+						if (loopName == null) {
+							loopName = "loop";
+							filters = parseFilters(startOfTagLine, startOfTagColumn, tokens, true);
+						} else {
+							filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						}
 						partsStack.push(parts);
-						parts = new LoopPart(startOfTagLine, startOfTagColumn, collectionName, itemName, loopName);
+						parts = new LoopPart(startOfTagLine, startOfTagColumn, collectionName, itemName, loopName, filters);
 						commandStack.push("foreach");
 						lastCollectionName.push(collectionName);
 						lastLoopName.push(loopName);
