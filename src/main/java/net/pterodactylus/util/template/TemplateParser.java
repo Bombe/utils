@@ -402,9 +402,27 @@ public class TemplateParser {
 	 *            The tokens to parse
 	 * @return The parsed filters
 	 */
-	private static List<FilterDefinition> parseFilters(int line, int column, Iterator<String> tokens) {
-		List<FilterDefinition> filterDefinitions = new ArrayList<FilterDefinition>();
-		if (tokens.hasNext() && (tokens.next() != null)) {
+	private static Filters parseFilters(int line, int column, Iterator<String> tokens) {
+		return parseFilters(line, column, tokens, false);
+	}
+
+	/**
+	 * Parses filters from the rest of the tokens.
+	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
+	 * @param tokens
+	 *            The tokens to parse
+	 * @param pipeTokenPresent
+	 *            {@code true} to assume that the “|” separator token has
+	 *            already been parsed
+	 * @return The parsed filters
+	 */
+	private static Filters parseFilters(int line, int column, Iterator<String> tokens, boolean pipeTokenPresent) {
+		Filters filterDefinitions = new Filters();
+		if (!pipeTokenPresent && (tokens.hasNext() && (tokens.next() != null))) {
 			throw new TemplateException(line, column, "expected \"|\" token");
 		}
 		while (tokens.hasNext()) {
