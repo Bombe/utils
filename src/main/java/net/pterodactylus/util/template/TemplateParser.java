@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.ConditionalPart.AndCondition;
 import net.pterodactylus.util.template.ConditionalPart.Condition;
 import net.pterodactylus.util.template.ConditionalPart.DataCondition;
 import net.pterodactylus.util.template.ConditionalPart.DataTextCondition;
-import net.pterodactylus.util.template.ConditionalPart.FilterCondition;
-import net.pterodactylus.util.template.ConditionalPart.FilterTextCondition;
 import net.pterodactylus.util.template.ConditionalPart.NotCondition;
 import net.pterodactylus.util.template.ConditionalPart.NullDataCondition;
 import net.pterodactylus.util.template.ConditionalPart.OrCondition;
@@ -267,9 +265,9 @@ public class TemplateParser {
 							itemName = itemName.substring(1);
 							directText = true;
 						}
-						List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						Filters filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 						partsStack.push(parts);
-						Condition condition = filterDefinitions.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : (directText ? new DataTextCondition(itemName, invert) : new DataCondition(itemName, invert))) : (directText ? new FilterTextCondition(itemName, filterDefinitions, invert) : new FilterCondition(itemName, filterDefinitions, invert));
+						Condition condition = checkForNull ? new NullDataCondition(itemName, invert) : (directText ? new DataTextCondition(itemName, filters, invert) : new DataCondition(itemName, filters, invert));
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, condition);
 						commandStack.push("if");
 						lastCondition.push(condition);
@@ -312,9 +310,9 @@ public class TemplateParser {
 								itemName = itemName.substring(1);
 							}
 						}
-						List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						Filters filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 						partsStack.peek().add(parts);
-						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), filterDefinitions.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert)) : new FilterCondition(itemName, filterDefinitions, invert));
+						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, filters, invert));
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, condition);
 						lastCondition.push(condition);
 						lastConditions.peek().add(condition);
@@ -355,7 +353,7 @@ public class TemplateParser {
 							pluginParameters = parseParameters(startOfTagLine, startOfTagColumn, tokens);
 							parts.add(new PluginPart(startOfTagLine, startOfTagColumn, itemName, pluginParameters));
 						} else {
-							List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+							Filters filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 							if (directText) {
 								parts.add(new FilteredTextPart(startOfTagLine, startOfTagColumn, itemName, filterDefinitions));
 							} else {

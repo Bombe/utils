@@ -20,10 +20,8 @@ package net.pterodactylus.util.template;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
 
-import net.pterodactylus.util.template.TemplateParser.FilterDefinition;
+import net.pterodactylus.util.template.TemplateParser.Filters;
 
 /**
  * {@link ContainerPart} implementation that determines at render time whether
@@ -49,6 +47,9 @@ class ConditionalPart extends ContainerPart {
 	public ConditionalPart(int line, int column, Condition condition) {
 		super(line, column);
 		this.condition = condition;
+		if (condition instanceof AbstractCondition) {
+			((AbstractCondition) condition).setConditionalPart(this);
+		}
 	}
 
 	/**
@@ -84,11 +85,54 @@ class ConditionalPart extends ContainerPart {
 	}
 
 	/**
+	 * Base-implementation of a {@link Condition} that stores the
+	 * {@link ConditionalPart} it was added to.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private abstract static class AbstractCondition implements Condition {
+
+		/** The conditional part. */
+		private ConditionalPart conditionalPart;
+
+		/**
+		 * Creates a new abstract condition.
+		 */
+		protected AbstractCondition() {
+			/* do nothing. */
+		}
+
+		//
+		// ACCESSORS
+		//
+
+		/**
+		 * Returns the conditional part this condition belongs to.
+		 *
+		 * @return The conditional part of this condition
+		 */
+		protected ConditionalPart getConditionalPart() {
+			return conditionalPart;
+		}
+
+		/**
+		 * Sets the conditional part this condition belongs to.
+		 *
+		 * @param conditionalPart
+		 *            The conditional part of this condition
+		 */
+		protected void setConditionalPart(ConditionalPart conditionalPart) {
+			this.conditionalPart = conditionalPart;
+		}
+
+	}
+
+	/**
 	 * {@link Condition} implements that inverts another condition.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class NotCondition implements Condition {
+	public static class NotCondition extends AbstractCondition {
 
 		/** The condition to invert. */
 		private final Condition condition;
@@ -111,6 +155,17 @@ class ConditionalPart extends ContainerPart {
 			return !condition.isAllowed(templateContext);
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void setConditionalPart(ConditionalPart conditionalPart) {
+			super.setConditionalPart(conditionalPart);
+			if (condition instanceof AbstractCondition) {
+				((AbstractCondition) condition).setConditionalPart(conditionalPart);
+			}
+		}
+
 	}
 
 	/**
@@ -119,7 +174,7 @@ class ConditionalPart extends ContainerPart {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class AndCondition implements Condition {
+	public static class AndCondition extends AbstractCondition {
 
 		/** The conditions. */
 		private final Collection<Condition> conditions;
@@ -157,6 +212,19 @@ class ConditionalPart extends ContainerPart {
 			return true;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void setConditionalPart(ConditionalPart conditionalPart) {
+			super.setConditionalPart(conditionalPart);
+			for (Condition condition : conditions) {
+				if (condition instanceof AbstractCondition) {
+					((AbstractCondition) condition).setConditionalPart(conditionalPart);
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -165,7 +233,7 @@ class ConditionalPart extends ContainerPart {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class OrCondition implements Condition {
+	public static class OrCondition extends AbstractCondition {
 
 		/** The conditions. */
 		private final Collection<Condition> conditions;
@@ -203,6 +271,19 @@ class ConditionalPart extends ContainerPart {
 			return false;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void setConditionalPart(ConditionalPart conditionalPart) {
+			super.setConditionalPart(conditionalPart);
+			for (Condition condition : conditions) {
+				if (condition instanceof AbstractCondition) {
+					((AbstractCondition) condition).setConditionalPart(conditionalPart);
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -211,13 +292,16 @@ class ConditionalPart extends ContainerPart {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class DataCondition implements Condition {
+	public static class DataCondition extends AbstractCondition {
 
 		/** Whether to invert the result. */
 		private final boolean invert;
 
 		/** The name of the data item to check. */
 		private final String itemName;
+
+		/** The filters to apply. */
+		private final Filters filters;
 
 		/**
 		 * Creates a new data condition.
@@ -226,7 +310,7 @@ class ConditionalPart extends ContainerPart {
 		 *            The name of the item to check
 		 */
 		public DataCondition(String itemName) {
-			this(itemName, false);
+			this(itemName, new Filters(), false);
 		}
 
 		/**
@@ -238,8 +322,23 @@ class ConditionalPart extends ContainerPart {
 		 *            {@code true} to invert the result, {@code false} otherwise
 		 */
 		public DataCondition(String itemName, boolean invert) {
+			this(itemName, new Filters(), invert);
+		}
+
+		/**
+		 * Creates a new data condition.
+		 *
+		 * @param itemName
+		 *            The name of the item to check
+		 * @param filters
+		 *            The filters to apply
+		 * @param invert
+		 *            {@code true} to invert the result, {@code false} otherwise
+		 */
+		public DataCondition(String itemName, Filters filters, boolean invert) {
 			this.invert = invert;
 			this.itemName = itemName;
+			this.filters = filters;
 		}
 
 		/**
@@ -247,7 +346,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(TemplateContext templateContext) throws TemplateException {
-			return Boolean.valueOf(String.valueOf(templateContext.get(itemName))) ^ invert;
+			return Boolean.valueOf(String.valueOf(filters.filter(getConditionalPart().getLine(), getConditionalPart().getColumn(), templateContext, templateContext.get(itemName)))) ^ invert;
 		}
 
 	}
@@ -258,13 +357,16 @@ class ConditionalPart extends ContainerPart {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class DataTextCondition implements Condition {
+	public static class DataTextCondition extends AbstractCondition {
 
 		/** Whether to invert the result. */
 		private final boolean invert;
 
 		/** The text to check. */
 		private final String text;
+
+		/** The filters to apply. */
+		private final Filters filters;
 
 		/**
 		 * Creates a new data condition.
@@ -273,7 +375,7 @@ class ConditionalPart extends ContainerPart {
 		 *            The text to check
 		 */
 		public DataTextCondition(String text) {
-			this(text, false);
+			this(text, new Filters(), false);
 		}
 
 		/**
@@ -281,12 +383,15 @@ class ConditionalPart extends ContainerPart {
 		 *
 		 * @param text
 		 *            The text to check
+		 * @param filters
+		 *            The filters to apply
 		 * @param invert
 		 *            {@code true} to invert the result, {@code false} otherwise
 		 */
-		public DataTextCondition(String text, boolean invert) {
+		public DataTextCondition(String text, Filters filters, boolean invert) {
 			this.invert = invert;
 			this.text = text;
+			this.filters = filters;
 		}
 
 		/**
@@ -294,7 +399,7 @@ class ConditionalPart extends ContainerPart {
 		 */
 		@Override
 		public boolean isAllowed(TemplateContext templateContext) throws TemplateException {
-			return Boolean.valueOf(text) ^ invert;
+			return Boolean.valueOf(String.valueOf(filters.filter(getConditionalPart().getLine(), getConditionalPart().getColumn(), templateContext, text))) ^ invert;
 		}
 
 		/**
@@ -313,7 +418,7 @@ class ConditionalPart extends ContainerPart {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class NullDataCondition implements Condition {
+	public static class NullDataCondition extends AbstractCondition {
 
 		/** Whether to invert the result. */
 		private final boolean invert;
@@ -350,162 +455,6 @@ class ConditionalPart extends ContainerPart {
 		@Override
 		public boolean isAllowed(TemplateContext templateContext) throws TemplateException {
 			return (templateContext.get(itemName) == null) ^ invert;
-		}
-
-	}
-
-	/**
-	 * {@link Condition} implementation that filters the value from the data
-	 * provider before checking whether it matches “true.”
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	public static class FilterCondition implements Condition {
-
-		/** The name of the item. */
-		private final String itemName;
-
-		/** The filters. */
-		private final List<FilterDefinition> filterDefinitions;
-
-		/** Whether to invert the result. */
-		private final boolean invert;
-
-		/**
-		 * Creates a new filter condition.
-		 *
-		 * @param itemName
-		 *            The name of the item
-		 * @param filterDefinitions
-		 *            The filters to apply
-		 */
-		public FilterCondition(String itemName, List<FilterDefinition> filterDefinitions) {
-			this(itemName, filterDefinitions, false);
-		}
-
-		/**
-		 * Creates a new filter condition.
-		 *
-		 * @param itemName
-		 *            The name of the item
-		 * @param filterDefinitions
-		 *            The filters to apply
-		 * @param invert
-		 *            {@code true} to invert the result
-		 */
-		public FilterCondition(String itemName, List<FilterDefinition> filterDefinitions, boolean invert) {
-			this.itemName = itemName;
-			this.filterDefinitions = filterDefinitions;
-			this.invert = invert;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean isAllowed(TemplateContext templateContext) throws TemplateException {
-			Object data = templateContext.get(itemName);
-			for (FilterDefinition filterDefinition : filterDefinitions) {
-				Filter filter = templateContext.getFilter(filterDefinition.getName());
-				if (filter != null) {
-					data = filter.format(templateContext, data, filterDefinition.getParameters());
-				}
-			}
-			return Boolean.valueOf(String.valueOf(data)) ^ invert;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("([").append(itemName).append("]");
-			for (FilterDefinition filterDefinition : filterDefinitions) {
-				stringBuilder.append("|").append(filterDefinition.getName());
-				for (Entry<String, String> filterParameter : filterDefinition.getParameters().entrySet()) {
-					stringBuilder.append(" ").append(filterParameter.getKey()).append("=").append(filterParameter.getValue());
-				}
-			}
-			return stringBuilder.append(" = ").append(!invert).append(")").toString();
-		}
-
-	}
-
-	/**
-	 * {@link Condition} implementation that filters a given text before
-	 * checking whether it matches “true.”
-	 *
-	 * @author <a href="mailto:david.roden@sysart.de">David Roden</a>
-	 */
-	public static class FilterTextCondition implements Condition {
-
-		/** The text to filter. */
-		private final String text;
-
-		/** The filters to apply. */
-		private final List<FilterDefinition> filterDefinitions;
-
-		/** Whether to invert the result. */
-		private final boolean invert;
-
-		/**
-		 * Creates a new filter text condition.
-		 *
-		 * @param text
-		 *            The text to filter
-		 * @param filterDefinitions
-		 *            The filters to apply
-		 */
-		public FilterTextCondition(String text, List<FilterDefinition> filterDefinitions) {
-			this(text, filterDefinitions, false);
-		}
-
-		/**
-		 * Creates a new filter text condition.
-		 *
-		 * @param text
-		 *            The text to filter
-		 * @param filterDefinitions
-		 *            The filters to apply
-		 * @param invert
-		 *            {@code true} to invert the result
-		 */
-		public FilterTextCondition(String text, List<FilterDefinition> filterDefinitions, boolean invert) {
-			this.text = text;
-			this.filterDefinitions = filterDefinitions;
-			this.invert = invert;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean isAllowed(TemplateContext templateContext) throws TemplateException {
-			Object data = text;
-			for (FilterDefinition filterDefinition : filterDefinitions) {
-				Filter filter = templateContext.getFilter(filterDefinition.getName());
-				if (filter != null) {
-					data = filter.format(templateContext, data, filterDefinition.getParameters());
-				}
-			}
-			return Boolean.valueOf(String.valueOf(data)) ^ invert;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.append("(").append(text);
-			for (FilterDefinition filterDefinition : filterDefinitions) {
-				stringBuilder.append("|").append(filterDefinition.getName());
-				for (Entry<String, String> filterParameter : filterDefinition.getParameters().entrySet()) {
-					stringBuilder.append(" ").append(filterParameter.getKey()).append("=").append(filterParameter.getValue());
-				}
-			}
-			return stringBuilder.append(" = ").append(!invert).append(")").toString();
 		}
 
 	}
