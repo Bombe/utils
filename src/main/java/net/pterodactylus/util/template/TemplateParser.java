@@ -595,18 +595,22 @@ public class TemplateParser {
 		/**
 		 * Filters the given object through all filters.
 		 *
+		 * @param line
+		 *            The line of the tag
+		 * @param column
+		 *            The column of the tag
 		 * @param templateContext
 		 *            The template context
 		 * @param data
 		 *            The data to filter
 		 * @return The filtered data
 		 */
-		public Object filter(TemplateContext templateContext, Object data) {
+		public Object filter(int line, int column, TemplateContext templateContext, Object data) {
 			Object output = data;
 			for (FilterDefinition filterDefinition : this) {
 				Filter filter = templateContext.getFilter(filterDefinition.getName());
 				if (filter == null) {
-					throw new TemplateException("Filter “" + filterDefinition.getName() + "” not found.");
+					throw new TemplateException(line, column, "Filter “" + filterDefinition.getName() + "” not found.");
 				}
 				output = filter.format(templateContext, output, filterDefinition.getParameters());
 			}

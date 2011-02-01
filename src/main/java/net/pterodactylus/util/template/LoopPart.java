@@ -75,6 +75,8 @@ class LoopPart extends ContainerPart {
 	 *            The name under which to store the current item
 	 * @param loopName
 	 *            The name of the loop
+	 * @param filters
+	 *            The filters to apply
 	 */
 	public LoopPart(int line, int column, String collectionName, String itemName, String loopName, Filters filters) {
 		super(line, column);
@@ -89,7 +91,7 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
-		Object collectionObject = filters.filter(templateContext, templateContext.get(collectionName));
+		Object collectionObject = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(collectionName));
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
 			collection = (Collection<?>) collectionObject;
