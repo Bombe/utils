@@ -226,6 +226,9 @@ public class Storage<T extends Storable> implements Closeable {
 	public int size() {
 		lock.readLock().lock();
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			return directoryEntries.size() - emptyDirectoryEntries.cardinality();
 		} finally {
 			lock.readLock().unlock();
@@ -245,6 +248,9 @@ public class Storage<T extends Storable> implements Closeable {
 		lock.readLock().lock();
 		Allocation allocation;
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			Integer directoryIndex = idDirectoryIndexes.get(id);
 			if (directoryIndex == null) {
 				return null;
@@ -275,6 +281,9 @@ public class Storage<T extends Storable> implements Closeable {
 	public int getDirectorySize() {
 		lock.readLock().lock();
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			return directoryEntries.size();
 		} finally {
 			lock.readLock().unlock();
@@ -292,6 +301,9 @@ public class Storage<T extends Storable> implements Closeable {
 	public Allocation getAllocation(int directoryIndex) {
 		lock.readLock().lock();
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			return directoryEntries.get(directoryIndex);
 		} finally {
 			lock.readLock().unlock();
@@ -309,6 +321,9 @@ public class Storage<T extends Storable> implements Closeable {
 	public void remove(T storable) throws StorageException {
 		lock.writeLock().lock();
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			Integer directoryIndex = idDirectoryIndexes.remove(storable.getId());
 			if (directoryIndex == null) {
 				return;
@@ -332,6 +347,9 @@ public class Storage<T extends Storable> implements Closeable {
 	public void close() {
 		lock.writeLock().lock();
 		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
 			Closer.close(indexFile);
 			Closer.close(dataFile);
 		} finally {
