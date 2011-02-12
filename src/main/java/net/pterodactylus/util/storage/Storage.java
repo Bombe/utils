@@ -43,7 +43,7 @@ import net.pterodactylus.util.io.Closer;
 public class Storage<T extends Storable> implements Closeable {
 
 	/** The internal block size. */
-	private static final int BLOCK_SIZE = 512;
+	private final int blockSize;
 
 	/** Factory for {@link Storable}s. */
 	private final Factory<T> factory;
@@ -71,7 +71,7 @@ public class Storage<T extends Storable> implements Closeable {
 	private final BitSet allocations = new BitSet();
 
 	/**
-	 * Creates a new storage.
+	 * Creates a new storage with a default block size of 512 bytes.
 	 *
 	 * @param factory
 	 *            The factory that creates the objects
@@ -83,6 +83,25 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the directory can not be found
 	 */
 	public Storage(Factory<T> factory, File directory, String name) throws FileNotFoundException {
+		this(512, factory, directory, name);
+	}
+
+	/**
+	 * Creates a new storage.
+	 *
+	 * @param blockSize
+	 *            The block size
+	 * @param factory
+	 *            The factory that creates the objects
+	 * @param directory
+	 *            The directory to store the files in
+	 * @param name
+	 *            The base name of the files
+	 * @throws FileNotFoundException
+	 *             if the directory can not be found
+	 */
+	public Storage(int blockSize, Factory<T> factory, File directory, String name) throws FileNotFoundException {
+		this.blockSize = blockSize;
 		this.factory = factory;
 		indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
 		dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
@@ -136,10 +155,10 @@ public class Storage<T extends Storable> implements Closeable {
 
 		/* first, write data. */
 		allocations.set(position, position + blocks);
-		if (dataFile.length() < (position * BLOCK_SIZE + storableLength)) {
-			dataFile.setLength(position * BLOCK_SIZE + storableLength);
+		if (dataFile.length() < (position * blockSize + storableLength)) {
+			dataFile.setLength(position * blockSize + storableLength);
 		}
-		dataFile.seek(position * BLOCK_SIZE);
+		dataFile.seek(position * blockSize);
 		dataFile.write(storableBytes);
 
 		/* now directory entry. */
@@ -199,7 +218,7 @@ public class Storage<T extends Storable> implements Closeable {
 		}
 		Allocation allocation = directoryEntries.get(directoryIndex);
 		byte[] buffer = new byte[allocation.getSize()];
-		dataFile.seek(allocation.getPosition() * BLOCK_SIZE);
+		dataFile.seek(allocation.getPosition() * blockSize);
 		dataFile.readFully(buffer);
 		return factory.restore(buffer);
 	}
@@ -279,11 +298,11 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The size of the data
 	 * @return The numbers of blocks
 	 */
-	static int getBlocks(long size) {
+	private int getBlocks(long size) {
 		if (size == 0) {
 			return 1;
 		}
-		return (int) ((size - 1) / BLOCK_SIZE + 1);
+		return (int) ((size - 1) / blockSize + 1);
 	}
 
 }
