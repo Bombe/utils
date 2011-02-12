@@ -55,7 +55,6 @@ public class Storage<T extends Storable> implements Closeable {
 	private final RandomAccessFile dataFile;
 
 	/** Lock for synchronization. */
-	@SuppressWarnings("unused")
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	/** The directory entries in on-disk order. */
@@ -69,6 +68,9 @@ public class Storage<T extends Storable> implements Closeable {
 
 	/** Keeps track of allocated data blocks. */
 	private final BitSet allocations = new BitSet();
+
+	/** Whether the store is opened. */
+	private boolean opened;
 
 	/**
 	 * Creates a new storage with a default block size of 512 bytes.
@@ -118,22 +120,31 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if an I/O error occurs
 	 */
 	public void open() throws IOException {
-		long indexLength = indexFile.length();
-		if ((indexLength % 16) != 0) {
-			throw new IOException("Invalid Index Length: " + indexLength);
-		}
-		for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
-			byte[] allocationBuffer = new byte[16];
-			indexFile.readFully(allocationBuffer);
-			Allocation allocation = Allocation.FACTORY.restore(allocationBuffer);
-			if ((allocation.getId() == 0) && (allocation.getPosition() == 0) && (allocation.getSize() == 0)) {
-				emptyDirectoryEntries.set(directoryIndex);
-				directoryEntries.add(null);
-			} else {
-				directoryEntries.add(allocation);
-				idDirectoryIndexes.put(allocation.getId(), directoryIndex);
+		lock.writeLock().lock();
+		try {
+			if (opened) {
+				throw new IllegalStateException("Storage already opened.");
 			}
-			++directoryIndex;
+			long indexLength = indexFile.length();
+			if ((indexLength % 16) != 0) {
+				throw new IOException("Invalid Index Length: " + indexLength);
+			}
+			for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
+				byte[] allocationBuffer = new byte[16];
+				indexFile.readFully(allocationBuffer);
+				Allocation allocation = Allocation.FACTORY.restore(allocationBuffer);
+				if ((allocation.getId() == 0) && (allocation.getPosition() == 0) && (allocation.getSize() == 0)) {
+					emptyDirectoryEntries.set(directoryIndex);
+					directoryEntries.add(null);
+				} else {
+					directoryEntries.add(allocation);
+					idDirectoryIndexes.put(allocation.getId(), directoryIndex);
+				}
+				++directoryIndex;
+			}
+			opened = true;
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
@@ -148,48 +159,56 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if an I/O error occurs
 	 */
 	public void add(T storable) throws StorageException, IOException {
-		byte[] storableBytes = storable.getBuffer();
-		int storableLength = storableBytes.length;
-		int blocks = getBlocks(storableLength);
-		int position = findFreeRegion(blocks);
+		lock.writeLock().lock();
+		try {
+			if (!opened) {
+				throw new IllegalStateException("Storage not opened!");
+			}
+			byte[] storableBytes = storable.getBuffer();
+			int storableLength = storableBytes.length;
+			int blocks = getBlocks(storableLength);
+			int position = findFreeRegion(blocks);
 
-		/* first, write data. */
-		allocations.set(position, position + blocks);
-		if (dataFile.length() < (position * blockSize + storableLength)) {
-			dataFile.setLength(position * blockSize + storableLength);
-		}
-		dataFile.seek(position * blockSize);
-		dataFile.write(storableBytes);
+			/* first, write data. */
+			allocations.set(position, position + blocks);
+			if (dataFile.length() < (position * blockSize + storableLength)) {
+				dataFile.setLength(position * blockSize + storableLength);
+			}
+			dataFile.seek(position * blockSize);
+			dataFile.write(storableBytes);
 
-		/* now directory entry. */
-		int oldIndex = -1;
-		Allocation allocation = new Allocation(storable.getId(), position, storableLength);
-		int directoryIndex = emptyDirectoryEntries.nextSetBit(0);
-		if (directoryIndex == -1) {
-			/* append. */
-			directoryIndex = directoryEntries.size();
-			directoryEntries.add(allocation);
-		} else {
-			directoryEntries.set(directoryIndex, allocation);
+			/* now directory entry. */
+			int oldIndex = -1;
+			Allocation allocation = new Allocation(storable.getId(), position, storableLength);
+			int directoryIndex = emptyDirectoryEntries.nextSetBit(0);
+			if (directoryIndex == -1) {
+				/* append. */
+				directoryIndex = directoryEntries.size();
+				directoryEntries.add(allocation);
+			} else {
+				directoryEntries.set(directoryIndex, allocation);
+				emptyDirectoryEntries.clear(directoryIndex);
+			}
+			if (idDirectoryIndexes.containsKey(storable.getId())) {
+				oldIndex = idDirectoryIndexes.get(storable.getId());
+				Allocation oldAllocation = directoryEntries.set(oldIndex, null);
+				emptyDirectoryEntries.set(oldIndex);
+				allocations.clear(oldAllocation.getPosition(), oldAllocation.getPosition() + getBlocks(oldAllocation.getSize()));
+			}
 			emptyDirectoryEntries.clear(directoryIndex);
-		}
-		if (idDirectoryIndexes.containsKey(storable.getId())) {
-			oldIndex = idDirectoryIndexes.get(storable.getId());
-			Allocation oldAllocation = directoryEntries.set(oldIndex, null);
-			emptyDirectoryEntries.set(oldIndex);
-			allocations.clear(oldAllocation.getPosition(), oldAllocation.getPosition() + getBlocks(oldAllocation.getSize()));
-		}
-		emptyDirectoryEntries.clear(directoryIndex);
-		idDirectoryIndexes.put(storable.getId(), directoryIndex);
+			idDirectoryIndexes.put(storable.getId(), directoryIndex);
 
-		/* now write directory to disk. */
-		indexFile.seek(directoryIndex * 16);
-		indexFile.write(allocation.getBuffer());
+			/* now write directory to disk. */
+			indexFile.seek(directoryIndex * 16);
+			indexFile.write(allocation.getBuffer());
 
-		/* if an old index was deleted, wipe it. */
-		if (oldIndex > -1) {
-			indexFile.seek(oldIndex * 16);
-			indexFile.write(new byte[16]);
+			/* if an old index was deleted, wipe it. */
+			if (oldIndex > -1) {
+				indexFile.seek(oldIndex * 16);
+				indexFile.write(new byte[16]);
+			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
@@ -199,7 +218,12 @@ public class Storage<T extends Storable> implements Closeable {
 	 * @return The number of storables
 	 */
 	public int size() {
-		return directoryEntries.size() - emptyDirectoryEntries.cardinality();
+		lock.readLock().lock();
+		try {
+			return directoryEntries.size() - emptyDirectoryEntries.cardinality();
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	/**
@@ -212,15 +236,20 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if an I/O error occurs
 	 */
 	public T load(long id) throws IOException {
-		Integer directoryIndex = idDirectoryIndexes.get(id);
-		if (directoryIndex == null) {
-			return null;
+		lock.readLock().lock();
+		try {
+			Integer directoryIndex = idDirectoryIndexes.get(id);
+			if (directoryIndex == null) {
+				return null;
+			}
+			Allocation allocation = directoryEntries.get(directoryIndex);
+			byte[] buffer = new byte[allocation.getSize()];
+			dataFile.seek(allocation.getPosition() * blockSize);
+			dataFile.readFully(buffer);
+			return factory.restore(buffer);
+		} finally {
+			lock.readLock().unlock();
 		}
-		Allocation allocation = directoryEntries.get(directoryIndex);
-		byte[] buffer = new byte[allocation.getSize()];
-		dataFile.seek(allocation.getPosition() * blockSize);
-		dataFile.readFully(buffer);
-		return factory.restore(buffer);
 	}
 
 	/**
@@ -230,7 +259,12 @@ public class Storage<T extends Storable> implements Closeable {
 	 * @return The size of the directory
 	 */
 	public int getDirectorySize() {
-		return directoryEntries.size();
+		lock.readLock().lock();
+		try {
+			return directoryEntries.size();
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	/**
@@ -242,7 +276,12 @@ public class Storage<T extends Storable> implements Closeable {
 	 *         allocation at the given index
 	 */
 	public Allocation getAllocation(int directoryIndex) {
-		return directoryEntries.get(directoryIndex);
+		lock.readLock().lock();
+		try {
+			return directoryEntries.get(directoryIndex);
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	/**
@@ -260,8 +299,13 @@ public class Storage<T extends Storable> implements Closeable {
 	 */
 	@Override
 	public void close() {
-		Closer.close(indexFile);
-		Closer.close(dataFile);
+		lock.writeLock().lock();
+		try {
+			Closer.close(indexFile);
+			Closer.close(dataFile);
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	//
