@@ -237,19 +237,25 @@ public class Storage<T extends Storable> implements Closeable {
 	 */
 	public T load(long id) throws IOException {
 		lock.readLock().lock();
+		Allocation allocation;
 		try {
 			Integer directoryIndex = idDirectoryIndexes.get(id);
 			if (directoryIndex == null) {
 				return null;
 			}
-			Allocation allocation = directoryEntries.get(directoryIndex);
-			byte[] buffer = new byte[allocation.getSize()];
-			dataFile.seek(allocation.getPosition() * blockSize);
-			dataFile.readFully(buffer);
-			return factory.restore(buffer);
+			allocation = directoryEntries.get(directoryIndex);
 		} finally {
 			lock.readLock().unlock();
 		}
+		byte[] buffer = new byte[allocation.getSize()];
+		lock.writeLock().lock();
+		try {
+			dataFile.seek(allocation.getPosition() * blockSize);
+			dataFile.readFully(buffer);
+		} finally {
+			lock.writeLock().unlock();
+		}
+		return factory.restore(buffer);
 	}
 
 	/**
