@@ -295,9 +295,26 @@ public class Storage<T extends Storable> implements Closeable {
 	 *
 	 * @param storable
 	 *            The storable to remove
+	 * @throws StorageException
+	 *             if the index file can not be written to
 	 */
-	public void remove(T storable) {
-		/* TODO */
+	public void remove(T storable) throws StorageException {
+		lock.writeLock().lock();
+		try {
+			Integer directoryIndex = idDirectoryIndexes.remove(storable.getId());
+			if (directoryIndex == null) {
+				return;
+			}
+			Allocation allocation = directoryEntries.set(directoryIndex, null);
+			emptyDirectoryEntries.set(directoryIndex);
+			allocations.clear(allocation.getPosition(), allocation.getPosition() + getBlocks(allocation.getSize()));
+			indexFile.seek(directoryIndex * 16);
+			indexFile.write(new byte[16]);
+		} catch (IOException ioe1) {
+			throw new StorageException("Could not write to index file!", ioe1);
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	/**
