@@ -81,10 +81,10 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The directory to store the files in
 	 * @param name
 	 *            The base name of the files
-	 * @throws FileNotFoundException
+	 * @throws StorageException
 	 *             if the directory can not be found
 	 */
-	public Storage(Factory<T> factory, File directory, String name) throws FileNotFoundException {
+	public Storage(Factory<T> factory, File directory, String name) throws StorageException {
 		this(512, factory, directory, name);
 	}
 
@@ -99,14 +99,18 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The directory to store the files in
 	 * @param name
 	 *            The base name of the files
-	 * @throws FileNotFoundException
+	 * @throws StorageException
 	 *             if the directory can not be found
 	 */
-	public Storage(int blockSize, Factory<T> factory, File directory, String name) throws FileNotFoundException {
+	public Storage(int blockSize, Factory<T> factory, File directory, String name) throws StorageException {
 		this.blockSize = blockSize;
 		this.factory = factory;
-		indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
-		dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
+		try {
+			indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
+			dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
+		} catch (FileNotFoundException fnfe1) {
+			throw new StorageException("Could not create data and/or index files!", fnfe1);
+		}
 	}
 
 	//
@@ -116,10 +120,10 @@ public class Storage<T extends Storable> implements Closeable {
 	/**
 	 * Opens this storage.
 	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @throws StorageException
+	 *             if the storage can not be opened
 	 */
-	public void open() throws IOException {
+	public void open() throws StorageException {
 		lock.writeLock().lock();
 		try {
 			if (opened) {
@@ -143,6 +147,8 @@ public class Storage<T extends Storable> implements Closeable {
 				++directoryIndex;
 			}
 			opened = true;
+		} catch (IOException ioe1) {
+			throw new StorageException("Could not open storage!", ioe1);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -155,10 +161,8 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The storable to store
 	 * @throws StorageException
 	 *             if a store error occurs
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 */
-	public void add(T storable) throws StorageException, IOException {
+	public void add(T storable) throws StorageException {
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
@@ -207,6 +211,8 @@ public class Storage<T extends Storable> implements Closeable {
 				indexFile.seek(oldIndex * 16);
 				indexFile.write(new byte[16]);
 			}
+		} catch (IOException ioe1) {
+			throw new StorageException("Could not add Storable: " + storable + "!", ioe1);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -232,10 +238,10 @@ public class Storage<T extends Storable> implements Closeable {
 	 * @param id
 	 *            The ID of the storable to load
 	 * @return The storable
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @throws StorageException
+	 *             if the Storable could not be loaded
 	 */
-	public T load(long id) throws IOException {
+	public T load(long id) throws StorageException {
 		lock.readLock().lock();
 		Allocation allocation;
 		try {
@@ -252,6 +258,8 @@ public class Storage<T extends Storable> implements Closeable {
 		try {
 			dataFile.seek(allocation.getPosition() * blockSize);
 			dataFile.readFully(buffer);
+		} catch (IOException ioe1) {
+			throw new StorageException("Could not load Storable!", ioe1);
 		} finally {
 			lock.writeLock().unlock();
 		}
