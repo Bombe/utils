@@ -352,6 +352,7 @@ public class Storage<T extends Storable> implements Closeable {
 			}
 			Closer.close(indexFile);
 			Closer.close(dataFile);
+			opened = false;
 		} finally {
 			lock.writeLock().unlock();
 		}
