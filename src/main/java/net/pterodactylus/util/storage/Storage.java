@@ -49,10 +49,10 @@ public class Storage<T extends Storable> implements Closeable {
 	private final Factory<T> factory;
 
 	/** The index file. */
-	private final RandomAccessFile indexFile;
+	private RandomAccessFile indexFile;
 
 	/** The data file. */
-	private final RandomAccessFile dataFile;
+	private RandomAccessFile dataFile;
 
 	/** Lock for synchronization. */
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -72,6 +72,12 @@ public class Storage<T extends Storable> implements Closeable {
 	/** Whether the store is opened. */
 	private boolean opened;
 
+	/** The directory to store the files in. */
+	private final File directory;
+
+	/** The base name for the files. */
+	private final String name;
+
 	/**
 	 * Creates a new storage with a default block size of 512 bytes.
 	 *
@@ -81,10 +87,8 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The directory to store the files in
 	 * @param name
 	 *            The base name of the files
-	 * @throws StorageException
-	 *             if the directory can not be found
 	 */
-	public Storage(Factory<T> factory, File directory, String name) throws StorageException {
+	public Storage(Factory<T> factory, File directory, String name) {
 		this(512, factory, directory, name);
 	}
 
@@ -99,18 +103,12 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The directory to store the files in
 	 * @param name
 	 *            The base name of the files
-	 * @throws StorageException
-	 *             if the directory can not be found
 	 */
-	public Storage(int blockSize, Factory<T> factory, File directory, String name) throws StorageException {
+	public Storage(int blockSize, Factory<T> factory, File directory, String name) {
 		this.blockSize = blockSize;
 		this.factory = factory;
-		try {
-			indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
-			dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
-		} catch (FileNotFoundException fnfe1) {
-			throw new StorageException("Could not create data and/or index files!", fnfe1);
-		}
+		this.directory = directory;
+		this.name = name;
 	}
 
 	//
@@ -128,6 +126,12 @@ public class Storage<T extends Storable> implements Closeable {
 		try {
 			if (opened) {
 				throw new IllegalStateException("Storage already opened.");
+			}
+			try {
+				indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
+				dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
+			} catch (FileNotFoundException fnfe1) {
+				throw new StorageException("Could not create data and/or index files!", fnfe1);
 			}
 			long indexLength = indexFile.length();
 			if ((indexLength % 16) != 0) {
