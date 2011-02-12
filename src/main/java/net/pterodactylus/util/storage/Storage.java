@@ -137,6 +137,10 @@ public class Storage<T extends Storable> implements Closeable {
 			if ((indexLength % 16) != 0) {
 				throw new IOException("Invalid Index Length: " + indexLength);
 			}
+			emptyDirectoryEntries.clear();
+			directoryEntries.clear();
+			idDirectoryIndexes.clear();
+			allocations.clear();
 			for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
 				byte[] allocationBuffer = new byte[16];
 				indexFile.readFully(allocationBuffer);
