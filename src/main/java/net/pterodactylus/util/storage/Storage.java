@@ -147,6 +147,7 @@ public class Storage<T extends Storable> implements Closeable {
 				} else {
 					directoryEntries.add(allocation);
 					idDirectoryIndexes.put(allocation.getId(), directoryIndex);
+					allocations.set(allocation.getPosition(), allocation.getPosition() + getBlocks(allocation.getSize()));
 				}
 			}
 			opened = true;
