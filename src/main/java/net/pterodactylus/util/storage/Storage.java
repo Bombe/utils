@@ -362,10 +362,6 @@ public class Storage<T extends Storable> implements Closeable {
 		}
 	}
 
-	//
-	// STATIC METHODS
-	//
-
 	/**
 	 * Returns the number of blocks for the given number of bytes.
 	 *
