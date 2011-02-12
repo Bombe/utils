@@ -351,7 +351,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The number of blocks
 	 * @return The index at which the blocks can be stored
 	 */
-	public int findFreeRegion(int blocks) {
+	private int findFreeRegion(int blocks) {
 		int currentBlock = -1;
 		while (true) {
 			int nextUsedBlock = allocations.nextSetBit(currentBlock + 1);
