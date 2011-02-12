@@ -148,7 +148,6 @@ public class Storage<T extends Storable> implements Closeable {
 					directoryEntries.add(allocation);
 					idDirectoryIndexes.put(allocation.getId(), directoryIndex);
 				}
-				++directoryIndex;
 			}
 			opened = true;
 		} catch (IOException ioe1) {
