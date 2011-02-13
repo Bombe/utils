@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.validation.Validation;
 
 /**
  * Storage for {@link Storable}s. The storage persists the objects to a data
@@ -105,6 +106,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *            The base name of the files
 	 */
 	public Storage(int blockSize, Factory<T> factory, File directory, String name) {
+		Validation.begin().isNotNull("Factory", factory).isNotNull("Directory", directory).isNotNull("Name", name).check().isGreater("Block Size", blockSize, 0).check();
 		this.blockSize = blockSize;
 		this.factory = factory;
 		this.directory = directory;
@@ -171,6 +173,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if a store error occurs
 	 */
 	public void add(T storable) throws StorageException {
+		Validation.begin().isNotNull("Storable", storable).check();
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
@@ -308,6 +311,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 */
 	public Allocation getAllocation(int directoryIndex) {
 		lock.readLock().lock();
+		Validation.begin().isGreater("Directory Index", directoryIndex, -1).isLess("Directory Index", directoryIndex, directoryEntries.size()).check();
 		try {
 			if (!opened) {
 				throw new IllegalStateException("Storage not opened!");
@@ -327,6 +331,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the index file can not be written to
 	 */
 	public void remove(T storable) throws StorageException {
+		Validation.begin().isNotNull("Storable", storable).check();
 		remove(storable.getId());
 	}
 
