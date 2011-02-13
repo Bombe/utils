@@ -214,13 +214,11 @@ public class Storage<T extends Storable> implements Closeable {
 			idDirectoryIndexes.put(storable.getId(), directoryIndex);
 
 			/* now write directory to disk. */
-			indexFile.seek(directoryIndex * 16);
-			indexFile.write(allocation.getBuffer());
+			writeAllocation(directoryIndex, allocation);
 
 			/* if an old index was deleted, wipe it. */
 			if (oldIndex > -1) {
-				indexFile.seek(oldIndex * 16);
-				indexFile.write(new byte[16]);
+				writeAllocation(oldIndex, null);
 			}
 		} catch (IOException ioe1) {
 			throw new StorageException("Could not add Storable: " + storable + "!", ioe1);
