@@ -420,4 +420,28 @@ public class Storage<T extends Storable> implements Closeable {
 		return (int) ((size - 1) / blockSize + 1);
 	}
 
+	/**
+	 * Writes the given allocation to the given directory index in the index
+	 * file. This will also work with {@code null} allocations which will result
+	 * in an {@link Allocation}-sized byte array filled with {@code 0}’s to be
+	 * written. This method requires that the index file has been opened for
+	 * writing and the write lock of {@link #lock} has been acquired!
+	 *
+	 * @param directoryIndex
+	 *            The index in the directory
+	 * @param allocation
+	 *            The allocation to write, or {@code null} to clear the
+	 *            directory entry
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	private void writeAllocation(int directoryIndex, Allocation allocation) throws IOException {
+		indexFile.seek(directoryIndex * 16);
+		if (allocation == null) {
+			indexFile.write(new byte[16]);
+		} else {
+			indexFile.write(allocation.getBuffer());
+		}
+	}
+
 }
