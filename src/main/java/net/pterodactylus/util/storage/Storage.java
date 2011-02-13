@@ -327,12 +327,24 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the index file can not be written to
 	 */
 	public void remove(T storable) throws StorageException {
+		remove(storable.getId());
+	}
+
+	/**
+	 * Removes the storable with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the storable to remove
+	 * @throws StorageException
+	 *             if the index file can not be written to
+	 */
+	public void remove(long id) throws StorageException {
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
 				throw new IllegalStateException("Storage not opened!");
 			}
-			Integer directoryIndex = idDirectoryIndexes.remove(storable.getId());
+			Integer directoryIndex = idDirectoryIndexes.remove(id);
 			if (directoryIndex == null) {
 				return;
 			}
