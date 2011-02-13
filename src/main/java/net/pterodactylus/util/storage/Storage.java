@@ -383,6 +383,64 @@ public class Storage<T extends Storable> implements Closeable {
 		}
 	}
 
+	/**
+	 * Compacts the directory. This may reduce the size of the index file but
+	 * will not touch the data file.
+	 *
+	 * @throws StorageException
+	 *             if the index file can not be compacted
+	 */
+	public void compact() throws StorageException {
+		lock.writeLock().lock();
+		try {
+			if (opened) {
+				throw new IllegalStateException("Storage is opened!");
+			}
+
+			/* open index file and check length. */
+			try {
+				indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
+			} catch (FileNotFoundException fnfe1) {
+				throw new StorageException("Could not create data and/or index files!", fnfe1);
+			}
+			long indexLength = indexFile.length();
+			if ((indexLength % 16) != 0) {
+				throw new StorageException("Invalid Index Length: " + indexLength);
+			}
+
+			/* first, read the directory entries. */
+			directoryEntries.clear();
+			for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
+				byte[] allocationBuffer = new byte[16];
+				indexFile.readFully(allocationBuffer);
+				Allocation allocation = Allocation.FACTORY.restore(allocationBuffer);
+				if ((allocation.getId() == 0) && (allocation.getPosition() == 0) && (allocation.getSize() == 0)) {
+					directoryEntries.add(null);
+				} else {
+					directoryEntries.add(allocation);
+				}
+			}
+
+			/* now write an index file without the null values. */
+			int directoryIndex = 0;
+			indexFile.seek(0);
+			for (Allocation allocation : directoryEntries) {
+				if (allocation == null) {
+					continue;
+				}
+				writeAllocation(directoryIndex++, allocation);
+			}
+
+			/* truncate the index file. */
+			indexFile.setLength(indexFile.getFilePointer());
+		} catch (IOException ioe1) {
+			throw new StorageException("Could not compact index!", ioe1);
+		} finally {
+			Closer.close(indexFile);
+			lock.writeLock().unlock();
+		}
+	}
+
 	//
 	// PRIVATE METHODS
 	//
