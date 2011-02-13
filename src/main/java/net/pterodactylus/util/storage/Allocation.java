@@ -88,7 +88,7 @@ public class Allocation implements Storable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public byte[] getBuffer() throws StorageException {
+	public byte[] getBuffer() {
 		byte[] buffer = new byte[16];
 		Storable.Utils.putLong(id, buffer, 0);
 		Storable.Utils.putInt(position, buffer, 8);
