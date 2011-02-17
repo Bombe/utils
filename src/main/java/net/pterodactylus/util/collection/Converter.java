@@ -18,12 +18,23 @@
 package net.pterodactylus.util.collection;
 
 /**
- * TODO
+ * Interface for objects that can convert one object into another.
  *
+ * @param <I>
+ *            The type of the input object
+ * @param <O>
+ *            The type of the output object
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Converter<I, O> {
 
+	/**
+	 * Converts the given input object into another object.
+	 *
+	 * @param input
+	 *            The object to convert
+	 * @return The converted object
+	 */
 	public O convert(I input);
 
 }
