@@ -57,7 +57,7 @@ public interface Storable {
 		 * @return The char from the byte array
 		 */
 		public static char getChar(byte[] buffer, int position) {
-			return (char) (buffer[position + 0] | (buffer[position + 1] << 8));
+			return (char) ((buffer[position + 0] & 0xff) | (buffer[position + 1] << 8));
 		}
 
 		/**
@@ -83,7 +83,7 @@ public interface Storable {
 		 * @return The long from the byte array
 		 */
 		public static long getLong(byte[] buffer, int position) {
-			return (buffer[position + 0] & 0xff) | ((buffer[position + 1] << 8) & 0xff00) | ((buffer[position + 2] << 16) & 0xff0000) | ((buffer[position + 3] << 24) & 0xff000000) | ((buffer[position + 4] << 32) & 0xff00000000L) | ((buffer[position + 5] << 40) & 0xff0000000000L) | ((buffer[position + 6] << 48) & 0xff000000000000L) | ((buffer[position + 7] << 56) & 0xff00000000000000L);
+			return (buffer[position + 0] & 0xff) | ((buffer[position + 1] << 8) & 0xff00) | ((buffer[position + 2] << 16) & 0xff0000) | ((buffer[position + 3] << 24) & 0xff000000) | (((long) buffer[position + 4] << 32) & 0xff00000000L) | (((long) buffer[position + 5] << 40) & 0xff0000000000L) | (((long) buffer[position + 6] << 48) & 0xff000000000000L) | (((long) buffer[position + 7] << 56) & 0xff00000000000000L);
 		}
 
 		/**
