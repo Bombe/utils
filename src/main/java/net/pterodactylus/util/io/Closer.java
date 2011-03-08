@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.io;
 
+import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -219,6 +220,25 @@ public class Closer {
 			} catch (IOException ioe1) {
 				/* ignore. */
 			}
+		}
+	}
+
+	/**
+	 * Closes the given {@link Closeable}, {@link #flush(Object)}ing it first.
+	 *
+	 * @param closeable
+	 *            The {@link Closeable} to close
+	 * @see Closeable#close()
+	 */
+	public static void close(Closeable closeable) {
+		if (closeable == null) {
+			return;
+		}
+		flush(closeable);
+		try {
+			closeable.close();
+		} catch (IOException ioe1) {
+			/* ignore. */
 		}
 	}
 

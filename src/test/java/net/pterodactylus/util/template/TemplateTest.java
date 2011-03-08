@@ -21,11 +21,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import junit.framework.TestCase;
@@ -224,6 +226,40 @@ public class TemplateTest extends TestCase {
 		template.render(templateContext, outputWriter);
 		output = outputWriter.toString();
 		assertEquals("Items: first, second, last.", output);
+	}
+
+	/**
+	 * Tests filtering a collection before the {@code %foreach} loop.
+	 */
+	public void testTemplateWithFilteredCollection() {
+		Template template;
+		TemplateContext templateContext;
+		StringWriter outputWriter;
+		Collection<? extends Object> collection;
+		Map<String, Integer> map;
+
+		template = TemplateParser.parse(new StringReader("<%foreach list item|sort><% item><%notlast>, <%/notlast><%/foreach>"));
+		outputWriter = new StringWriter();
+		templateContext = new TemplateContext();
+		templateContext.addFilter("sort", new CollectionSortFilter());
+		collection = Arrays.asList(4, 7, 1);
+		templateContext.set("list", collection);
+		template.render(templateContext, outputWriter);
+		assertEquals("1, 4, 7", outputWriter.toString());
+
+		template = TemplateParser.parse(new StringReader("<%foreach map item|sort><% item.key>: <%item.value><%notlast>, <%/notlast><%/foreach>"));
+		outputWriter = new StringWriter();
+		templateContext = new TemplateContext();
+		templateContext.addFilter("sort", new CollectionSortFilter());
+		templateContext.addAccessor(Entry.class, new ReflectionAccessor());
+		map = new HashMap<String, Integer>();
+		map.put("one", 1);
+		map.put("two", 2);
+		map.put("three", 3);
+		map.put("four", 4);
+		templateContext.set("map", map);
+		template.render(templateContext, outputWriter);
+		assertEquals("four: 4, one: 1, three: 3, two: 2", outputWriter.toString());
 	}
 
 	/**

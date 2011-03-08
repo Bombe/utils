@@ -19,10 +19,9 @@ package net.pterodactylus.util.template;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 
 import net.pterodactylus.util.io.Renderable;
-import net.pterodactylus.util.template.TemplateParser.FilterDefinition;
+import net.pterodactylus.util.template.TemplateParser.Filters;
 
 /**
  * {@link Part} implementation that runs the output of another part through one
@@ -36,7 +35,7 @@ class FilteredPart extends AbstractPart {
 	private final String name;
 
 	/** The filters to apply. */
-	private final List<FilterDefinition> filterDefinitions;
+	private final Filters filters;
 
 	/**
 	 * Creates a new filtered part.
@@ -47,13 +46,13 @@ class FilteredPart extends AbstractPart {
 	 *            The column number of the tag
 	 * @param name
 	 *            The name of the data object
-	 * @param filterDefinitions
+	 * @param filters
 	 *            The filters to apply
 	 */
-	public FilteredPart(int line, int column, String name, List<FilterDefinition> filterDefinitions) {
+	public FilteredPart(int line, int column, String name, Filters filters) {
 		super(line, column);
 		this.name = name;
-		this.filterDefinitions = filterDefinitions;
+		this.filters = filters;
 	}
 
 	/**
@@ -61,14 +60,7 @@ class FilteredPart extends AbstractPart {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
-		Object data = templateContext.get(name);
-		for (FilterDefinition filterDefinition : filterDefinitions) {
-			Filter filter = templateContext.getFilter(filterDefinition.getName());
-			if (filter == null) {
-				throw new TemplateException(getLine(), getColumn(), "Filter “" + filterDefinition.getName() + "” not found.");
-			}
-			data = filter.format(templateContext, data, filterDefinition.getParameters());
-		}
+		Object data = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(name));
 		try {
 			if (data instanceof Renderable) {
 				((Renderable) data).render(writer);

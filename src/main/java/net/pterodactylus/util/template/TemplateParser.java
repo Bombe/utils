@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.ConditionalPart.AndCondition;
 import net.pterodactylus.util.template.ConditionalPart.Condition;
 import net.pterodactylus.util.template.ConditionalPart.DataCondition;
 import net.pterodactylus.util.template.ConditionalPart.DataTextCondition;
-import net.pterodactylus.util.template.ConditionalPart.FilterCondition;
-import net.pterodactylus.util.template.ConditionalPart.FilterTextCondition;
 import net.pterodactylus.util.template.ConditionalPart.NotCondition;
 import net.pterodactylus.util.template.ConditionalPart.NullDataCondition;
 import net.pterodactylus.util.template.ConditionalPart.OrCondition;
@@ -174,8 +172,15 @@ public class TemplateParser {
 						if (tokens.hasNext()) {
 							loopName = tokens.next();
 						}
+						Filters filters;
+						if (loopName == null) {
+							loopName = "loop";
+							filters = parseFilters(startOfTagLine, startOfTagColumn, tokens, true);
+						} else {
+							filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						}
 						partsStack.push(parts);
-						parts = new LoopPart(startOfTagLine, startOfTagColumn, collectionName, itemName, loopName);
+						parts = new LoopPart(startOfTagLine, startOfTagColumn, collectionName, itemName, loopName, filters);
 						commandStack.push("foreach");
 						lastCollectionName.push(collectionName);
 						lastLoopName.push(loopName);
@@ -260,9 +265,9 @@ public class TemplateParser {
 							itemName = itemName.substring(1);
 							directText = true;
 						}
-						List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						Filters filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 						partsStack.push(parts);
-						Condition condition = filterDefinitions.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : (directText ? new DataTextCondition(itemName, invert) : new DataCondition(itemName, invert))) : (directText ? new FilterTextCondition(itemName, filterDefinitions, invert) : new FilterCondition(itemName, filterDefinitions, invert));
+						Condition condition = checkForNull ? new NullDataCondition(itemName, invert) : (directText ? new DataTextCondition(itemName, filters, invert) : new DataCondition(itemName, filters, invert));
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, condition);
 						commandStack.push("if");
 						lastCondition.push(condition);
@@ -305,9 +310,9 @@ public class TemplateParser {
 								itemName = itemName.substring(1);
 							}
 						}
-						List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+						Filters filters = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 						partsStack.peek().add(parts);
-						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), filterDefinitions.isEmpty() ? (checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, invert)) : new FilterCondition(itemName, filterDefinitions, invert));
+						Condition condition = new AndCondition(new NotCondition(lastCondition.pop()), checkForNull ? new NullDataCondition(itemName, invert) : new DataCondition(itemName, filters, invert));
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, condition);
 						lastCondition.push(condition);
 						lastConditions.peek().add(condition);
@@ -348,7 +353,7 @@ public class TemplateParser {
 							pluginParameters = parseParameters(startOfTagLine, startOfTagColumn, tokens);
 							parts.add(new PluginPart(startOfTagLine, startOfTagColumn, itemName, pluginParameters));
 						} else {
-							List<FilterDefinition> filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
+							Filters filterDefinitions = parseFilters(startOfTagLine, startOfTagColumn, tokens);
 							if (directText) {
 								parts.add(new FilteredTextPart(startOfTagLine, startOfTagColumn, itemName, filterDefinitions));
 							} else {
@@ -402,9 +407,27 @@ public class TemplateParser {
 	 *            The tokens to parse
 	 * @return The parsed filters
 	 */
-	private static List<FilterDefinition> parseFilters(int line, int column, Iterator<String> tokens) {
-		List<FilterDefinition> filterDefinitions = new ArrayList<FilterDefinition>();
-		if (tokens.hasNext() && (tokens.next() != null)) {
+	private static Filters parseFilters(int line, int column, Iterator<String> tokens) {
+		return parseFilters(line, column, tokens, false);
+	}
+
+	/**
+	 * Parses filters from the rest of the tokens.
+	 *
+	 * @param line
+	 *            The line number of the tag
+	 * @param column
+	 *            The column number of the tag
+	 * @param tokens
+	 *            The tokens to parse
+	 * @param pipeTokenPresent
+	 *            {@code true} to assume that the “|” separator token has
+	 *            already been parsed
+	 * @return The parsed filters
+	 */
+	private static Filters parseFilters(int line, int column, Iterator<String> tokens, boolean pipeTokenPresent) {
+		Filters filterDefinitions = new Filters();
+		if (!pipeTokenPresent && (tokens.hasNext() && (tokens.next() != null))) {
 			throw new TemplateException(line, column, "expected \"|\" token");
 		}
 		while (tokens.hasNext()) {
@@ -554,6 +577,42 @@ public class TemplateParser {
 		 */
 		public Map<String, String> getParameters() {
 			return parameters;
+		}
+
+	}
+
+	/**
+	 * Convenience class that wraps around a {@link List} of
+	 * {@link FilterDefinition}s and can filter an object through all the
+	 * filters it contains.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class Filters extends ArrayList<FilterDefinition> {
+
+		/**
+		 * Filters the given object through all filters.
+		 *
+		 * @param line
+		 *            The line of the tag
+		 * @param column
+		 *            The column of the tag
+		 * @param templateContext
+		 *            The template context
+		 * @param data
+		 *            The data to filter
+		 * @return The filtered data
+		 */
+		public Object filter(int line, int column, TemplateContext templateContext, Object data) {
+			Object output = data;
+			for (FilterDefinition filterDefinition : this) {
+				Filter filter = templateContext.getFilter(filterDefinition.getName());
+				if (filter == null) {
+					throw new TemplateException(line, column, "Filter “" + filterDefinition.getName() + "” not found.");
+				}
+				output = filter.format(templateContext, output, filterDefinition.getParameters());
+			}
+			return output;
 		}
 
 	}

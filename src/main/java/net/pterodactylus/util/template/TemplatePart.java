@@ -59,7 +59,7 @@ public class TemplatePart extends AbstractPart {
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		Template template = templateContext.getTemplate(templateName);
 		if (template == null) {
-			throw new TemplateException(getLine(), getColumn());
+			throw new TemplateException(getLine(), getColumn(), "Template “" + templateName + "” not found.");
 		}
 		TemplateContext includedContext = new TemplateContext(templateContext).mergeContext(template.getInitialContext());
 		for (Entry<String, String> parameter : parameters.entrySet()) {
