@@ -1023,6 +1023,37 @@ public class TemplateTest extends TestCase {
 		assertEquals("Hello, User!", output);
 	}
 
+	/**
+	 * Test case for the “parent” parameter in the {@link StoreFilter}.
+	 */
+	public void testStoreAndConditionalFilter() {
+		Template template;
+		TemplateContext templateContext;
+		String templateString;
+		StringWriter outputWriter;
+		String output;
+
+		templateString = "<%foreach list item><%= true|store key=shown><%/foreach><%if shown>true<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("store", new StoreFilter());
+		templateContext.set("list", Arrays.asList(1));
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("false", output);
+
+		templateString = "<%foreach list item><%= true|store key=shown parent=true><%/foreach><%if shown>true<%else>false<%/if>";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("store", new StoreFilter());
+		templateContext.set("list", Arrays.asList(1));
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("true", output);
+	}
+
 	public void testInsertFilter() {
 		Template template;
 		TemplateContext templateContext;
