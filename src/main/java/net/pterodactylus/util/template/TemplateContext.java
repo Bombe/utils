@@ -248,6 +248,26 @@ public class TemplateContext {
 	}
 
 	/**
+	 * Sets the object with the given name to the given value. If
+	 * {@code setInParent} is {@code true}, the object is also set in this
+	 * context’s parent context, if there is one.
+	 *
+	 * @param name
+	 *            The name of the object
+	 * @param value
+	 *            The value of the object
+	 * @param setInParent
+	 *            {@code true} to set the object in the parent context,
+	 *            {@code false} otherwise
+	 */
+	public void set(String name, Object value, boolean setInParent) {
+		objects.put(name, value);
+		if (setInParent && (parentContext != null)) {
+			parentContext.set(name, value);
+		}
+	}
+
+	/**
 	 * Returns the template with the given name. If the providers of this
 	 * context can not find a template with the given name, the parent context
 	 * is asked.
