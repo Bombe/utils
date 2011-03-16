@@ -111,6 +111,7 @@ public class Validation {
 		}
 		message.setLength(message.length() - 2);
 		message.append('.');
+		failedChecks.clear();
 		throw new IllegalArgumentException(message.toString());
 	}
 
