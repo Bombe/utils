@@ -53,7 +53,7 @@ public class Logging {
 	}
 
 	/** The root name of the hierarchy. */
-	private static String hierarchyRootName;
+	private static String hierarchyRootName = "default";
 
 	/**
 	 * Adds a listener to the log handler.

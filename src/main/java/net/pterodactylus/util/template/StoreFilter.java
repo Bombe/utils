@@ -33,7 +33,8 @@ public class StoreFilter implements Filter {
 	@Override
 	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String key = parameters.get("key");
-		templateContext.set(key, data);
+		boolean setInParent = Boolean.valueOf(parameters.get("parent"));
+		templateContext.set(key, data, setInParent);
 		return "";
 	}
 

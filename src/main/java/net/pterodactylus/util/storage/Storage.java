@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
 
 /**
@@ -42,6 +45,9 @@ import net.pterodactylus.util.validation.Validation;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Storage<T extends Storable> implements Closeable {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(Storage.class);
 
 	/** The internal block size. */
 	private final int blockSize;
@@ -124,17 +130,20 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the storage can not be opened
 	 */
 	public void open() throws StorageException {
+		logger.log(Level.INFO, "[%s] Opening Storage…", name);
 		lock.writeLock().lock();
 		try {
 			if (opened) {
 				throw new IllegalStateException("Storage already opened.");
 			}
+			logger.log(Level.FINE, "[%s] Opening Data and Index Files…", name);
 			try {
 				indexFile = new RandomAccessFile(new File(directory, name + ".idx"), "rws");
 				dataFile = new RandomAccessFile(new File(directory, name + ".dat"), "rws");
 			} catch (FileNotFoundException fnfe1) {
 				throw new StorageException("Could not create data and/or index files!", fnfe1);
 			}
+			logger.log(Level.FINE, "[%s] Files opened.", name);
 			long indexLength = indexFile.length();
 			if ((indexLength % 16) != 0) {
 				throw new IOException("Invalid Index Length: " + indexLength);
@@ -143,10 +152,12 @@ public class Storage<T extends Storable> implements Closeable {
 			directoryEntries.clear();
 			idDirectoryIndexes.clear();
 			allocations.clear();
+			logger.log(Level.FINE, "[%s] Reading " + (indexLength / 16) + " existing Directory Entries…", name);
 			for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
 				byte[] allocationBuffer = new byte[16];
 				indexFile.readFully(allocationBuffer);
 				Allocation allocation = Allocation.FACTORY.restore(allocationBuffer);
+				logger.log(Level.FINEST, "[%s] Read Allocation: %s", new Object[] { name, allocation });
 				if ((allocation.getId() == 0) && (allocation.getPosition() == 0) && (allocation.getSize() == 0)) {
 					emptyDirectoryEntries.set(directoryIndex);
 					directoryEntries.add(null);
@@ -162,6 +173,7 @@ public class Storage<T extends Storable> implements Closeable {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.INFO, "[%s] Storage opened.", name);
 	}
 
 	/**
@@ -174,6 +186,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 */
 	public void add(T storable) throws StorageException {
 		Validation.begin().isNotNull("Storable", storable).check();
+		logger.log(Level.INFO, "[%s] Adding Storable %s…", new Object[] { name, storable });
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
@@ -183,14 +196,17 @@ public class Storage<T extends Storable> implements Closeable {
 			int storableLength = storableBytes.length;
 			int blocks = getBlocks(storableLength);
 			int position = findFreeRegion(blocks);
+			logger.log(Level.FINEST, "[%s] Will add Storable at %d, for %d blocks.", new Object[] { name, position, blocks });
 
 			/* first, write data. */
+			logger.log(Level.FINE, "[%s] Writing Storable Data…", name);
 			allocations.set(position, position + blocks);
 			if (dataFile.length() < (position * blockSize + storableLength)) {
 				dataFile.setLength(position * blockSize + storableLength);
 			}
 			dataFile.seek(position * blockSize);
 			dataFile.write(storableBytes);
+			logger.log(Level.FINE, "[%s] Storable Data written.", name);
 
 			/* now directory entry. */
 			int oldIndex = -1;
@@ -200,14 +216,17 @@ public class Storage<T extends Storable> implements Closeable {
 				/* append. */
 				directoryIndex = directoryEntries.size();
 				directoryEntries.add(allocation);
+				logger.log(Level.FINEST, "[%s] Appending to Directory, Entry %d…", new Object[] { name, directoryIndex });
 			} else {
 				directoryEntries.set(directoryIndex, allocation);
 				emptyDirectoryEntries.clear(directoryIndex);
+				logger.log(Level.FINEST, "[%s] Replacing Directory Entry %d…", new Object[] { name, directoryIndex });
 			}
 			if (idDirectoryIndexes.containsKey(storable.getId())) {
 				oldIndex = idDirectoryIndexes.get(storable.getId());
 				Allocation oldAllocation = directoryEntries.set(oldIndex, null);
 				emptyDirectoryEntries.set(oldIndex);
+				logger.log(Level.FINE, "[%s] Freeing Directory Index %d…", new Object[] { name, oldIndex });
 				allocations.clear(oldAllocation.getPosition(), oldAllocation.getPosition() + getBlocks(oldAllocation.getSize()));
 			}
 			emptyDirectoryEntries.clear(directoryIndex);
@@ -225,6 +244,7 @@ public class Storage<T extends Storable> implements Closeable {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.FINE, "[%s] Storable added.", name);
 	}
 
 	/**
@@ -254,6 +274,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the Storable could not be loaded
 	 */
 	public T load(long id) throws StorageException {
+		logger.log(Level.INFO, "[%s] Loading Storable %d…", new Object[] { name, id });
 		lock.readLock().lock();
 		Allocation allocation;
 		try {
@@ -261,16 +282,19 @@ public class Storage<T extends Storable> implements Closeable {
 				throw new IllegalStateException("Storage not opened!");
 			}
 			Integer directoryIndex = idDirectoryIndexes.get(id);
+			logger.log(Level.FINEST, "[%s] Directory Index: %d", new Object[] { name, directoryIndex });
 			if (directoryIndex == null) {
 				return null;
 			}
 			allocation = directoryEntries.get(directoryIndex);
+			logger.log(Level.FINEST, "[%s] Allocation: %s", new Object[] { name, allocation });
 		} finally {
 			lock.readLock().unlock();
 		}
 		byte[] buffer = new byte[allocation.getSize()];
 		lock.writeLock().lock();
 		try {
+			logger.log(Level.FINEST, "[%s] Reading %d Bytes…", new Object[] { name, allocation.getSize() });
 			dataFile.seek(allocation.getPosition() * blockSize);
 			dataFile.readFully(buffer);
 		} catch (IOException ioe1) {
@@ -278,6 +302,7 @@ public class Storage<T extends Storable> implements Closeable {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.INFO, "[%s] Read Storable, restoring from Factory…", name);
 		return factory.restore(buffer);
 	}
 
@@ -342,18 +367,21 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the index file can not be written to
 	 */
 	public void remove(long id) throws StorageException {
+		logger.log(Level.INFO, "[%s] Removing Storable %d…", new Object[] { name, id });
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
 				throw new IllegalStateException("Storage not opened!");
 			}
 			Integer directoryIndex = idDirectoryIndexes.remove(id);
+			logger.log(Level.FINEST, "[%s] Directory Index: %s", new Object[] { name, directoryIndex });
 			if (directoryIndex == null) {
 				return;
 			}
 			Allocation allocation = directoryEntries.set(directoryIndex, null);
 			emptyDirectoryEntries.set(directoryIndex);
 			allocations.clear(allocation.getPosition(), allocation.getPosition() + getBlocks(allocation.getSize()));
+			logger.log(Level.FINE, "[%s] Clearing Directory Index %d…", new Object[] { name, directoryIndex });
 			indexFile.seek(directoryIndex * 16);
 			indexFile.write(new byte[16]);
 		} catch (IOException ioe1) {
@@ -361,6 +389,7 @@ public class Storage<T extends Storable> implements Closeable {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.FINE, "[%s] Storable removed.", name);
 	}
 
 	/**
@@ -368,6 +397,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 */
 	@Override
 	public void close() {
+		logger.log(Level.INFO, "[%s] Closing Storage…", name);
 		lock.writeLock().lock();
 		try {
 			if (!opened) {
@@ -379,6 +409,7 @@ public class Storage<T extends Storable> implements Closeable {
 		} finally {
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.INFO, "[%s] Storage closed.", name);
 	}
 
 	/**
@@ -389,6 +420,7 @@ public class Storage<T extends Storable> implements Closeable {
 	 *             if the index file can not be compacted
 	 */
 	public void compact() throws StorageException {
+		logger.log(Level.INFO, "[%s] Compacting Storage…", name);
 		lock.writeLock().lock();
 		try {
 			if (opened) {
@@ -407,6 +439,7 @@ public class Storage<T extends Storable> implements Closeable {
 			}
 
 			/* first, read the directory entries. */
+			logger.log(Level.FINE, "[%s] Reading Directory…", name);
 			directoryEntries.clear();
 			for (int directoryIndex = 0; directoryIndex < (indexLength / 16); ++directoryIndex) {
 				byte[] allocationBuffer = new byte[16];
@@ -418,6 +451,7 @@ public class Storage<T extends Storable> implements Closeable {
 					directoryEntries.add(allocation);
 				}
 			}
+			logger.log(Level.FINE, "[%s] Read %d Directory Entries.", new Object[] { name, directoryEntries.size() });
 
 			/* now write an index file without the null values. */
 			int directoryIndex = 0;
@@ -428,8 +462,10 @@ public class Storage<T extends Storable> implements Closeable {
 				}
 				writeAllocation(directoryIndex++, allocation);
 			}
+			logger.log(Level.FINE, "[%s] Wrote %d Directory Entries.", new Object[] { name, directoryIndex });
 
 			/* truncate the index file. */
+			logger.log(Level.FINE, "[%s] Truncating Directory File…", name);
 			indexFile.setLength(indexFile.getFilePointer());
 		} catch (IOException ioe1) {
 			throw new StorageException("Could not compact index!", ioe1);
@@ -437,6 +473,7 @@ public class Storage<T extends Storable> implements Closeable {
 			Closer.close(indexFile);
 			lock.writeLock().unlock();
 		}
+		logger.log(Level.INFO, "[%s] Storage compacted.", name);
 	}
 
 	//
