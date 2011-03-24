@@ -1313,6 +1313,24 @@ public class TemplateTest extends TestCase {
 		assertEquals("testtest", stringWriter.toString());
 	}
 
+	/**
+	 * Tests the {@link DeletePlugin}.
+	 */
+	public void testDeletePlugin() {
+		Template template;
+		TemplateContext templateContext;
+		StringWriter stringWriter;
+
+		template = TemplateParser.parse(new StringReader("<%a><%:delete key=a><%a>"));
+		templateContext = new TemplateContext();
+		templateContext.addPlugin("delete", new DeletePlugin());
+		templateContext.set("a", "a");
+		stringWriter = new StringWriter();
+
+		template.render(templateContext, stringWriter);
+		assertEquals("a", stringWriter.toString());
+	}
+
 	private static class TestFilter implements Filter {
 
 		/**
