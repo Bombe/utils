@@ -176,6 +176,15 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("This template repeats: item: first - item: second - ", output);
 
+		templateString = "This template repeats: <% foreach items item>item: <% item> - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.set("items", "first");
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: first - ", output);
+
 		templateString = "This template repeats: <% foreach items item>item: <% item> (<%foreach inners inner>[<%item>: <%inner>]<%/foreach>) - <% /foreach>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
