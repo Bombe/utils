@@ -47,7 +47,7 @@ public class Filters {
 	 *            The list filter
 	 * @return The filtered list
 	 */
-	public static <E> List<E> filteredList(List<E> list, Filter<E> listFilter) {
+	public static <E> List<E> filteredList(List<E> list, Filter<? super E> listFilter) {
 		List<E> filteredList = new ArrayList<E>();
 		for (E element : list) {
 			if (listFilter.filterObject(element)) {
@@ -69,7 +69,7 @@ public class Filters {
 	 *            The set filter
 	 * @return The filtered set
 	 */
-	public static <E> Set<E> filteredSet(Set<E> set, Filter<E> setFilter) {
+	public static <E> Set<E> filteredSet(Set<E> set, Filter<? super E> setFilter) {
 		Set<E> filteredSet = new HashSet<E>();
 		for (E element : set) {
 			if (setFilter.filterObject(element)) {
@@ -115,7 +115,7 @@ public class Filters {
 	 *            The collection filter
 	 * @return The filtered collection
 	 */
-	public static <K> Collection<K> filteredCollection(Collection<K> collection, Filter<K> collectionFilter) {
+	public static <K> Collection<K> filteredCollection(Collection<K> collection, Filter<? super K> collectionFilter) {
 		return filteredList(new ArrayList<K>(collection), collectionFilter);
 	}
 
@@ -131,7 +131,7 @@ public class Filters {
 	 *            The iterator filter
 	 * @return The filtered iterator
 	 */
-	public static <E> Iterator<E> filteredIterator(final Iterator<E> iterator, final Filter<E> iteratorFilter) {
+	public static <E> Iterator<E> filteredIterator(final Iterator<E> iterator, final Filter<? super E> iteratorFilter) {
 		return new Iterator<E>() {
 
 			private boolean gotNextElement = false;
