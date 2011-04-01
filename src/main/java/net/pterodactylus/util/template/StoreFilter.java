@@ -34,7 +34,8 @@ public class StoreFilter implements Filter {
 	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String key = parameters.get("key");
 		boolean setInParent = Boolean.valueOf(parameters.get("parent"));
-		templateContext.set(key, data, setInParent);
+		boolean convertToText = Boolean.valueOf(parameters.get("text"));
+		templateContext.set(key, convertToText ? String.valueOf(data) : data, setInParent);
 		return "";
 	}
 
