@@ -176,6 +176,15 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("This template repeats: item: first - item: second - ", output);
 
+		templateString = "This template repeats: <% foreach items item>item: <% item> - <% /foreach>";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.set("items", "first");
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("This template repeats: item: first - ", output);
+
 		templateString = "This template repeats: <% foreach items item>item: <% item> (<%foreach inners inner>[<%item>: <%inner>]<%/foreach>) - <% /foreach>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
@@ -984,6 +993,24 @@ public class TemplateTest extends TestCase {
 		templateContext.set("a", 0);
 		template.render(templateContext, stringWriter);
 		assertEquals("is something", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader("<%if a|match key=b>equal<%else>not equal<%/if>"));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("match", new MatchFilter());
+		templateContext.set("a", "This is a string.");
+		templateContext.set("b", "This is a string.");
+		template.render(templateContext, stringWriter);
+		assertEquals("equal", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader("<%if ! a|match key=b>not equal<%else>equal<%/if>"));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("match", new MatchFilter());
+		templateContext.set("a", "This is a string.");
+		templateContext.set("b", "This is not a string.");
+		template.render(templateContext, stringWriter);
+		assertEquals("not equal", stringWriter.toString());
 	}
 
 	public void testStoreFilter() {
@@ -1311,6 +1338,24 @@ public class TemplateTest extends TestCase {
 
 		template.render(templateContext, stringWriter);
 		assertEquals("testtest", stringWriter.toString());
+	}
+
+	/**
+	 * Tests the {@link DeletePlugin}.
+	 */
+	public void testDeletePlugin() {
+		Template template;
+		TemplateContext templateContext;
+		StringWriter stringWriter;
+
+		template = TemplateParser.parse(new StringReader("<%a><%:delete key=a><%a>"));
+		templateContext = new TemplateContext();
+		templateContext.addPlugin("delete", new DeletePlugin());
+		templateContext.set("a", "a");
+		stringWriter = new StringWriter();
+
+		template.render(templateContext, stringWriter);
+		assertEquals("a", stringWriter.toString());
 	}
 
 	private static class TestFilter implements Filter {

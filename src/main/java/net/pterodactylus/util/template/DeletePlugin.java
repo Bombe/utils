@@ -1,5 +1,5 @@
 /*
- * utils - StoreFilter.java - Copyright © 2010 David Roden
+ * utils - DeletePlugin.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,27 @@ package net.pterodactylus.util.template;
 
 import java.util.Map;
 
+import net.pterodactylus.util.collection.TypeSafe;
+
 /**
- * Filter that stores the output of the chain in the {@link TemplateContext}. It
- * is used in conjunction with {@link InsertFilter}.
+ * Plugin that will remove a value from the current {@link TemplateContext} by
+ * setting it to {@code null}. The name of the value to delete is given as the
+ * “key” parameter.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class StoreFilter implements Filter {
+public class DeletePlugin implements Plugin {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String key = parameters.get("key");
-		boolean setInParent = Boolean.valueOf(parameters.get("parent"));
-		boolean convertToText = Boolean.valueOf(parameters.get("text"));
-		templateContext.set(key, convertToText ? String.valueOf(data) : data, setInParent);
-		return "";
+	public void execute(TemplateContext templateContext, Map<String, String> parameters) {
+		String key = TypeSafe.ensureType(parameters.get("key"), String.class);
+		if (key == null) {
+			return;
+		}
+		templateContext.set(key, null);
 	}
 
 }

@@ -18,6 +18,7 @@
 package net.pterodactylus.util.template;
 
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +103,7 @@ class LoopPart extends ContainerPart {
 			Map<?, ?> map = (Map<?, ?>) collectionObject;
 			collection = map.entrySet();
 		} else {
-			return;
+			collection = Arrays.asList(collectionObject);
 		}
 		LoopStructure loopStructure = new LoopStructure(collection.size());
 		Map<String, Object> overrideObjects = new HashMap<String, Object>();
