@@ -67,7 +67,7 @@ public class TemplateParser {
 	 *
 	 * @param input
 	 *            The input to parse
-	 * @return The list of parts created from the template’s {@link #input}
+	 * @return The list of parts created from the input
 	 * @throws TemplateException
 	 *             if the template can not be parsed correctly
 	 */
