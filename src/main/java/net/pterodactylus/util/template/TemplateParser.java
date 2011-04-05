@@ -610,7 +610,11 @@ public class TemplateParser {
 				if (filter == null) {
 					throw new TemplateException(line, column, "Filter “" + filterDefinition.getName() + "” not found.");
 				}
-				output = filter.format(templateContext, output, filterDefinition.getParameters());
+				try {
+					output = filter.format(templateContext, output, filterDefinition.getParameters());
+				} catch (Exception e1) {
+					throw new TemplateException(line, column, "Error while applying filter.", e1);
+				}
 			}
 			return output;
 		}
