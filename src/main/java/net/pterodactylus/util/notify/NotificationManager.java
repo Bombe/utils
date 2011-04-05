@@ -32,14 +32,6 @@ public class NotificationManager implements NotificationListener {
 	/** All notifications. */
 	private final Map<String, Notification> notifications = new HashMap<String, Notification>();
 
-	/** Notifications removed since last retrieval. */
-	/* synchronize access on notifications. */
-	private final Map<String, Notification> removedNotifications = new HashMap<String, Notification>();
-
-	/** The time the notifications were last retrieved. */
-	/* synchronize access on {@link #notifications}. */
-	private long lastRetrievalTime;
-
 	//
 	// ACCESSORS
 	//
@@ -51,43 +43,8 @@ public class NotificationManager implements NotificationListener {
 	 */
 	public Set<Notification> getNotifications() {
 		synchronized (notifications) {
-			lastRetrievalTime = System.currentTimeMillis();
 			return new HashSet<Notification>(notifications.values());
 		}
-	}
-
-	/**
-	 * Returns all notifications that have been updated since the last
-	 * retrieval.
-	 *
-	 * @return All changed notifications
-	 */
-	public Set<Notification> getChangedNotifications() {
-		Set<Notification> changedNotifications = new HashSet<Notification>();
-		synchronized (notifications) {
-			for (Notification notification : notifications.values()) {
-				if (notification.getLastUpdatedTime() > lastRetrievalTime) {
-					changedNotifications.add(notification);
-				}
-			}
-			lastRetrievalTime = System.currentTimeMillis();
-		}
-		return changedNotifications;
-	}
-
-	/**
-	 * Returns all notifications that have been removed since the last retrieval
-	 * and clears the list of removed notifications.
-	 *
-	 * @return All removed notifications
-	 */
-	public Set<Notification> getRemovedNotifications() {
-		Set<Notification> notifications;
-		synchronized (this.notifications) {
-			notifications = new HashSet<Notification>(removedNotifications.values());
-			removedNotifications.clear();
-		}
-		return notifications;
 	}
 
 	/**
@@ -115,7 +72,6 @@ public class NotificationManager implements NotificationListener {
 			if (!notifications.containsKey(notification.getId())) {
 				notifications.put(notification.getId(), notification);
 				notification.addNotificationListener(this);
-				removedNotifications.remove(notification.getId());
 			}
 		}
 	}
@@ -131,7 +87,6 @@ public class NotificationManager implements NotificationListener {
 			if (notifications.containsKey(notification.getId())) {
 				notifications.remove(notification.getId());
 				notification.removeNotificationListener(this);
-				removedNotifications.put(notification.getId(), notification);
 			}
 		}
 	}
