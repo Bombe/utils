@@ -138,4 +138,17 @@ public class Digits {
 		}
 	}
 
+	/**
+	 * Rounds the given number to the nearest multiple of {@code unit}.
+	 *
+	 * @param number
+	 *            The number to round
+	 * @param unit
+	 *            The unit to round to
+	 * @return The rounded number
+	 */
+	public static double round(double number, double unit) {
+		return (long) (number / unit + 0.5) * unit;
+	}
+
 }
