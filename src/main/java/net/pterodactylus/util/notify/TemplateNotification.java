@@ -91,6 +91,15 @@ public class TemplateNotification extends AbstractNotification implements Part {
 		return new TemplateContext(template.getInitialContext());
 	}
 
+	/**
+	 * Expose the used template to subclasses.
+	 *
+	 * @return The template
+	 */
+	protected Template getTemplate() {
+		return template;
+	}
+
 	//
 	// NOTIFICATION METHODS
 	//

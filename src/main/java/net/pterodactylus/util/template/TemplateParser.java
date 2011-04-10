@@ -67,7 +67,7 @@ public class TemplateParser {
 	 *
 	 * @param input
 	 *            The input to parse
-	 * @return The list of parts created from the template’s {@link #input}
+	 * @return The list of parts created from the input
 	 * @throws TemplateException
 	 *             if the template can not be parsed correctly
 	 */
@@ -610,7 +610,11 @@ public class TemplateParser {
 				if (filter == null) {
 					throw new TemplateException(line, column, "Filter “" + filterDefinition.getName() + "” not found.");
 				}
-				output = filter.format(templateContext, output, filterDefinition.getParameters());
+				try {
+					output = filter.format(templateContext, output, filterDefinition.getParameters());
+				} catch (Exception e1) {
+					throw new TemplateException(line, column, "Error while applying filter.", e1);
+				}
 			}
 			return output;
 		}
