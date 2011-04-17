@@ -449,7 +449,7 @@ public class SimpleXML {
 		if (childNode == null) {
 			return defaultValue;
 		}
-		return childNode.getValue();
+		return (childNode.getValue() == null) ? defaultValue : childNode.getValue();
 	}
 
 	/**

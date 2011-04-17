@@ -35,6 +35,7 @@ import net.pterodactylus.util.template.ConditionalPart.DataTextCondition;
 import net.pterodactylus.util.template.ConditionalPart.NotCondition;
 import net.pterodactylus.util.template.ConditionalPart.NullDataCondition;
 import net.pterodactylus.util.template.ConditionalPart.OrCondition;
+import net.pterodactylus.util.template.WhitespaceRemover.NoWhitespaceRemover;
 
 /**
  * Parser for {@link Template}s.
@@ -53,8 +54,25 @@ public class TemplateParser {
 	 *             if the template can not be parsed
 	 */
 	public static Template parse(Reader input) throws TemplateException {
+		return parse(input, new NoWhitespaceRemover());
+	}
+
+	/**
+	 * Parses the input of the template if it wasn’t already parsed. The
+	 * {@link WhitespaceRemover} is allowed to process all text strings that are
+	 * found between two template tags.
+	 *
+	 * @param input
+	 *            The input to parse
+	 * @param whitespaceRemover
+	 *            The whitespace remover
+	 * @return The parsed template
+	 * @throws TemplateException
+	 *             if the template can not be parsed
+	 */
+	public static Template parse(Reader input, WhitespaceRemover whitespaceRemover) throws TemplateException {
 		Template template = new Template();
-		template.add(extractParts(input));
+		template.add(extractParts(input, whitespaceRemover));
 		return template;
 	}
 
@@ -67,11 +85,13 @@ public class TemplateParser {
 	 *
 	 * @param input
 	 *            The input to parse
+	 * @param whitespaceRemover
+	 *            The whitespace remover
 	 * @return The list of parts created from the input
 	 * @throws TemplateException
 	 *             if the template can not be parsed correctly
 	 */
-	private static Part extractParts(Reader input) throws TemplateException {
+	private static Part extractParts(Reader input, WhitespaceRemover whitespaceRemover) throws TemplateException {
 		BufferedReader bufferedInputReader;
 		if (input instanceof BufferedReader) {
 			bufferedInputReader = (BufferedReader) input;
@@ -372,7 +392,7 @@ public class TemplateParser {
 					startOfTagColumn = column;
 					inAngleBracket = true;
 					if (currentTextPart.length() > 0) {
-						parts.add(new TextPart(startOfTagLine, startOfTagColumn, currentTextPart.toString()));
+						parts.add(new TextPart(startOfTagLine, startOfTagColumn, whitespaceRemover.removeWhitespace(currentTextPart.toString())));
 						currentTextPart.setLength(0);
 					}
 				} else {

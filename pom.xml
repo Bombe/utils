@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.9.3</version>
+	<version>0.9.4</version>
 	<name>utils</name>
 	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
@@ -69,6 +69,13 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<createChecksum>true</createChecksum>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -174,6 +174,60 @@ public class Validation {
 	}
 
 	/**
+	 * Checks whether the given {@code object} matches any of the
+	 * {@code expecteds} values.
+	 *
+	 * @param objectName
+	 *            The name of the object
+	 * @param object
+	 *            The object to check
+	 * @param expecteds
+	 *            The values of which at least one has to be
+	 *            {@link Object#equals(Object) equal}
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isEither(String objectName, long object, long... expecteds) {
+		boolean matched = false;
+		for (long expected : expecteds) {
+			matched = object == expected;
+			if (matched) {
+				break;
+			}
+		}
+		if (!matched) {
+			addFailedCheck(objectName + " should be one of " + Arrays.toString(expecteds) + " but was " + object);
+		}
+		return this;
+	}
+
+	/**
+	 * Checks whether the given {@code object} matches any of the
+	 * {@code expecteds} values.
+	 *
+	 * @param objectName
+	 *            The name of the object
+	 * @param object
+	 *            The object to check
+	 * @param expecteds
+	 *            The values of which at least one has to be
+	 *            {@link Object#equals(Object) equal}
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public Validation isEither(String objectName, Object object, Object... expecteds) {
+		boolean matched = false;
+		for (Object expected : expecteds) {
+			matched = (object == null) ? (expected == null) : object.equals(expected);
+			if (matched) {
+				break;
+			}
+		}
+		if (!matched) {
+			addFailedCheck(objectName + " should be one of " + Arrays.toString(expecteds) + " but was " + object);
+		}
+		return this;
+	}
+
+	/**
 	 * Checks if <code>value</code> is less than <code>upperBound</code>.
 	 *
 	 * @param objectName
