@@ -176,6 +176,42 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns a container that contains the elements of this container with the
+	 * exception of the first occurence of the given element which is removed.
+	 *
+	 * @param element
+	 *            The element to remove
+	 * @return A container with the reduced elements
+	 */
+	public Container<T> remove(T element) {
+		int index = indexOf(element);
+		if (index == -1) {
+			return this;
+		}
+		return remove(index);
+	}
+
+	/**
+	 * Returns a container that contains the elements of this container with the
+	 * exception of the element at the given index which is removed.
+	 *
+	 * @param index
+	 *            The index of the element to remove
+	 * @return A container with the reduced elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> remove(int index) {
+		Validation.begin().isGreaterOrEqual("Index", index, 0).isLessOrEqual("Index", index, elements.length - 1).check();
+		if (elements.length == 1) {
+			return new Container<T>();
+		}
+		Object[] newElements = new Object[elements.length - 1];
+		System.arraycopy(elements, 0, newElements, 0, index);
+		System.arraycopy(elements, index + 1, newElements, index, newElements.length - index);
+		return new Container<T>((T) newElements);
+	}
+
+	/**
 	 * Filters the elements of this container through the given filter. The
 	 * returned container will only contain elements for which the given filter
 	 * matched.
