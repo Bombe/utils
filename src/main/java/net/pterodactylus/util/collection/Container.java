@@ -18,6 +18,7 @@
 package net.pterodactylus.util.collection;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -290,6 +291,39 @@ public class Container<T> implements Iterable<T> {
 		for (int newIndex = 0, oldIndex = elements.length; oldIndex >= 0; ++newIndex, --oldIndex) {
 			newElements[newIndex] = elements[oldIndex];
 		}
+		return new Container<T>((T[]) newElements);
+	}
+
+	/**
+	 * Returns a container that contains all elements of this container sorted
+	 * by their natural order. For this to work, all elements need to implement
+	 * the {@link Comparable} interface.
+	 *
+	 * @see Arrays#sort(Object[])
+	 * @return A container with the sorted elements
+	 */
+	public Container<T> sort() {
+		return sort(null);
+	}
+
+	/**
+	 * Returns a container that contains all elements of this container sorted
+	 * using the given comparator.
+	 *
+	 * @see Arrays#sort(Object[], Comparator)
+	 * @param comparator
+	 *            The comparator to compare the objects (or {@code null} to use
+	 *            natural ordering)
+	 * @return A container with the sorted elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> sort(Comparator<? super T> comparator) {
+		if (elements.length < 2) {
+			return this;
+		}
+		Object[] newElements = new Object[elements.length];
+		System.arraycopy(elements, 0, newElements, 0, elements.length);
+		Arrays.sort((T[]) newElements, comparator);
 		return new Container<T>((T[]) newElements);
 	}
 
