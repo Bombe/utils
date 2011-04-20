@@ -136,4 +136,33 @@ public class ContainerTest extends TestCase {
 		assertEquals("Object", object2, container.get(object1));
 	}
 
+	/**
+	 * Tests the {@link Container#last()} method.
+	 */
+	public void testLast() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+		Object object3 = new Object();
+
+		container = new Container<Object>();
+		assertEquals("last() is empty", true, container.last().isEmpty());
+
+		container = new Container<Object>(object1);
+		assertEquals("last() is empty", false, container.last().isEmpty());
+		assertEquals("last element", object1, container.last().get());
+
+		container = new Container<Object>(new Object[] { object1, object2 });
+		assertEquals("last() is empty", false, container.last().isEmpty());
+		assertEquals("last element", object2, container.last().get());
+
+		container = new Container<Object>(new Object[] { object1, object2, object3 });
+		assertEquals("last() is empty", false, container.last().isEmpty());
+		assertEquals("last element", object3, container.last().get());
+
+		container = new Container<Object>(new Object[] { object1, object3, object2 });
+		assertEquals("last() is empty", false, container.last().isEmpty());
+		assertEquals("last element", object2, container.last().get());
+	}
+
 }
