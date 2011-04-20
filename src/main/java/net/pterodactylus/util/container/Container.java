@@ -56,6 +56,17 @@ public class Container<T> implements Iterable<T> {
 		this.elements = new Object[] { element };
 	}
 
+	/**
+	 * Creates a new container and stores the given elements.
+	 *
+	 * @param elements
+	 *            The elements to store
+	 */
+	public Container(T[] elements) {
+		this.elements = new Object[elements.length];
+		System.arraycopy(elements, 0, this.elements, 0, elements.length);
+	}
+
 	//
 	// ACCESSORS
 	//
