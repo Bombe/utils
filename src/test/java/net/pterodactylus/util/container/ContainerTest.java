@@ -165,4 +165,56 @@ public class ContainerTest extends TestCase {
 		assertEquals("last element", object2, container.last().get());
 	}
 
+	/**
+	 * Tests the {@link Container#indexOf(Object)} method.
+	 */
+	public void testIndexOf() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+		Object object3 = new Object();
+
+		container = new Container<Object>();
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", -1, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of object3", -1, container.indexOf(object3));
+
+		container = new Container<Object>(object1);
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of object3", -1, container.indexOf(object3));
+
+		container = new Container<Object>(object2);
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", -1, container.indexOf(object1));
+		assertEquals("Index of object2", 0, container.indexOf(object2));
+		assertEquals("Index of object3", -1, container.indexOf(object3));
+
+		container = new Container<Object>(object3);
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", -1, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of object3", 0, container.indexOf(object3));
+
+		container = new Container<Object>(new Object[] { object1, object2 });
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", 1, container.indexOf(object2));
+		assertEquals("Index of object3", -1, container.indexOf(object3));
+
+		container = new Container<Object>(new Object[] { object1, object3 });
+		assertEquals("Index of null", -1, container.indexOf(null));
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of object3", 1, container.indexOf(object3));
+
+		container = new Container<Object>(new Object[] { null, object3 });
+		assertEquals("Index of null", 0, container.indexOf(null));
+		assertEquals("Index of object1", -1, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of object3", 1, container.indexOf(object3));
+	}
+
 }
