@@ -26,6 +26,11 @@ import junit.framework.TestCase;
  */
 public class ContainerTest extends TestCase {
 
+	// first, all the basic methods that return information about a container
+	// are tested. this needs to be done first so we can be sure that the
+	// returned information is correct when we later need to verify
+	// the results of more complex operations.
+
 	/**
 	 * Tests the constructors with various arguments.
 	 *
@@ -267,6 +272,45 @@ public class ContainerTest extends TestCase {
 		assertEquals("Contains object1", false, container.contains(object1));
 		assertEquals("Contains object2", false, container.contains(object2));
 		assertEquals("Contains object3", true, container.contains(object3));
+	}
+
+	// now follow the more complex operations.
+
+	/**
+	 * Tests the {@link Container#add(Object)} method.
+	 */
+	public void testAdd() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+
+		container = new Container<Object>();
+		assertEquals("Container is empty", true, container.isEmpty());
+		container = container.add(object1);
+		assertEquals("Container size", 1, container.size());
+		assertEquals("Contains object1", true, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		container = container.add(object2);
+		assertEquals("Container size", 2, container.size());
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", 1, container.indexOf(object2));
+
+		container = new Container<Object>();
+		assertEquals("Container is empty", true, container.isEmpty());
+		container = container.add(object1);
+		assertEquals("Container size", 1, container.size());
+		assertEquals("Contains object1", true, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		container = container.add(null);
+		assertEquals("Container size", 2, container.size());
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", -1, container.indexOf(object2));
+		assertEquals("Index of null", 1, container.indexOf(null));
+		container = container.add(object2);
+		assertEquals("Container size", 3, container.size());
+		assertEquals("Index of object1", 0, container.indexOf(object1));
+		assertEquals("Index of object2", 2, container.indexOf(object2));
+		assertEquals("Index of null", 1, container.indexOf(null));
 	}
 
 }
