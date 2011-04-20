@@ -19,6 +19,7 @@ package net.pterodactylus.util.container;
 
 import java.util.Iterator;
 
+import net.pterodactylus.util.collection.Converter;
 import net.pterodactylus.util.filter.Filter;
 
 /**
@@ -150,6 +151,29 @@ public class Container<T> implements Iterable<T> {
 		Object[] finalElements = new Object[filteredElementCount];
 		System.arraycopy(filteredElements, 0, finalElements, 0, filteredElementCount);
 		return new Container<T>((T[]) finalElements);
+	}
+
+	/**
+	 * Maps all elements in this container using the given mapper and returns a
+	 * container containing the mapped elements.
+	 *
+	 * @param <O>
+	 *            The type of the mapped elements
+	 * @param mapper
+	 *            The mapper to use
+	 * @return A container with the mapped elements
+	 */
+	@SuppressWarnings("unchecked")
+	public <O> Container<O> map(Converter<T, O> mapper) {
+		if (isEmpty()) {
+			return (Container<O>) this;
+		}
+		Object[] mappedElements = new Object[elements.length];
+		int index = 0;
+		for (Object object : elements) {
+			mappedElements[index++] = mapper.convert((T) object);
+		}
+		return new Container<O>((O[]) mappedElements);
 	}
 
 	//
