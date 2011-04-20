@@ -155,6 +155,18 @@ public class Container<T> implements Iterable<T> {
 		return -1;
 	}
 
+	/**
+	 * Returns whether the given element is stored in this container.
+	 *
+	 * @param element
+	 *            The element to check for
+	 * @return {@code true} if the given element is stored in this container,
+	 *         {@code false} otherwise
+	 */
+	public boolean contains(T element) {
+		return indexOf(element) != -1;
+	}
+
 	//
 	// ACTIONS
 	//
