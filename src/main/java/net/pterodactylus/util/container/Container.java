@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import net.pterodactylus.util.collection.Converter;
 import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.validation.Validation;
 
 /**
  * A container stores an arbitrary amounts of elements, allowing easy filtering,
@@ -141,6 +142,26 @@ public class Container<T> implements Iterable<T> {
 		Object[] newElements = new Object[elements.length + 1];
 		System.arraycopy(elements, 0, newElements, 0, elements.length);
 		newElements[elements.length] = element;
+		return new Container<T>((T[]) newElements);
+	}
+
+	/**
+	 * Creates and returns a new container that contains the elements of this
+	 * container with the given element inserted at the given index.
+	 *
+	 * @param index
+	 *            The index at which to insert the new element
+	 * @param element
+	 *            The element to insert
+	 * @return A container with the new elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> add(int index, T element) {
+		Validation.begin().isGreaterOrEqual("Index", index, 0).isLessOrEqual("Index", index, elements.length).check();
+		Object[] newElements = new Object[elements.length + 1];
+		System.arraycopy(elements, 0, newElements, 0, index);
+		newElements[index] = element;
+		System.arraycopy(elements, index, newElements, index + 1, elements.length - index);
 		return new Container<T>((T[]) newElements);
 	}
 
