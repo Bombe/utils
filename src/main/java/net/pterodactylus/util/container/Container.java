@@ -126,6 +126,25 @@ public class Container<T> implements Iterable<T> {
 	//
 
 	/**
+	 * Creates and returns a new container that contains all elements of this
+	 * container and the given element, which is appended at the end.
+	 *
+	 * @param element
+	 *            The element to add
+	 * @return The container with all elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> add(T element) {
+		if (isEmpty()) {
+			return new Container<T>(element);
+		}
+		Object[] newElements = new Object[elements.length + 1];
+		System.arraycopy(elements, 0, newElements, 0, elements.length);
+		newElements[elements.length] = element;
+		return new Container<T>((T[]) newElements);
+	}
+
+	/**
 	 * Filters the elements of this container through the given filter. The
 	 * returned container will only contain elements for which the given filter
 	 * matched.
