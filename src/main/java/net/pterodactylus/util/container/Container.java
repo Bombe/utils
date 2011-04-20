@@ -83,6 +83,16 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns whether this container is empty.
+	 *
+	 * @return {@code true} if this container is empty, {@code false} if it
+	 *         contains at least one element
+	 */
+	public boolean isEmpty() {
+		return elements.length == 0;
+	}
+
+	/**
 	 * Returns the first element of this container, or {@code null} if this
 	 * container is empty.
 	 *
