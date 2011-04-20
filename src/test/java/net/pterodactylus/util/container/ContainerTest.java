@@ -55,4 +55,23 @@ public class ContainerTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Tests the {@link Container#size()} method return values.
+	 */
+	public void testSize() {
+		Container<Object> container;
+
+		container = new Container<Object>();
+		assertEquals("Container Size", 0, container.size());
+
+		container = new Container<Object>(new Object());
+		assertEquals("Container Size", 1, container.size());
+
+		container = new Container<Object>(new Object[] { new Object(), new Object() });
+		assertEquals("Container Size", 2, container.size());
+
+		container = new Container<Object>(new Object[] { new Object(), new Object(), new Object(), new Object() });
+		assertEquals("Container Size", 4, container.size());
+	}
+
 }
