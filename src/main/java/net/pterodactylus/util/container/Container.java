@@ -69,6 +69,34 @@ public class Container<T> implements Iterable<T> {
 		return elements.length;
 	}
 
+	/**
+	 * Returns the first element of this container, or {@code null} if this
+	 * container is empty.
+	 *
+	 * @return The first element of this container, or {@code null} if this
+	 *         container is empty
+	 */
+	public T get() {
+		return get(null);
+	}
+
+	/**
+	 * Returns the first element of this container, or the default value if this
+	 * container is empty.
+	 *
+	 * @param defaultValue
+	 *            The default value to return if the container is empty
+	 * @return The first element of this container, or the default value if this
+	 *         container is empty
+	 */
+	@SuppressWarnings("unchecked")
+	public T get(T defaultValue) {
+		if (elements.length == 0) {
+			return defaultValue;
+		}
+		return (T) elements[0];
+	}
+
 	//
 	// INTERFACE Iterable
 	//
