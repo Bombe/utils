@@ -123,6 +123,19 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns a container that only contains the last element of this
+	 * container.
+	 *
+	 * @return A container with the last element of this container
+	 */
+	public Container<T> last() {
+		if (elements.length < 2) {
+			return this;
+		}
+		return crop(elements.length - 1, elements.length);
+	}
+
+	/**
 	 * Returns the index of the given element in this container.
 	 *
 	 * @param element
