@@ -251,6 +251,23 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns a container with the elements of this container in reverse order.
+	 *
+	 * @return A container with the reversed elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> reverse() {
+		if (elements.length < 2) {
+			return this;
+		}
+		Object[] newElements = new Object[elements.length];
+		for (int newIndex = 0, oldIndex = elements.length; oldIndex >= 0; ++newIndex, --oldIndex) {
+			newElements[newIndex] = elements[oldIndex];
+		}
+		return new Container<T>((T[]) newElements);
+	}
+
+	/**
 	 * Filters the elements of this container through the given filter. The
 	 * returned container will only contain elements for which the given filter
 	 * matched.
