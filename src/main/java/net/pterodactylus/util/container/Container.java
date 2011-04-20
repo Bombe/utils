@@ -19,6 +19,8 @@ package net.pterodactylus.util.container;
 
 import java.util.Iterator;
 
+import net.pterodactylus.util.filter.Filter;
+
 /**
  * A container stores an arbitrary amounts of elements, allowing easy filtering,
  * mapping, and processing of the elements.
@@ -106,6 +108,38 @@ public class Container<T> implements Iterable<T> {
 			return defaultValue;
 		}
 		return (T) elements[0];
+	}
+
+	//
+	// ACTIONS
+	//
+
+	/**
+	 * Filters the elements of this container through the given filter. The
+	 * returned container will only contain elements for which the given filter
+	 * matched.
+	 *
+	 * @param filter
+	 *            The filter to apply on the elements
+	 * @return A container containing the filtered elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> filter(Filter<T> filter) {
+		Object[] filteredElements = new Object[elements.length];
+		int filteredElementCount = 0;
+		for (Object object : elements) {
+			if (filter.filterObject((T) object)) {
+				filteredElements[filteredElementCount++] = object;
+			}
+		}
+		if (filteredElementCount == elements.length) {
+			return this;
+		} else if (filteredElementCount == 0) {
+			return new Container<T>();
+		}
+		Object[] finalElements = new Object[filteredElementCount];
+		System.arraycopy(filteredElements, 0, finalElements, 0, filteredElementCount);
+		return new Container<T>((T[]) finalElements);
 	}
 
 	//
