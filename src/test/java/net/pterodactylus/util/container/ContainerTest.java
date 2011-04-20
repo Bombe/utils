@@ -93,4 +93,25 @@ public class ContainerTest extends TestCase {
 		assertEquals("Container is empty", false, container.isEmpty());
 	}
 
+	/**
+	 * Tests the {@link Container#get()} method.
+	 */
+	public void testGet() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+
+		container = new Container<Object>();
+		assertEquals("Object", null, container.get());
+
+		container = new Container<Object>(object1);
+		assertEquals("Object", object1, container.get());
+
+		container = new Container<Object>(new Object[] { object1, object2 });
+		assertEquals("Object", object1, container.get());
+
+		container = new Container<Object>(new Object[] { object2, object1 });
+		assertEquals("Object", object2, container.get());
+	}
+
 }
