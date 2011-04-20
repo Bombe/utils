@@ -114,4 +114,26 @@ public class ContainerTest extends TestCase {
 		assertEquals("Object", object2, container.get());
 	}
 
+	/**
+	 * Tests the {@link Container#get(Object)} method.
+	 */
+	public void testGetWithDefaultValue() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+		Object defaultObject = new Object();
+
+		container = new Container<Object>();
+		assertEquals("Object", defaultObject, container.get(defaultObject));
+
+		container = new Container<Object>(object1);
+		assertEquals("Object", object1, container.get(object2));
+
+		container = new Container<Object>(new Object[] { object1, object2 });
+		assertEquals("Object", object1, container.get(defaultObject));
+
+		container = new Container<Object>(new Object[] { object2, object1 });
+		assertEquals("Object", object2, container.get(object1));
+	}
+
 }
