@@ -191,6 +191,18 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns a container that contains only the element at the given index.
+	 *
+	 * @param index
+	 *            The index of the element
+	 * @return A container that contains only the element at the given index of
+	 *         this container
+	 */
+	public Container<T> crop(int index) {
+		return crop(index, index + 1);
+	}
+
+	/**
 	 * Returns a container that contains a part of this container, starting at
 	 * the index {@code start} (inclusive) and ending at the index {@code end}
 	 * (exclusive).
