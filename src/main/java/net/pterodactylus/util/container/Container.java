@@ -69,6 +69,7 @@ public class Container<T> implements Iterable<T> {
 	 *            The elements to store
 	 */
 	public Container(T[] elements) {
+		Validation.begin().isNotNull("Elements", elements).check();
 		this.elements = new Object[elements.length];
 		System.arraycopy(elements, 0, this.elements, 0, elements.length);
 	}
