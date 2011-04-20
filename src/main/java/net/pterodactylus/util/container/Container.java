@@ -17,7 +17,9 @@
 
 package net.pterodactylus.util.container;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import net.pterodactylus.util.collection.Converter;
 import net.pterodactylus.util.filter.Filter;
@@ -331,6 +333,20 @@ public class Container<T> implements Iterable<T> {
 			processor.process((T) object);
 		}
 		return this;
+	}
+
+	//
+	// CONVERSIONS
+	//
+
+	/**
+	 * Returns the elements of this contains as a {@link List}.
+	 *
+	 * @return The list containing the elements of this container
+	 */
+	@SuppressWarnings("unchecked")
+	public List<T> asList() {
+		return Arrays.asList((T[]) elements);
 	}
 
 	//
