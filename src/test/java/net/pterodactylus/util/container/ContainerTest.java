@@ -217,4 +217,56 @@ public class ContainerTest extends TestCase {
 		assertEquals("Index of object3", 1, container.indexOf(object3));
 	}
 
+	/**
+	 * Tests the {@link Container#indexOf(Object)} method.
+	 */
+	public void testContains() {
+		Container<Object> container;
+		Object object1 = new Object();
+		Object object2 = new Object();
+		Object object3 = new Object();
+
+		container = new Container<Object>();
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", false, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		assertEquals("Contains object3", false, container.contains(object3));
+
+		container = new Container<Object>(object1);
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", true, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		assertEquals("Contains object3", false, container.contains(object3));
+
+		container = new Container<Object>(object2);
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", false, container.contains(object1));
+		assertEquals("Contains object2", true, container.contains(object2));
+		assertEquals("Contains object3", false, container.contains(object3));
+
+		container = new Container<Object>(object3);
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", false, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		assertEquals("Contains object3", true, container.contains(object3));
+
+		container = new Container<Object>(new Object[] { object1, object2 });
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", true, container.contains(object1));
+		assertEquals("Contains object2", true, container.contains(object2));
+		assertEquals("Contains object3", false, container.contains(object3));
+
+		container = new Container<Object>(new Object[] { object1, object3 });
+		assertEquals("Contains null", false, container.contains(null));
+		assertEquals("Contains object1", true, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		assertEquals("Contains object3", true, container.contains(object3));
+
+		container = new Container<Object>(new Object[] { null, object3 });
+		assertEquals("Contains null", true, container.contains(null));
+		assertEquals("Contains object1", false, container.contains(object1));
+		assertEquals("Contains object2", false, container.contains(object2));
+		assertEquals("Contains object3", true, container.contains(object3));
+	}
+
 }
