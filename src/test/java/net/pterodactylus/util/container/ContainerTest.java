@@ -74,4 +74,23 @@ public class ContainerTest extends TestCase {
 		assertEquals("Container Size", 4, container.size());
 	}
 
+	/**
+	 * Tests the {@link Container#isEmpty()} method.
+	 */
+	public void testIsEmpty() {
+		Container<Object> container;
+
+		container = new Container<Object>();
+		assertEquals("Container is empty", true, container.isEmpty());
+
+		container = new Container<Object>(new Object());
+		assertEquals("Container is empty", false, container.isEmpty());
+
+		container = new Container<Object>(new Object[] { new Object(), new Object() });
+		assertEquals("Container is empty", false, container.isEmpty());
+
+		container = new Container<Object>(new Object[] { new Object(), new Object(), new Object(), new Object() });
+		assertEquals("Container is empty", false, container.isEmpty());
+	}
+
 }
