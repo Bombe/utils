@@ -176,6 +176,21 @@ public class Container<T> implements Iterable<T> {
 		return new Container<O>((O[]) mappedElements);
 	}
 
+	/**
+	 * Processes all elements in this container.
+	 *
+	 * @param processor
+	 *            The processor to apply to all elements
+	 * @return This container
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> process(Processor<T> processor) {
+		for (Object object : elements) {
+			processor.process((T) object);
+		}
+		return this;
+	}
+
 	//
 	// INTERFACE Iterable
 	//
