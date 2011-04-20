@@ -134,15 +134,8 @@ public class Container<T> implements Iterable<T> {
 	 *            The element to add
 	 * @return The container with all elements
 	 */
-	@SuppressWarnings("unchecked")
 	public Container<T> add(T element) {
-		if (isEmpty()) {
-			return new Container<T>(element);
-		}
-		Object[] newElements = new Object[elements.length + 1];
-		System.arraycopy(elements, 0, newElements, 0, elements.length);
-		newElements[elements.length] = element;
-		return new Container<T>((T[]) newElements);
+		return add(elements.length, element);
 	}
 
 	/**
