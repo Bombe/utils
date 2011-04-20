@@ -122,6 +122,23 @@ public class Container<T> implements Iterable<T> {
 		return (T) elements[0];
 	}
 
+	/**
+	 * Returns the index of the given element in this container.
+	 *
+	 * @param element
+	 *            The element to locate in this container
+	 * @return The index of the element, or {@code -1} if the given element can
+	 *         not be located in this container
+	 */
+	public int indexOf(T element) {
+		for (int index = 0; index < elements.length; ++index) {
+			if (((element == null) && (elements[index] == null)) || ((element != null) && element.equals(elements[index]))) {
+				return index;
+			}
+		}
+		return -1;
+	}
+
 	//
 	// ACTIONS
 	//
