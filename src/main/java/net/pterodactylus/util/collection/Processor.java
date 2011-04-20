@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.container;
+package net.pterodactylus.util.collection;
 
 /**
  * A processor is used to process all elements of a {@link Container}.

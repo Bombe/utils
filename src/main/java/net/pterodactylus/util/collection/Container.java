@@ -15,13 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.container;
+package net.pterodactylus.util.collection;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import net.pterodactylus.util.collection.Converter;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.validation.Validation;
 

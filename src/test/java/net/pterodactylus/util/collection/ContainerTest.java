@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.container;
+package net.pterodactylus.util.collection;
 
+import net.pterodactylus.util.collection.Container;
 import junit.framework.TestCase;
 
 /**
