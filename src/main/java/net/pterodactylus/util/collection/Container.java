@@ -332,14 +332,14 @@ public class Container<T> implements Iterable<T> {
 	 * @return A container with the mapped elements
 	 */
 	@SuppressWarnings("unchecked")
-	public <O> Container<O> map(Converter<T, O> mapper) {
+	public <O> Container<O> map(Mapper<T, O> mapper) {
 		if (isEmpty()) {
 			return (Container<O>) this;
 		}
 		Object[] mappedElements = new Object[elements.length];
 		int index = 0;
 		for (Object object : elements) {
-			mappedElements[index++] = mapper.convert((T) object);
+			mappedElements[index++] = mapper.map((T) object);
 		}
 		return new Container<O>((O[]) mappedElements);
 	}
