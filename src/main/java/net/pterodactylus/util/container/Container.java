@@ -176,6 +176,32 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Returns a container that contains a part of this container, starting at
+	 * the index {@code start} (inclusive) and ending at the index {@code end}
+	 * (exclusive).
+	 *
+	 * @param start
+	 *            The index of the first element to return
+	 * @param end
+	 *            The index of the first element that is not returned
+	 * @return A container with the requested elements
+	 */
+	@SuppressWarnings("unchecked")
+	public Container<T> crop(int start, int end) {
+		Validation.begin().isGreaterOrEqual("Start Index", start, 0).isGreaterOrEqual("End Index", end, 0).isLessOrEqual("Start Index", start, elements.length - 1).isLessOrEqual("End Index", end, elements.length).isGreaterOrEqual("End Index", end, start).check();
+		if ((end - start) == 0) {
+			return new Container<T>();
+		} else if ((start == 0) && (end == elements.length)) {
+			return this;
+		} else if ((end - start) == 1) {
+			return new Container<T>((T) elements[start]);
+		}
+		Object[] newElements = new Object[end - start];
+		System.arraycopy(elements, start, newElements, 0, end - start);
+		return new Container<T>((T[]) newElements);
+	}
+
+	/**
 	 * Returns a container that contains the elements of this container with the
 	 * exception of the first occurence of the given element which is removed.
 	 *
