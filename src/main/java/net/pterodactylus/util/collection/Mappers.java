@@ -26,7 +26,7 @@ import java.util.Set;
  * Helper methods for using the {@link Mapper} interface with {@link Set}s and
  * {@link List}s.
  *
- * This helper class replaces the now deprecated {@link Converters} class.
+ * This helper class replaces the now deprecated {@code Converters} class.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
