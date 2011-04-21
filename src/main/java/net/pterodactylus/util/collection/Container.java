@@ -89,6 +89,18 @@ public class Container<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new container from the given iterable. This will call the
+	 * {@link #Container(Iterator)} constructor with an {@link Iterator} created
+	 * from {@link Iterable#iterator()}.
+	 *
+	 * @param elements
+	 *            The iterable containing the elements to store
+	 */
+	public Container(Iterable<? extends T> elements) {
+		this(elements.iterator());
+	}
+
+	/**
 	 * Creates a new container from the given iterator.
 	 *
 	 * @param elementIterator
