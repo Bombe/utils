@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.collection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -84,6 +85,20 @@ public class Container<T> implements Iterable<T> {
 	 */
 	public Container(Collection<? extends T> elements) {
 		Validation.begin().isNotNull("Elements", elements).check();
+		this.elements = elements.toArray();
+	}
+
+	/**
+	 * Creates a new container from the given iterator.
+	 *
+	 * @param elementIterator
+	 *            The iterator containing the elements to store
+	 */
+	public Container(Iterator<? extends T> elementIterator) {
+		List<T> elements = new ArrayList<T>();
+		while (elementIterator.hasNext()) {
+			elements.add(elementIterator.next());
+		}
 		this.elements = elements.toArray();
 	}
 
