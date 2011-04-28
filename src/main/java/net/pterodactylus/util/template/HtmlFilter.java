@@ -297,10 +297,6 @@ public class HtmlFilter implements Filter {
 				htmlOutput.append('&').append(htmlEntities.get(c)).append(';');
 				continue;
 			}
-			if (c > 127) {
-				htmlOutput.append("&#").append((int) c).append(';');
-				continue;
-			}
 			htmlOutput.append(c);
 		}
 		return htmlOutput.toString();
