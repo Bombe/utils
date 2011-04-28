@@ -1,5 +1,5 @@
 /*
- * utils - Converters.java - Copyright © 2011 David Roden
+ * utils - Mappers.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,19 +23,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Helper methods for using the {@link Converter} interface with {@link Set}s
- * and {@link List}s.
+ * Helper methods for using the {@link Mapper} interface with {@link Set}s and
+ * {@link List}s.
+ *
+ * This helper class replaces the now deprecated {@code Converters} class.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
- * @deprecated Use {@link Mappers} instead
  */
-@Deprecated
-public class Converters {
+public class Mappers {
 
 	/**
-	 * Converts all objects in the given list and returns a list that contains
-	 * the converted objects in the same order as the input objects in the
-	 * original list.
+	 * Maps all objects in the given list and returns a list that contains the
+	 * mapped objects in the same order as the input objects in the original
+	 * list.
 	 *
 	 * @param <I>
 	 *            The type of the input objects
@@ -43,21 +43,21 @@ public class Converters {
 	 *            The type of the output objects
 	 * @param inputList
 	 *            The list with the input object
-	 * @param converter
-	 *            The converter to use
-	 * @return The list containing the converted objects
+	 * @param mapper
+	 *            The mapper to use
+	 * @return The list containing the mapped objects
 	 */
-	public static <I, O> List<O> convertList(List<I> inputList, Converter<I, O> converter) {
+	public static <I, O> List<O> mappedList(List<I> inputList, Mapper<I, O> mapper) {
 		List<O> outputList = new ArrayList<O>();
 		for (I input : inputList) {
-			outputList.add(converter.convert(input));
+			outputList.add(mapper.map(input));
 		}
 		return outputList;
 	}
 
 	/**
-	 * Converts all objects in the given list and returns a list that contains
-	 * the converted objects.
+	 * Maps all objects in the given list and returns a list that contains the
+	 * mapped objects.
 	 *
 	 * @param <I>
 	 *            The type of the input objects
@@ -65,14 +65,14 @@ public class Converters {
 	 *            The type of the output objects
 	 * @param inputSet
 	 *            The set with the input object
-	 * @param converter
-	 *            The converter to use
-	 * @return The set containing the converted objects
+	 * @param mapper
+	 *            The mapper to use
+	 * @return The set containing the mapped objects
 	 */
-	public static <I, O> Set<O> convertSet(Set<I> inputSet, Converter<I, O> converter) {
+	public static <I, O> Set<O> mappedSet(Set<I> inputSet, Mapper<I, O> mapper) {
 		Set<O> outputSet = new HashSet<O>();
 		for (I input : inputSet) {
-			outputSet.add(converter.convert(input));
+			outputSet.add(mapper.map(input));
 		}
 		return outputSet;
 	}

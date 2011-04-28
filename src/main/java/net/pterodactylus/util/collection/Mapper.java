@@ -1,5 +1,5 @@
 /*
- * utils - Converter.java - Copyright © 2011 David Roden
+ * utils - Mapper.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,23 @@
 package net.pterodactylus.util.collection;
 
 /**
- * Interface for objects that can convert one object into another.
+ * Interface for objects that can map one object to another.
  *
  * @param <I>
  *            The type of the input object
  * @param <O>
  *            The type of the output object
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
- * @deprecated Use {@link Mapper} instead
  */
-@Deprecated
-public interface Converter<I, O> {
+public interface Mapper<I, O> {
 
 	/**
-	 * Converts the given input object into another object.
+	 * Maps the given input object to another object.
 	 *
 	 * @param input
-	 *            The object to convert
-	 * @return The converted object
+	 *            The object to map
+	 * @return The mapped object
 	 */
-	public O convert(I input);
+	public O map(I input);
 
 }

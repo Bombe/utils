@@ -1,5 +1,5 @@
 /*
- * utils - Converter.java - Copyright © 2011 David Roden
+ * utils - Processor.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,25 +18,21 @@
 package net.pterodactylus.util.collection;
 
 /**
- * Interface for objects that can convert one object into another.
+ * A processor is used to process all elements of a {@link Container}.
  *
- * @param <I>
- *            The type of the input object
- * @param <O>
- *            The type of the output object
+ * @see Container#process(Processor)
+ * @param <T>
+ *            The type of the elements to process
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
- * @deprecated Use {@link Mapper} instead
  */
-@Deprecated
-public interface Converter<I, O> {
+public interface Processor<T> {
 
 	/**
-	 * Converts the given input object into another object.
+	 * Processes the given object.
 	 *
-	 * @param input
-	 *            The object to convert
-	 * @return The converted object
+	 * @param object
+	 *            The object to process
 	 */
-	public O convert(I input);
+	public void process(T object);
 
 }
