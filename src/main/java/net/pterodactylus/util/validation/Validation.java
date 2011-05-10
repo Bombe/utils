@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.pterodactylus.util.validation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -59,28 +59,14 @@ import java.util.List;
  */
 public class Validation {
 
-	/** The list of failed checks. */
-	private List<String> failedChecks;
+	/** The validation runners. */
+	private List<ValidationRunner<?>> validationRunners = new ArrayList<ValidationRunner<?>>();
 
 	/**
 	 * Private constructor to prevent construction from the outside.
 	 */
 	private Validation() {
 		/* do nothing. */
-	}
-
-	/**
-	 * Adds a check to the list of failed checks, instantiating a new list if
-	 * {@link #failedChecks} is still <code>null</code>.
-	 *
-	 * @param check
-	 *            The check to add
-	 */
-	private void addFailedCheck(String check) {
-		if (failedChecks == null) {
-			failedChecks = new ArrayList<String>();
-		}
-		failedChecks.add(check);
 	}
 
 	/**
@@ -101,7 +87,14 @@ public class Validation {
 	 *             if a previous check failed
 	 */
 	public Validation check() throws IllegalArgumentException {
-		if (failedChecks == null) {
+		List<String> failedChecks = new ArrayList<String>();
+		for (ValidationRunner<?> validationRunner : validationRunners) {
+			if (!validationRunner.validate()) {
+				failedChecks.add(validationRunner.getObjectName() + " failed " + validationRunner.getValidator());
+			}
+		}
+		validationRunners.clear();
+		if (failedChecks.isEmpty()) {
 			return this;
 		}
 		StringBuilder message = new StringBuilder();
@@ -144,39 +137,41 @@ public class Validation {
 	/**
 	 * Checks if the given object is not <code>null</code>.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The object’s name
 	 * @param object
 	 *            The object to check
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isNotNull(String objectName, Object object) {
-		if (object == null) {
-			addFailedCheck(objectName + " should not be null");
-		}
+	public <T> Validation isNotNull(String objectName, T object) {
+		validationRunners.add(new ValidationRunner<T>(objectName, object, new NotNullValidator<T>()));
 		return this;
 	}
 
 	/**
 	 * Checks if the given object is <code>null</code>.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The object’s name
 	 * @param object
 	 *            The object to check
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isNull(String objectName, Object object) {
-		if (object != null) {
-			addFailedCheck(objectName + " should be null");
-		}
+	public <T> Validation isNull(String objectName, T object) {
+		validationRunners.add(new ValidationRunner<T>(objectName, object, new NotValidator<T>(new NotNullValidator<T>())));
 		return this;
 	}
 
 	/**
-	 * Checks whether the given {@code object} matches any of the
-	 * {@code expecteds} values.
+	 * Checks whether the given {@code object} matches any of the {@code
+	 * expecteds} values.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The name of the object
 	 * @param object
@@ -186,44 +181,12 @@ public class Validation {
 	 *            {@link Object#equals(Object) equal}
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isEither(String objectName, long object, long... expecteds) {
-		boolean matched = false;
-		for (long expected : expecteds) {
-			matched = object == expected;
-			if (matched) {
-				break;
-			}
+	public <T> Validation isEither(String objectName, T object, T... expecteds) {
+		OrValidator<T> orValidator = new OrValidator<T>();
+		for (T expected : expecteds) {
+			orValidator.addValidator(new EqualityValidator<T>(expected));
 		}
-		if (!matched) {
-			addFailedCheck(objectName + " should be one of " + Arrays.toString(expecteds) + " but was " + object);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks whether the given {@code object} matches any of the
-	 * {@code expecteds} values.
-	 *
-	 * @param objectName
-	 *            The name of the object
-	 * @param object
-	 *            The object to check
-	 * @param expecteds
-	 *            The values of which at least one has to be
-	 *            {@link Object#equals(Object) equal}
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isEither(String objectName, Object object, Object... expecteds) {
-		boolean matched = false;
-		for (Object expected : expecteds) {
-			matched = (object == null) ? (expected == null) : object.equals(expected);
-			if (matched) {
-				break;
-			}
-		}
-		if (!matched) {
-			addFailedCheck(objectName + " should be one of " + Arrays.toString(expecteds) + " but was " + object);
-		}
+		validationRunners.add(new ValidationRunner<T>(objectName, object, orValidator));
 		return this;
 	}
 
@@ -239,9 +202,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isLess(String objectName, long value, long upperBound) {
-		if (value >= upperBound) {
-			addFailedCheck(objectName + " should be < " + upperBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Long>(objectName, value, new LongRangeValidator(Long.MIN_VALUE, upperBound - 1)));
 		return this;
 	}
 
@@ -257,9 +218,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isLess(String objectName, double value, double upperBound) {
-		if (value >= upperBound) {
-			addFailedCheck(objectName + " should be < " + upperBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Double>(objectName, value, new DoubleRangeValidator(Double.NEGATIVE_INFINITY, false, upperBound, false)));
 		return this;
 	}
 
@@ -275,9 +234,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isLessOrEqual(String objectName, long value, long upperBound) {
-		if (value > upperBound) {
-			addFailedCheck(objectName + " should be <= " + upperBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Long>(objectName, value, new LongRangeValidator(Long.MIN_VALUE, upperBound)));
 		return this;
 	}
 
@@ -293,15 +250,15 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isLessOrEqual(String objectName, double value, double upperBound) {
-		if (value > upperBound) {
-			addFailedCheck(objectName + " should be <= " + upperBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Double>(objectName, value, new DoubleRangeValidator(Double.NEGATIVE_INFINITY, false, upperBound, true)));
 		return this;
 	}
 
 	/**
 	 * Checks if the given value is equal to the expected value.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The object’s name
 	 * @param value
@@ -310,70 +267,16 @@ public class Validation {
 	 *            The expected value to check <code>value</code> against
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isEqual(String objectName, long value, long expected) {
-		if (value != expected) {
-			addFailedCheck(objectName + " should be == " + expected + " but was " + value);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks if the given value is equal to the expected value.
-	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The value to check
-	 * @param expected
-	 *            The expected value to check <code>value</code> against
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isEqual(String objectName, double value, double expected) {
-		if (value != expected) {
-			addFailedCheck(objectName + " should be == " + expected + " but was " + value);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks if the given value is equal to the expected value.
-	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The value to check
-	 * @param expected
-	 *            The expected value to check <code>value</code> against
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isEqual(String objectName, boolean value, boolean expected) {
-		if (value != expected) {
-			addFailedCheck(objectName + " should be == " + expected + " but was " + value);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks if the given value is equal to the expected value.
-	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The value to check
-	 * @param expected
-	 *            The expected value to check <code>value</code> against
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isEqual(String objectName, Object value, Object expected) {
-		if (!value.equals(expected)) {
-			addFailedCheck(objectName + " should equal " + expected + " but was " + value);
-		}
+	public <T> Validation isEqual(String objectName, T value, T expected) {
+		validationRunners.add(new ValidationRunner<T>(objectName, value, new EqualityValidator<T>(expected)));
 		return this;
 	}
 
 	/**
 	 * Checks if the given value is the same as the expected value.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The object’s name
 	 * @param value
@@ -382,16 +285,16 @@ public class Validation {
 	 *            The expected value to check <code>value</code> against
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isSame(String objectName, Object value, Object expected) {
-		if (value != expected) {
-			addFailedCheck(objectName + " should be == " + expected + " but was " + value);
-		}
+	public <T> Validation isSame(String objectName, T value, T expected) {
+		validationRunners.add(new ValidationRunner<T>(objectName, value, new IdentityValidator<T>(expected)));
 		return this;
 	}
 
 	/**
 	 * Checks if the given value is not equal to the expected value.
 	 *
+	 * @param <T>
+	 *            The type of object being validated
 	 * @param objectName
 	 *            The object’s name
 	 * @param value
@@ -400,46 +303,8 @@ public class Validation {
 	 *            The expected value to check <code>value</code> against
 	 * @return This {@link Validation} object to allow method chaining
 	 */
-	public Validation isNotEqual(String objectName, long value, long expected) {
-		if (value == expected) {
-			addFailedCheck(objectName + " should be != " + expected + " but was " + value);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks if the given value is not equal to the expected value.
-	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The value to check
-	 * @param expected
-	 *            The expected value to check <code>value</code> against
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isNotEqual(String objectName, double value, double expected) {
-		if (value == expected) {
-			addFailedCheck(objectName + " should be != " + expected + " but was " + value);
-		}
-		return this;
-	}
-
-	/**
-	 * Checks if the given value is not equal to the expected value.
-	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The value to check
-	 * @param expected
-	 *            The expected value to check <code>value</code> against
-	 * @return This {@link Validation} object to allow method chaining
-	 */
-	public Validation isNotEqual(String objectName, boolean value, boolean expected) {
-		if (value == expected) {
-			addFailedCheck(objectName + " should be != " + expected + " but was " + value);
-		}
+	public <T> Validation isNotEqual(String objectName, T value, T expected) {
+		validationRunners.add(new ValidationRunner<T>(objectName, value, new NotValidator<T>(new EqualityValidator<T>(expected))));
 		return this;
 	}
 
@@ -455,9 +320,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isGreater(String objectName, long value, long lowerBound) {
-		if (value <= lowerBound) {
-			addFailedCheck(objectName + " should be > " + lowerBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Long>(objectName, value, new LongRangeValidator(lowerBound + 1, Long.MAX_VALUE)));
 		return this;
 	}
 
@@ -473,9 +336,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isGreater(String objectName, double value, double lowerBound) {
-		if (value <= lowerBound) {
-			addFailedCheck(objectName + " should be > " + lowerBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Double>(objectName, value, new DoubleRangeValidator(lowerBound, false, Double.MAX_VALUE, true)));
 		return this;
 	}
 
@@ -491,9 +352,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isGreaterOrEqual(String objectName, long value, long lowerBound) {
-		if (value < lowerBound) {
-			addFailedCheck(objectName + " should be >= " + lowerBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Long>(objectName, value, new LongRangeValidator(lowerBound, Long.MAX_VALUE)));
 		return this;
 	}
 
@@ -509,9 +368,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isGreaterOrEqual(String objectName, double value, double lowerBound) {
-		if (value < lowerBound) {
-			addFailedCheck(objectName + " should be >= " + lowerBound + " but was " + value);
-		}
+		validationRunners.add(new ValidationRunner<Double>(objectName, value, new DoubleRangeValidator(lowerBound, true, Double.MAX_VALUE, true)));
 		return this;
 	}
 
@@ -525,10 +382,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isPositive(String objectName, long value) {
-		if (value < 0) {
-			addFailedCheck(objectName + " should be >= 0 but was " + value);
-		}
-		return this;
+		return isGreaterOrEqual(objectName, value, 0);
 	}
 
 	/**
@@ -541,10 +395,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isPositive(String objectName, double value) {
-		if (value < 0) {
-			addFailedCheck(objectName + " should be >= 0 but was " + value);
-		}
-		return this;
+		return isGreaterOrEqual(objectName, value, 0);
 	}
 
 	/**
@@ -557,10 +408,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isNegative(String objectName, long value) {
-		if (value >= 0) {
-			addFailedCheck(objectName + " should be < 0 but was " + value);
-		}
-		return this;
+		return isLess(objectName, value, 0);
 	}
 
 	/**
@@ -573,10 +421,7 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isNegative(String objectName, double value) {
-		if (value >= 0) {
-			addFailedCheck(objectName + " should be < 0 but was " + value);
-		}
-		return this;
+		return isLess(objectName, value, 0);
 	}
 
 	/**
@@ -592,29 +437,72 @@ public class Validation {
 	 * @return This {@link Validation} object to allow method chaining
 	 */
 	public Validation isInstanceOf(String objectName, Object object, Class<?> clazz) {
-		if (!clazz.isAssignableFrom(object.getClass())) {
-			addFailedCheck(objectName + " should be a kind of " + clazz.getName() + " but is " + object.getClass().getName());
-		}
+		validationRunners.add(new ValidationRunner<Object>(objectName, object, new SubClassValidator(clazz)));
 		return this;
 	}
 
 	/**
-	 * Checks whether the given value is one of the expected values.
+	 * Container for objects that are required to perform a single validation.
 	 *
-	 * @param objectName
-	 *            The object’s name
-	 * @param value
-	 *            The object’s value
-	 * @param expectedValues
-	 *            The expected values
-	 * @return This {@link Validation} object to allow method chaining
+	 * @param <T>
+	 *            The type of the object being validation
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public Validation isOneOf(String objectName, Object value, Object... expectedValues) {
-		List<?> values;
-		if (!(values = Arrays.asList(expectedValues)).contains(value)) {
-			addFailedCheck(objectName + " should be one of " + values + " but is " + value);
+	private static class ValidationRunner<T> {
+
+		/** The name of the object being validated. */
+		private final String objectName;
+
+		/** The value being validated. */
+		private final T value;
+
+		/** The validator performing the validation. */
+		private final Validator<T> validator;
+
+		/**
+		 * Creates a new validation runner.
+		 *
+		 * @param objectName
+		 *            The name of the object being validated
+		 * @param value
+		 *            The object being validated
+		 * @param validator
+		 *            The validator performing the validation
+		 */
+		public ValidationRunner(String objectName, T value, Validator<T> validator) {
+			this.objectName = objectName;
+			this.value = value;
+			this.validator = validator;
 		}
-		return this;
+
+		/**
+		 * Returns the name of the object being validated.
+		 *
+		 * @return The name of the object being validated
+		 */
+		public String getObjectName() {
+			return objectName;
+		}
+
+		/**
+		 * Returns the validator performing the validation.
+		 *
+		 * @return The validator performing the validation
+		 */
+		public Validator<T> getValidator() {
+			return validator;
+		}
+
+		/**
+		 * Whether the validation succeeded.
+		 *
+		 * @return {@code true} if the validation succeeded, {@code false}
+		 *         otherwise
+		 */
+		public boolean validate() {
+			return validator.validate(value);
+		}
+
 	}
 
 }
