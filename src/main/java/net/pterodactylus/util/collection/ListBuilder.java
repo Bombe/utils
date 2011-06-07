@@ -19,6 +19,8 @@ package net.pterodactylus.util.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -83,6 +85,33 @@ public class ListBuilder<T> {
 	 */
 	public ListBuilder<T> addAll(Collection<? extends T> elements) {
 		list.addAll(elements);
+		return this;
+	}
+
+	/**
+	 * Sorts the current list contents. This method requires that all elements
+	 * in this list implement the {@link Comparable} interface!
+	 *
+	 * @return This list builder
+	 * @throws ClassCastException
+	 *             if the list contains elements that are not <i>mutually
+	 *             comparable</i> (for example, strings and integers).
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ListBuilder<T> sort() throws ClassCastException {
+		Collections.sort((List) list);
+		return this;
+	}
+
+	/**
+	 * Sorts the current list contents using the given comparator.
+	 *
+	 * @param comparator
+	 *            The comparator to use
+	 * @return This list builder
+	 */
+	public ListBuilder<T> sort(Comparator<? super T> comparator) {
+		Collections.sort(list, comparator);
 		return this;
 	}
 
