@@ -27,14 +27,27 @@ import java.util.Comparator;
  *            The type to compare
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ReverseComparator<T extends Comparable<T>> implements Comparator<T> {
+public class ReverseComparator<T> implements Comparator<T> {
+
+	/** The comparator to reverse. */
+	private final Comparator<T> comparator;
+
+	/**
+	 * Creates a new comparator that reverse the given comparator.
+	 *
+	 * @param comparator
+	 *            The comparator to reverse
+	 */
+	public ReverseComparator(Comparator<T> comparator) {
+		this.comparator = comparator;
+	}
 
 	/**
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public int compare(T o1, T o2) {
-		return -o1.compareTo(o2);
+		return -comparator.compare(o1, o2);
 	}
 
 }
