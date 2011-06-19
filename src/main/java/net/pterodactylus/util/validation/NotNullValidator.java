@@ -1,5 +1,5 @@
 /*
- * utils - ReverseComparator.java - Copyright © 2009 David Roden
+ * utils - NotNullValidator.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.collection;
-
-import java.util.Comparator;
+package net.pterodactylus.util.validation;
 
 /**
- * This {@link Comparator} implementation compares to {@link Comparable}s but
- * reverses the result of the comparison.
+ * {@link Validator} implementation that validates that an object is not {@code
+ * null}.
  *
  * @param <T>
- *            The type to compare
+ *            The type of the object being validated
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ReverseComparator<T> implements Comparator<T> {
+public class NotNullValidator<T> implements Validator<T> {
 
-	/** The comparator to reverse. */
-	private final Comparator<T> comparator;
+	//
+	// VALIDATOR METHODS
+	//
 
 	/**
-	 * Creates a new comparator that reverse the given comparator.
-	 *
-	 * @param comparator
-	 *            The comparator to reverse
+	 * {@inheritDoc}
 	 */
-	public ReverseComparator(Comparator<T> comparator) {
-		this.comparator = comparator;
+	public boolean validate(T value) {
+		return value != null;
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
 	/**
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 * {@inheritDoc}
 	 */
 	@Override
-	public int compare(T o1, T o2) {
-		return comparator.compare(o2, o1);
+	public String toString() {
+		return "(x != null)";
 	}
 
 }

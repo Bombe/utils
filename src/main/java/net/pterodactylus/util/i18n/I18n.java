@@ -21,6 +21,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
+import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 
 /**
@@ -462,14 +465,19 @@ public class I18n {
 		logger.log(Level.FINEST, "Trying to load resources from " + resourceName + "…");
 		InputStream inputStream = classLoader.getResourceAsStream(resourceName);
 		if (inputStream != null) {
+			Reader inputStreamReader = null;
 			try {
 				logger.log(Level.FINEST, "Loading resources from " + resourceName + "…");
-				currentValues.load(inputStream);
+				inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+				currentValues.load(inputStreamReader);
 				logger.log(Level.FINEST, "Resources successfully loaded.");
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, String.format("Could not read properties from “%1$s”.", resourceName), ioe1);
 			} catch (IllegalArgumentException iae1) {
 				logger.log(Level.WARNING, String.format("Could not parse properties from “%1$s”.", resourceName), iae1);
+			} finally {
+				Closer.close(inputStreamReader);
+				Closer.close(inputStream);
 			}
 		}
 	}

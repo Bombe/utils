@@ -131,22 +131,28 @@ public class ValidationTest extends TestCase {
 	}
 
 	/**
-	 * Tests {@link Validation#isEqual(String, long, long)}.
+	 * Tests {@link Validation#isEqual(String, Object, Object)}.
 	 */
-	public void testIsEqual_Long() {
-		Validation.begin().isEqual("Test Object", 17, 17d).check();
+	public void testIsEqual_Object() {
+		Validation.begin().isEqual("Test Object", new Integer(5), new Integer(5)).check();
+		try {
+			Validation.begin().isEqual("Test Object", new Integer(5), new Integer(4)).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+		try {
+			Validation.begin().isEqual("Test Object", 17, 17d).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
 		try {
 			Validation.begin().isEqual("Test Object", 18, 17).check();
 			fail();
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */
 		}
-	}
-
-	/**
-	 * Tests {@link Validation#isEqual(String, double, double)}.
-	 */
-	public void testIsEqual_Double() {
 		Validation.begin().isEqual("Test Object", 16.5, 16.5d).check();
 		try {
 			Validation.begin().isEqual("Test Object", 18f, 17d).check();
@@ -154,12 +160,6 @@ public class ValidationTest extends TestCase {
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */
 		}
-	}
-
-	/**
-	 * Tests {@link Validation#isEqual(String, boolean, boolean)}.
-	 */
-	public void testIsEqual_Boolean() {
 		Validation.begin().isEqual("Test Object", true, true).check();
 		Validation.begin().isEqual("Test Object", false, false).check();
 		try {
@@ -170,19 +170,6 @@ public class ValidationTest extends TestCase {
 		}
 		try {
 			Validation.begin().isEqual("Test Object", false, true).check();
-			fail();
-		} catch (IllegalArgumentException iae1) {
-			/* expected. */
-		}
-	}
-
-	/**
-	 * Tests {@link Validation#isEqual(String, Object, Object)}.
-	 */
-	public void testIsEqual_Object() {
-		Validation.begin().isEqual("Test Object", new Integer(5), new Integer(5)).check();
-		try {
-			Validation.begin().isEqual("Test Object", new Integer(5), new Integer(4)).check();
 			fail();
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */
@@ -210,22 +197,11 @@ public class ValidationTest extends TestCase {
 	}
 
 	/**
-	 * Tests {@link Validation#isNotEqual(String, long, long)}.
+	 * Tests {@link Validation#isNotEqual(String, Object, Object)}.
 	 */
-	public void testIsNotEqual_Long() {
+	public void testIsNotEqual() {
 		Validation.begin().isNotEqual("Test Object", 18, 17).check();
-		try {
-			Validation.begin().isNotEqual("Test Object", 17, 17d).check();
-			fail();
-		} catch (IllegalArgumentException iae1) {
-			/* expected. */
-		}
-	}
-
-	/**
-	 * Tests {@link Validation#isNotEqual(String, double, double)}.
-	 */
-	public void testIsNotEqual_Double() {
+		Validation.begin().isNotEqual("Test Object", 17, 17d).check();
 		Validation.begin().isNotEqual("Test Object", 18f, 17d).check();
 		try {
 			Validation.begin().isNotEqual("Test Object", 16.5, 16.5d).check();
@@ -233,12 +209,6 @@ public class ValidationTest extends TestCase {
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */
 		}
-	}
-
-	/**
-	 * Tests {@link Validation#isNotEqual(String, boolean, boolean)}.
-	 */
-	public void testIsNotEqual_Boolean() {
 		Validation.begin().isNotEqual("Test Object", true, false).check();
 		Validation.begin().isNotEqual("Test Object", false, true).check();
 		try {
@@ -419,12 +389,12 @@ public class ValidationTest extends TestCase {
 	}
 
 	/**
-	 * Tests {@link Validation#isOneOf(String, Object, Object...)}.
+	 * Tests {@link Validation#isEither(String, Object, Object...)}.
 	 */
-	public void testIsOneOf() {
-		Validation.begin().isOneOf("Test Object", "a", "a", "b", "c").check();
+	public void testIsEither() {
+		Validation.begin().isEither("Test Object", "a", "a", "b", "c").check();
 		try {
-			Validation.begin().isOneOf("Test Object", "a", "b", "c", "d").check();
+			Validation.begin().isEither("Test Object", "a", "b", "c", "d").check();
 			fail();
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */

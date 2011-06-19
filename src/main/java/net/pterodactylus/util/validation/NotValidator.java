@@ -1,5 +1,5 @@
 /*
- * utils - ReverseComparator.java - Copyright © 2009 David Roden
+ * utils - InvertingValidator.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.collection;
-
-import java.util.Comparator;
+package net.pterodactylus.util.validation;
 
 /**
- * This {@link Comparator} implementation compares to {@link Comparable}s but
- * reverses the result of the comparison.
+ * {@link Validator} implementation that inverts the result of another
+ * {@link Validator}.
  *
  * @param <T>
- *            The type to compare
+ *            The type of the object being validated
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ReverseComparator<T> implements Comparator<T> {
+public class NotValidator<T> implements Validator<T> {
 
-	/** The comparator to reverse. */
-	private final Comparator<T> comparator;
+	/** The validator to invert. */
+	private final Validator<T> validator;
 
 	/**
-	 * Creates a new comparator that reverse the given comparator.
+	 * Creates a new inverting validator.
 	 *
-	 * @param comparator
-	 *            The comparator to reverse
+	 * @param validator
+	 *            The validator to invert
 	 */
-	public ReverseComparator(Comparator<T> comparator) {
-		this.comparator = comparator;
+	public NotValidator(Validator<T> validator) {
+		this.validator = validator;
 	}
 
+	//
+	// VALIDATOR METHODS
+	//
+
 	/**
-	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 * {@inheritDoc}
+	 */
+	public boolean validate(T value) {
+		return !validator.validate(value);
+	}
+
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
-	public int compare(T o1, T o2) {
-		return comparator.compare(o2, o1);
+	public String toString() {
+		return "!" + validator;
 	}
 
 }

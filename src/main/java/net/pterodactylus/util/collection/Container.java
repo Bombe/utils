@@ -17,10 +17,13 @@
 
 package net.pterodactylus.util.collection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.validation.Validation;
@@ -72,6 +75,44 @@ public class Container<T> implements Iterable<T> {
 		Validation.begin().isNotNull("Elements", elements).check();
 		this.elements = new Object[elements.length];
 		System.arraycopy(elements, 0, this.elements, 0, elements.length);
+	}
+
+	/**
+	 * Creates a new container from the given collection. The elements are
+	 * sorted according to the collection’s {@link Collection#iterator()}.
+	 *
+	 * @param elements
+	 *            The collection with the elements to store
+	 */
+	public Container(Collection<? extends T> elements) {
+		Validation.begin().isNotNull("Elements", elements).check();
+		this.elements = elements.toArray();
+	}
+
+	/**
+	 * Creates a new container from the given iterable. This will call the
+	 * {@link #Container(Iterator)} constructor with an {@link Iterator} created
+	 * from {@link Iterable#iterator()}.
+	 *
+	 * @param elements
+	 *            The iterable containing the elements to store
+	 */
+	public Container(Iterable<? extends T> elements) {
+		this(elements.iterator());
+	}
+
+	/**
+	 * Creates a new container from the given iterator.
+	 *
+	 * @param elementIterator
+	 *            The iterator containing the elements to store
+	 */
+	public Container(Iterator<? extends T> elementIterator) {
+		List<T> elements = new ArrayList<T>();
+		while (elementIterator.hasNext()) {
+			elements.add(elementIterator.next());
+		}
+		this.elements = elements.toArray();
 	}
 
 	//
@@ -374,6 +415,29 @@ public class Container<T> implements Iterable<T> {
 		int index = 0;
 		for (Object object : elements) {
 			mappedElements[index++] = mapper.map((T) object);
+		}
+		return new Container<O>((O[]) mappedElements);
+	}
+
+	/**
+	 * Maps all elements in this container using the given map and returns a
+	 * container containing the mapped elements.
+	 *
+	 * @param <O>
+	 *            The type of the mapped elements
+	 * @param map
+	 *            The map to use to look up elements
+	 * @return A container with the mapped elements
+	 */
+	@SuppressWarnings("unchecked")
+	public <O> Container<O> map(Map<T, O> map) {
+		if (isEmpty()) {
+			return (Container<O>) this;
+		}
+		Object[] mappedElements = new Object[elements.length];
+		int index = 0;
+		for (Object object : elements) {
+			mappedElements[index++] = map.get(object);
 		}
 		return new Container<O>((O[]) mappedElements);
 	}
