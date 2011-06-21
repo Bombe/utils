@@ -36,6 +36,25 @@ public abstract class ValidatorContainer<T> implements Validator<T> {
 	private final List<Validator<T>> validators = new ArrayList<Validator<T>>();
 
 	/**
+	 * Creates a new validator container.
+	 */
+	protected ValidatorContainer() {
+		/* do nothing. */
+	}
+
+	/**
+	 * Creates a new validator container.
+	 *
+	 * @param validators
+	 *            The validators to store
+	 */
+	protected ValidatorContainer(Validator<T>... validators) {
+		for (Validator<T> validator : validators) {
+			this.validators.add(validator);
+		}
+	}
+
+	/**
 	 * Adds a validator to this validator container.
 	 *
 	 * @param validator

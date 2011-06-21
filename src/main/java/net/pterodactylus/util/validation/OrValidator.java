@@ -27,6 +27,23 @@ package net.pterodactylus.util.validation;
  */
 public class OrValidator<T> extends ValidatorContainer<T> {
 
+	/**
+	 * Creates a new “OR” validator.
+	 */
+	public OrValidator() {
+		super();
+	}
+
+	/**
+	 * Creates a new “OR” validator.
+	 *
+	 * @param validators
+	 *            The validators of which at least one has to validate
+	 */
+	public OrValidator(Validator<T>... validators) {
+		super(validators);
+	}
+
 	//
 	// VALIDATOR METHODS
 	//

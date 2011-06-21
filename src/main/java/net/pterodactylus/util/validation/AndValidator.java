@@ -27,6 +27,23 @@ package net.pterodactylus.util.validation;
  */
 public class AndValidator<T> extends ValidatorContainer<T> {
 
+	/**
+	 * Creates a new “AND” validator.
+	 */
+	public AndValidator() {
+		super();
+	}
+
+	/**
+	 * Creates a new “AND” validator.
+	 *
+	 * @param validators
+	 *            The required validators
+	 */
+	public AndValidator(Validator<T>... validators) {
+		super(validators);
+	}
+
 	//
 	// VALIDATOR METHODS
 	//
