@@ -59,9 +59,11 @@ public abstract class ValidatorContainer<T> implements Validator<T> {
 	 *
 	 * @param validator
 	 *            The validator to add
+	 * @return This validator container
 	 */
-	public void addValidator(Validator<T> validator) {
+	public ValidatorContainer<T> addValidator(Validator<T> validator) {
 		validators.add(validator);
+		return this;
 	}
 
 	//
