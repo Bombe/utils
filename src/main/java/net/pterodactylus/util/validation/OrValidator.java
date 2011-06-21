@@ -34,6 +34,7 @@ public class OrValidator<T> extends ValidatorContainer<T> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean validate(T value) {
 		for (Validator<T> validator : getValidators()) {
 			if (validator.validate(value)) {
