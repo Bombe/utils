@@ -22,9 +22,11 @@ import java.io.InputStream;
 /**
  * {@link Page} implementation that delivers static files from the class path.
  *
+ * @param <REQ>
+ *            The type of the request
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class StaticPage implements Page {
+public class StaticPage<REQ extends Request> implements Page<REQ> {
 
 	/** The prefix for {@link #getPath()}. */
 	private final String pathPrefix;
@@ -63,7 +65,7 @@ public class StaticPage implements Page {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request<?, ?> request) {
+	public Response handleRequest(REQ request) {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);

@@ -34,9 +34,11 @@ import net.pterodactylus.util.template.TemplateContextFactory;
  * A template page is a single page that is created from a {@link Template} but
  * does not necessarily return HTML.
  *
+ * @param <REQ>
+ *            The type of the request
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePage implements Page {
+public class TemplatePage<REQ extends Request> implements Page<REQ> {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(TemplatePage.class);
@@ -84,7 +86,7 @@ public class TemplatePage implements Page {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request<?, ?> request) {
+	public Response handleRequest(REQ request) {
 		ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
 		OutputStreamWriter responseWriter = null;
 		try {

@@ -22,25 +22,15 @@ import java.net.URI;
 /**
  * Container for request data.
  *
- * @param <REQ>
- *            The type of the original requests
- * @param <RES>
- *            The type of the original responses
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class Request<REQ, RES> {
+public abstract class Request {
 
 	/** The URI that was accessed. */
 	private final URI uri;
 
 	/** The HTTP method that was used. */
 	private final Method method;
-
-	/** The original request. */
-	private final REQ request;
-
-	/** The original response. */
-	private final RES response;
 
 	/**
 	 * Creates a new request that holds the given data.
@@ -49,16 +39,10 @@ public abstract class Request<REQ, RES> {
 	 *            The URI of the request
 	 * @param method
 	 *            The HTTP method of the request
-	 * @param request
-	 *            The original request
-	 * @param response
-	 *            The original response
 	 */
-	public Request(URI uri, Method method, REQ request, RES response) {
+	public Request(URI uri, Method method) {
 		this.uri = uri;
 		this.method = method;
-		this.request = request;
-		this.response = response;
 	}
 
 	/**
@@ -77,24 +61,6 @@ public abstract class Request<REQ, RES> {
 	 */
 	public Method getMethod() {
 		return method;
-	}
-
-	/**
-	 * Returns the original request.
-	 *
-	 * @return The original reqest
-	 */
-	public REQ getRequest() {
-		return request;
-	}
-
-	/**
-	 * Returns the original response
-	 *
-	 * @return The original response
-	 */
-	public RES getResponse() {
-		return response;
 	}
 
 }

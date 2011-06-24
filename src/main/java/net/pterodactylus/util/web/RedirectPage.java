@@ -20,9 +20,11 @@ package net.pterodactylus.util.web;
 /**
  * Page implementation that redirects the user to another URL.
  *
+ * @param <REQ>
+ *            The type of the request
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class RedirectPage implements Page {
+public class RedirectPage<REQ extends Request> implements Page<REQ> {
 
 	/** The original path. */
 	private String originalPath;
@@ -55,7 +57,7 @@ public class RedirectPage implements Page {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request<?, ?> request) {
+	public Response handleRequest(REQ request) {
 		return new RedirectResponse(newPath);
 	}
 

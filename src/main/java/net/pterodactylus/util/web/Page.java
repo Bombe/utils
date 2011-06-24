@@ -21,9 +21,11 @@ package net.pterodactylus.util.web;
  * A page is responsible for handling HTTP requests and creating appropriate
  * responses.
  *
+ * @param <REQ>
+ *            The type of the request
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Page {
+public interface Page<REQ extends Request> {
 
 	/**
 	 * Returns the path of this page.
@@ -39,6 +41,6 @@ public interface Page {
 	 *            The request to handle
 	 * @return The response
 	 */
-	public Response handleRequest(Request<?, ?> request);
+	public Response handleRequest(REQ request);
 
 }
