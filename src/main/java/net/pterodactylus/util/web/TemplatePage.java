@@ -17,8 +17,6 @@
 
 package net.pterodactylus.util.web;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.logging.Level;
@@ -86,11 +84,10 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(REQ request) {
-		ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
+	public Response handleRequest(REQ request, Response response) {
 		OutputStreamWriter responseWriter = null;
 		try {
-			responseWriter = new OutputStreamWriter(responseOutputStream, "UTF-8");
+			responseWriter = new OutputStreamWriter(response.getContent(), "UTF-8");
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("request", request);
 			template.render(templateContext, responseWriter);
@@ -98,11 +95,8 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", ioe1);
 		} finally {
 			Closer.close(responseWriter);
-			Closer.close(responseOutputStream);
 		}
-		ByteArrayInputStream responseInputStream = new ByteArrayInputStream(responseOutputStream.toByteArray());
-		/* no need to close a ByteArrayInputStream. */
-		return new Response(200, "OK", contentType, null, responseInputStream);
+		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType);
 	}
 
 }

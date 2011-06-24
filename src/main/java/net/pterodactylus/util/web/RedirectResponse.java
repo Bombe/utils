@@ -43,7 +43,10 @@ public class RedirectResponse extends Response {
 	 *            Whether the redirect should be marked as permanent
 	 */
 	public RedirectResponse(String newLocation, boolean permanent) {
-		super(permanent ? 302 : 307, "Redirected", null, createHeader("Location", newLocation));
+		super(null);
+		setStatusCode(permanent ? 302 : 307);
+		setStatusText("Redirected");
+		addHeader("Location", newLocation);
 	}
 
 }

@@ -57,7 +57,7 @@ public class RedirectPage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(REQ request) {
+	public Response handleRequest(REQ request, Response response) {
 		return new RedirectResponse(newPath);
 	}
 

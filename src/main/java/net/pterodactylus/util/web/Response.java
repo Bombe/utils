@@ -17,9 +17,7 @@
 
 package net.pterodactylus.util.web;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,107 +29,33 @@ import java.util.Map;
 public class Response {
 
 	/** The HTTP status code of the response. */
-	private final int statusCode;
+	private int statusCode = 200;
 
 	/** The HTTP status text of the response. */
-	private final String statusText;
+	private String statusText = "OK";
 
 	/** The content type of the response. */
-	private final String contentType;
+	private String contentType = "text/plain; charset=utf-8";
 
 	/** The headers of the response. */
-	private final Map<String, String> headers;
+	private Map<String, Header> headers = new HashMap<String, Header>();
 
-	/** The content of the response body. */
-	private final InputStream content;
-
-	/**
-	 * Creates a new response.
-	 *
-	 * @param statusCode
-	 *            The HTTP status code of the response
-	 * @param statusText
-	 *            The HTTP status text of the response
-	 * @param contentType
-	 *            The content type of the response
-	 * @param text
-	 *            The text in the response body
-	 */
-	public Response(int statusCode, String statusText, String contentType, String text) {
-		this(statusCode, statusText, contentType, getBytes(text));
-	}
+	/** Output stream the response body is written to. */
+	private final OutputStream content;
 
 	/**
 	 * Creates a new response.
 	 *
-	 * @param statusCode
-	 *            The HTTP status code of the response
-	 * @param statusText
-	 *            The HTTP status text of the response
-	 * @param contentType
-	 *            The content type of the response
 	 * @param content
-	 *            The content of the reponse body
+	 *            The output stream the response body will be written to
 	 */
-	public Response(int statusCode, String statusText, String contentType, byte[] content) {
-		this(statusCode, statusText, contentType, new HashMap<String, String>(), content);
-	}
-
-	/**
-	 * Creates a new response.
-	 *
-	 * @param statusCode
-	 *            The HTTP status code of the response
-	 * @param statusText
-	 *            The HTTP status text of the response
-	 * @param contentType
-	 *            The content type of the response
-	 * @param headers
-	 *            The headers of the response
-	 */
-	public Response(int statusCode, String statusText, String contentType, Map<String, String> headers) {
-		this(statusCode, statusText, contentType, headers, (InputStream) null);
-	}
-
-	/**
-	 * Creates a new response.
-	 *
-	 * @param statusCode
-	 *            The HTTP status code of the response
-	 * @param statusText
-	 *            The HTTP status text of the response
-	 * @param contentType
-	 *            The content type of the response
-	 * @param headers
-	 *            The headers of the response
-	 * @param content
-	 *            The content of the reponse body
-	 */
-	public Response(int statusCode, String statusText, String contentType, Map<String, String> headers, byte[] content) {
-		this(statusCode, statusText, contentType, headers, new ByteArrayInputStream(content));
-	}
-
-	/**
-	 * Creates a new response.
-	 *
-	 * @param statusCode
-	 *            The HTTP status code of the response
-	 * @param statusText
-	 *            The HTTP status text of the response
-	 * @param contentType
-	 *            The content type of the response
-	 * @param headers
-	 *            The headers of the response
-	 * @param content
-	 *            The content of the reponse body
-	 */
-	public Response(int statusCode, String statusText, String contentType, Map<String, String> headers, InputStream content) {
-		this.statusCode = statusCode;
-		this.statusText = statusText;
-		this.contentType = contentType;
-		this.headers = headers;
+	public Response(OutputStream content) {
 		this.content = content;
 	}
+
+	//
+	// ACCESSORS
+	//
 
 	/**
 	 * Returns the HTTP status code of the response.
@@ -140,6 +64,18 @@ public class Response {
 	 */
 	public int getStatusCode() {
 		return statusCode;
+	}
+
+	/**
+	 * Sets the status code of this response.
+	 *
+	 * @param statusCode
+	 *            The status code of this response
+	 * @return This response
+	 */
+	public Response setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
+		return this;
 	}
 
 	/**
@@ -152,6 +88,19 @@ public class Response {
 	}
 
 	/**
+	 * Sets the text of the HTTP status line. The status line is part of the
+	 * HTTP protocol and is normally not displayed to the browser.
+	 *
+	 * @param statusText
+	 *            The text of the HTTP status line
+	 * @return This response
+	 */
+	public Response setStatusText(String statusText) {
+		this.statusText = statusText;
+		return this;
+	}
+
+	/**
 	 * Returns the content type of the response.
 	 *
 	 * @return The content type of the reponse
@@ -161,38 +110,47 @@ public class Response {
 	}
 
 	/**
+	 * Sets the content type of this response.
+	 *
+	 * @param contentType
+	 *            The content type of this response
+	 * @return This response
+	 */
+	public Response setContentType(String contentType) {
+		this.contentType = contentType;
+		return this;
+	}
+
+	/**
 	 * Returns HTTP headers of the response. May be {@code null} if no headers
 	 * are returned.
 	 *
-	 * @return The response headers, or {@code null} if there are no response
-	 *         headers
+	 * @return The response headers
 	 */
-	public Map<String, String> getHeaders() {
-		return headers;
+	public Iterable<Header> getHeaders() {
+		return headers.values();
 	}
 
 	/**
-	 * Sets the HTTP header with the given name to the given value. Multiple
-	 * headers with the same name are not implemented so that latest call to
-	 * {@link #setHeader(String, String)} determines what is sent to the
-	 * browser.
+	 * Adds a header field with the given name and value to this response.
 	 *
 	 * @param name
-	 *            The name of the header
+	 *            The name of the header field
 	 * @param value
-	 *            The value of the header
+	 *            The value of the header field
+	 * @return This response
 	 */
-	public void setHeader(String name, String value) {
-		headers.put(name, value);
+	public Response addHeader(String name, String value) {
+		getHeader(name).addValue(value);
+		return this;
 	}
 
 	/**
-	 * Returns the content of the response body. May be {@code null} if the
-	 * response does not have a body.
+	 * Returns the output stream the response body has to be written to.
 	 *
-	 * @return The content of the response body
+	 * @return The output stream of the response body
 	 */
-	public InputStream getContent() {
+	public OutputStream getContent() {
 		return content;
 	}
 
@@ -201,19 +159,20 @@ public class Response {
 	//
 
 	/**
-	 * Returns the UTF-8 representation of the given text.
+	 * Returns the header field with the given name, creating a new header field
+	 * if no header field with the given name already exists.
 	 *
-	 * @param text
-	 *            The text to encode
-	 * @return The encoded text
+	 * @param name
+	 *            The name of the header field to return
+	 * @return The header field with the given name
 	 */
-	private static byte[] getBytes(String text) {
-		try {
-			return text.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException uee1) {
-			/* every JVM needs to support UTF-8. */
+	private Header getHeader(String name) {
+		Header header = headers.get(name);
+		if (header == null) {
+			header = new Header(name);
+			headers.put(name, header);
 		}
-		return null;
+		return header;
 	}
 
 	/**

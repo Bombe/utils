@@ -17,6 +17,8 @@
 
 package net.pterodactylus.util.web;
 
+import java.io.IOException;
+
 /**
  * A page is responsible for handling HTTP requests and creating appropriate
  * responses.
@@ -39,8 +41,12 @@ public interface Page<REQ extends Request> {
 	 *
 	 * @param request
 	 *            The request to handle
-	 * @return The response
+	 * @param response
+	 *            The response
+	 * @return The response to send to the browser
+	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
-	public Response handleRequest(REQ request);
+	public Response handleRequest(REQ request, Response response) throws IOException;
 
 }

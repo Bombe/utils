@@ -17,7 +17,10 @@
 
 package net.pterodactylus.util.web;
 
+import java.io.IOException;
 import java.io.InputStream;
+
+import net.pterodactylus.util.io.StreamCopier;
 
 /**
  * {@link Page} implementation that delivers static files from the class path.
@@ -65,15 +68,15 @@ public class StaticPage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(REQ request) {
+	public Response handleRequest(REQ request, Response response) throws IOException {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);
 		InputStream fileInputStream = getClass().getResourceAsStream(resourcePathPrefix + filename);
 		if (fileInputStream == null) {
-			return new Response(404, "Not found.", null, "");
+			return response.setStatusCode(404).setStatusText("Not found.");
 		}
-		return new Response(200, "OK", mimeType, null, fileInputStream);
+		StreamCopier.copy(fileInputStream, response.getContent());
+		return response.setStatusCode(200).setStatusText("OK").setContentType(mimeType);
 	}
-
 }
