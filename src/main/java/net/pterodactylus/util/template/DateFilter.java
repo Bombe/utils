@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * {@link Filter} implementation that formats a date. The date may be given
@@ -42,13 +43,28 @@ public class DateFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String format = parameters.get("format");
-		DateFormat dateFormat = getDateFormat(format);
-		if (data instanceof Date) {
-			return dateFormat.format((Date) data);
-		} else if (data instanceof Long) {
-			return dateFormat.format(new Date((Long) data));
+		TimeZone timezone = TimeZone.getDefault();
+		String timezoneName = parameters.get("timezone");
+		if (timezoneName != null) {
+			Object timezoneObject = templateContext.get(timezoneName);
+			if (timezoneObject == null) {
+				timezone = TimeZone.getTimeZone(timezoneName);
+			} else if (timezoneObject instanceof TimeZone) {
+				timezone = (TimeZone) timezoneObject;
+			} else if (timezoneObject instanceof String) {
+				timezone = TimeZone.getTimeZone((String) timezoneObject);
+			}
 		}
-		return data;
+		DateFormat dateFormat = getDateFormat(format);
+		synchronized (dateFormat) {
+			dateFormat.setTimeZone(timezone);
+			if (data instanceof Date) {
+				return dateFormat.format((Date) data);
+			} else if (data instanceof Long) {
+				return dateFormat.format(new Date((Long) data));
+			}
+			return data;
+		}
 	}
 
 	//
