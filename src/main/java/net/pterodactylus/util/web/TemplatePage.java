@@ -84,6 +84,14 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean isPrefixPage() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Response handleRequest(REQ request, Response response) {
 		OutputStreamWriter responseWriter = null;
 		try {

@@ -37,6 +37,15 @@ public interface Page<REQ extends Request> {
 	public String getPath();
 
 	/**
+	 * Returns whether this page handles all paths beginning with
+	 * {@link #getPath()} or whether this page only handles a single path.
+	 *
+	 * @return {@code true} if this page can handle multiple paths,
+	 *         {@code false} if it handles only a single path
+	 */
+	public boolean isPrefixPage();
+
+	/**
 	 * Handles a request.
 	 *
 	 * @param request

@@ -68,6 +68,14 @@ public class StaticPage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean isPrefixPage() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Response handleRequest(REQ request, Response response) throws IOException {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
