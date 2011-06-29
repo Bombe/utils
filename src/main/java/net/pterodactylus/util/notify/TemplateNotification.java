@@ -20,7 +20,10 @@ package net.pterodactylus.util.notify;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.pterodactylus.util.template.Accessor;
+import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Part;
+import net.pterodactylus.util.template.Plugin;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
@@ -36,6 +39,12 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	private final Template template;
 
 	/**
+	 * Template context to merge with the template’s initial context and the
+	 * context given when rendering the template.
+	 */
+	private final TemplateContext mergeContext;
+
+	/**
 	 * Creates a new notification.
 	 *
 	 * @param template
@@ -44,6 +53,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	public TemplateNotification(Template template) {
 		super();
 		this.template = template;
+		this.mergeContext = new TemplateContext(template.getInitialContext());
 	}
 
 	/**
@@ -57,6 +67,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	public TemplateNotification(String id, Template template) {
 		super(id);
 		this.template = template;
+		this.mergeContext = new TemplateContext(template.getInitialContext());
 	}
 
 	/**
@@ -76,6 +87,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	public TemplateNotification(String id, long creationTime, long lastUpdatedTime, boolean dismissable, Template template) {
 		super(id, creationTime, lastUpdatedTime, dismissable);
 		this.template = template;
+		this.mergeContext = new TemplateContext(template.getInitialContext());
 	}
 
 	//
@@ -100,6 +112,34 @@ public class TemplateNotification extends AbstractNotification implements Part {
 		return template;
 	}
 
+	/**
+	 * Sets a template variable.
+	 *
+	 * @param name
+	 *            The name of the template variable
+	 * @param value
+	 *            The value of the template variable
+	 * @return This template notification
+	 */
+	public TemplateNotification set(String name, Object value) {
+		mergeContext.set(name, value);
+		return this;
+	}
+
+	/**
+	 * Returns the template variable with the given name. The resolution is
+	 * delegated to {@link TemplateContext#get(String)} and will use
+	 * {@link Accessor}s, {@link Filter}s, and {@link Plugin}s registered with
+	 * the notification’s template.
+	 *
+	 * @param name
+	 *            The name of the template variable
+	 * @return The value of the template variable
+	 */
+	public Object get(String name) {
+		return mergeContext.get(name);
+	}
+
 	//
 	// NOTIFICATION METHODS
 	//
@@ -109,7 +149,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	@Override
 	public void render(Writer writer) throws IOException {
-		template.render(new TemplateContext(template.getInitialContext()), writer);
+		template.render(new TemplateContext().mergeContext(template.getInitialContext()).mergeContext(mergeContext), writer);
 	}
 
 	//
@@ -121,7 +161,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
-		template.render(templateContext.mergeContext(template.getInitialContext()), writer);
+		template.render(new TemplateContext().mergeContext(template.getInitialContext()).mergeContext(mergeContext).mergeContext(templateContext), writer);
 	}
 
 }
