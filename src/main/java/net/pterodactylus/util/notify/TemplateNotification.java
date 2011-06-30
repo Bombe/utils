@@ -123,6 +123,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	public TemplateNotification set(String name, Object value) {
 		mergeContext.set(name, value);
+		touch();
 		return this;
 	}
 
