@@ -50,6 +50,9 @@ public class TemplateContext {
 	/** The parent context. */
 	private final TemplateContext parentContext;
 
+	/** Merged contexts. */
+	private final List<TemplateContext> mergedContexts = new ArrayList<TemplateContext>();
+
 	/**
 	 * Creates a new template context.
 	 */
@@ -143,8 +146,7 @@ public class TemplateContext {
 	 */
 	public Accessor getAccessor(Class<?> clazz) {
 		Accessor accessor = null;
-		TemplateContext context = this;
-		while ((context != null) && (accessor == null)) {
+		for (TemplateContext context : getAllTemplateContexts()) {
 			Class<?> classToCheck = clazz;
 			while ((classToCheck != null) && (accessor == null)) {
 				if (context.accessors.containsKey(classToCheck)) {
@@ -159,7 +161,9 @@ public class TemplateContext {
 				}
 				classToCheck = classToCheck.getSuperclass();
 			}
-			context = context.parentContext;
+			if (accessor != null) {
+				break;
+			}
 		}
 		return accessor;
 	}
@@ -174,10 +178,11 @@ public class TemplateContext {
 	 */
 	public Filter getFilter(String name) {
 		Filter filter = null;
-		TemplateContext context = this;
-		while ((context != null) && (filter == null)) {
+		for (TemplateContext context : getAllTemplateContexts()) {
 			filter = context.filters.get(name);
-			context = context.parentContext;
+			if (filter != null) {
+				break;
+			}
 		}
 		return filter;
 	}
@@ -192,10 +197,11 @@ public class TemplateContext {
 	 */
 	public Plugin getPlugin(String name) {
 		Plugin plugin = null;
-		TemplateContext context = this;
-		while ((context != null) && (plugin == null)) {
+		for (TemplateContext context : getAllTemplateContexts()) {
 			plugin = context.plugins.get(name);
-			context = context.parentContext;
+			if (plugin != null) {
+				break;
+			}
 		}
 		return plugin;
 	}
@@ -215,10 +221,11 @@ public class TemplateContext {
 		while (nameTokens.hasMoreTokens()) {
 			String nameToken = nameTokens.nextToken();
 			if (object == null) {
-				TemplateContext context = this;
-				while ((context != null) && (object == null)) {
+				for (TemplateContext context : getAllTemplateContexts()) {
 					object = context.objects.get(nameToken);
-					context = context.parentContext;
+					if (object != null) {
+						break;
+					}
 				}
 			} else {
 				Accessor accessor = getAccessor(object.getClass());
@@ -248,17 +255,17 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Sets the object with the given name to the given value. If
-	 * {@code setInParent} is {@code true}, the object is also set in this
-	 * context’s parent context, if there is one.
+	 * Sets the object with the given name to the given value. If {@code
+	 * setInParent} is {@code true}, the object is also set in this context’s
+	 * parent context, if there is one.
 	 *
 	 * @param name
 	 *            The name of the object
 	 * @param value
 	 *            The value of the object
 	 * @param setInParent
-	 *            {@code true} to set the object in the parent context,
-	 *            {@code false} otherwise
+	 *            {@code true} to set the object in the parent context, {@code
+	 *            false} otherwise
 	 */
 	public void set(String name, Object value, boolean setInParent) {
 		objects.put(name, value);
@@ -278,15 +285,16 @@ public class TemplateContext {
 	 */
 	public Template getTemplate(String name) {
 		Template template = null;
-		TemplateContext context = this;
-		while ((context != null) && (template == null)) {
+		for (TemplateContext context : getAllTemplateContexts()) {
 			for (Provider provider : context.providers) {
 				template = provider.getTemplate(this, name);
 				if (template != null) {
 					break;
 				}
 			}
-			context = context.parentContext;
+			if (template != null) {
+				break;
+			}
 		}
 		return template;
 	}
@@ -300,12 +308,35 @@ public class TemplateContext {
 	 * @return This template context
 	 */
 	public TemplateContext mergeContext(TemplateContext templateContext) {
-		accessors.putAll(templateContext.accessors);
-		filters.putAll(templateContext.filters);
-		plugins.putAll(templateContext.plugins);
-		providers.addAll(templateContext.providers);
-		objects.putAll(templateContext.objects);
+		mergedContexts.add(0, templateContext);
 		return this;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Returns all template context that a request for data (variables,
+	 * accessors, plugins, filters) has to visit. This is a combined list of all
+	 * merged contexts, their merged contexts (and recursively their merged
+	 * contexts), this context, and the parents of this context (and their
+	 * merged and parent contexts, and so on).
+	 *
+	 * @return All template contexts
+	 */
+	private List<TemplateContext> getAllTemplateContexts() {
+		List<TemplateContext> allTemplateContexts = new ArrayList<TemplateContext>();
+		for (TemplateContext mergedContext : mergedContexts) {
+			allTemplateContexts.addAll(mergedContext.getAllTemplateContexts());
+		}
+		allTemplateContexts.add(this);
+		TemplateContext currentTemplateContext = parentContext;
+		while (currentTemplateContext != null) {
+			allTemplateContexts.addAll(currentTemplateContext.getAllTemplateContexts());
+			currentTemplateContext = currentTemplateContext.parentContext;
+		}
+		return allTemplateContexts;
 	}
 
 }
