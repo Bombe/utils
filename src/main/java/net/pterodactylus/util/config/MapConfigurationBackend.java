@@ -268,8 +268,9 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 		FileOutputStream configurationOutputStream = null;
 		OutputStreamWriter outputStreamWriter = null;
 		BufferedWriter bufferedWriter = null;
+		File tempFile = new File(configurationFile.getPath() + ".tmp");
 		try {
-			configurationOutputStream = new FileOutputStream(configurationFile);
+			configurationOutputStream = new FileOutputStream(tempFile);
 			outputStreamWriter = new OutputStreamWriter(configurationOutputStream, "UTF-8");
 			bufferedWriter = new BufferedWriter(outputStreamWriter);
 			bufferedWriter.write("# MapConfigurationBackend.Version=1");
@@ -295,6 +296,8 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 			Closer.close(outputStreamWriter);
 			Closer.close(configurationOutputStream);
 		}
+		configurationFile.delete();
+		tempFile.renameTo(configurationFile);
 	}
 
 	//
