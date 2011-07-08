@@ -473,7 +473,11 @@ public abstract class AbstractService implements Service, Runnable {
 			syncObject.notify();
 		}
 		if (registerShutdownHook) {
-			Runtime.getRuntime().removeShutdownHook(shutdownHook);
+			try {
+				Runtime.getRuntime().removeShutdownHook(shutdownHook);
+			} catch (IllegalStateException ise1) {
+				/* we might be called during shutdown, so ignore this. */
+			}
 		}
 		serviceStop();
 	}
