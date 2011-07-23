@@ -120,7 +120,7 @@ public class Ticker implements Runnable {
 	 */
 	public Object registerEvent(long executionTime, Runnable thread, String eventName) {
 		synchronized (syncObject) {
-			logger.log(Level.INFO, "Ticker registered " + eventName + " at " + executionTime + ".");
+			logger.log(Level.INFO, "Ticker registered %s at %d.", new Object[] { eventName, executionTime });
 			EventIdentifier identifierObject = new EventIdentifier(executionTime, eventName);
 			runnables.put(identifierObject, thread);
 			executionTimes.add(identifierObject);
@@ -170,7 +170,7 @@ public class Ticker implements Runnable {
 			return;
 		}
 		synchronized (syncObject) {
-			logger.log(Level.INFO, "Ticker removes event " + ((EventIdentifier) eventIdentifier).getEventName() + " at " + ((EventIdentifier) eventIdentifier).getExecutionTime() + ".");
+			logger.log(Level.INFO, "Ticker removes event %s at %d.", new Object[] { ((EventIdentifier) eventIdentifier).getEventName(), ((EventIdentifier) eventIdentifier).getExecutionTime() });
 			runnables.remove(eventIdentifier);
 			removeEventIdentifier((EventIdentifier) eventIdentifier);
 			syncObject.notify();
@@ -236,7 +236,7 @@ public class Ticker implements Runnable {
 					long now = System.currentTimeMillis();
 					long executionTime = eventIdentifier.getExecutionTime();
 					if (executionTime > now) {
-						logger.log(Level.INFO, "Ticker is waiting up to " + (executionTime - now) + " for " + eventIdentifier.getEventName() + " to execute at " + executionTime + ".");
+						logger.log(Level.INFO, "Ticker is waiting up to %d for %s to execute at %d.", new Object[] { executionTime - now, eventIdentifier.getEventName(), executionTime });
 						try {
 							syncObject.wait(executionTime - now);
 						} catch (InterruptedException ie1) {
@@ -249,7 +249,7 @@ public class Ticker implements Runnable {
 						removeEventIdentifier(eventIdentifier);
 						Runnable runnable = runnables.remove(eventIdentifier);
 						if (runnable != null) {
-							logger.log(Level.INFO, "Ticker executes " + eventIdentifier.getEventName() + ", " + (now - executionTime) + " ms late");
+							logger.log(Level.INFO, "Ticker executes %s, %d ms late", new Object[] { eventIdentifier.getEventName(), now - executionTime });
 							Thread eventThread = threadFactory.newThread(runnable);
 							eventThread.setName("Event Thread for " + eventIdentifier.getEventName() + " @ " + executionTime);
 							eventThread.start();
