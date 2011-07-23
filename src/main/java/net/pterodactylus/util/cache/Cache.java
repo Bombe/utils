@@ -61,6 +61,14 @@ public interface Cache<K, V> {
 	public V get(K key) throws CacheException;
 
 	/**
+	 * Removes the cached value for the given key.
+	 *
+	 * @param key
+	 *            The key to remove the cached value for
+	 */
+	public void remove(K key);
+
+	/**
 	 * Removes all cached values. For non-memory based caches this operation may
 	 * be slow.
 	 */

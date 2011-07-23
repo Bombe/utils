@@ -164,6 +164,19 @@ public class MemoryCache<K, V> extends AbstractCache<K, V> implements WritableCa
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void remove(K key) {
+		cacheLock.writeLock().lock();
+		try {
+			cachedValues.remove(key);
+		} finally {
+			cacheLock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void put(K key, V value) {
 		cacheLock.writeLock().lock();
 		try {
