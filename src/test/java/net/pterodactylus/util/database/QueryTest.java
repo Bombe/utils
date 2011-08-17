@@ -45,6 +45,9 @@ public class QueryTest extends TestCase {
 
 		query.addField(new Field("TYPE"));
 		assertEquals("SELECT ID, TYPE FROM TEST", query);
+
+		query.addField(new Field("DATA D"));
+		assertEquals("SELECT ID, TYPE, DATA D FROM TEST", query);
 	}
 
 	//
