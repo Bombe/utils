@@ -69,6 +69,9 @@ public class Query {
 	/** The name of the table. */
 	private final String table;
 
+	/** The joins. */
+	private final List<Join> joins = new ArrayList<Join>();
+
 	/** The WHERE clauses. */
 	private final List<WhereClause> whereClauses = new ArrayList<WhereClause>();
 
@@ -112,6 +115,18 @@ public class Query {
 	public void addValueField(ValueField... valueFields) {
 		for (ValueField valueField : valueFields) {
 			this.valueFields.add(valueField);
+		}
+	}
+
+	/**
+	 * Adds one or more joins to this query.
+	 *
+	 * @param joins
+	 *            The joins to add
+	 */
+	public void addJoin(Join... joins) {
+		for (Join join : joins) {
+			this.joins.add(join);
 		}
 	}
 
@@ -213,6 +228,17 @@ public class Query {
 			}
 			writer.write(" FROM ");
 			writer.write(table);
+			for (Join join : joins) {
+				writer.write(" ");
+				writer.write(join.getType().name());
+				writer.write(" JOIN ");
+				writer.write(join.getTable());
+				writer.write(" ON (");
+				writer.write(join.getLeftField().getName());
+				writer.write(" = ");
+				writer.write(join.getRightField().getName());
+				writer.write(")");
+			}
 			renderWhereClauses(writer);
 			if (!orderFields.isEmpty()) {
 				writer.write(" ORDER BY ");
