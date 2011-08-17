@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import net.pterodactylus.util.database.Join.JoinType;
 import net.pterodactylus.util.database.OrderField.Order;
 import net.pterodactylus.util.database.Query.Type;
 import net.pterodactylus.util.io.Closer;
@@ -67,6 +68,18 @@ public class QueryTest extends TestCase {
 
 		query.addField(new Field("T"));
 		assertEquals("SELECT T FROM TEST ORDER BY CRIT ASC, CRIT2 DESC, CRIT3 ASC", query);
+	}
+
+	/**
+	 * Tests SELECT queries with JOINs.
+	 */
+	public void testSelectWithJoin() {
+		Query query = new Query(Type.SELECT, "TEST");
+		query.addJoin(new Join(JoinType.LEFT, "TEST2", new Field("TEST.ID"), new Field("TEST2.TEST")));
+		assertEquals("SELECT * FROM TEST LEFT JOIN TEST2 ON (TEST.ID = TEST2.TEST)", query);
+
+		query.addJoin(new Join(JoinType.RIGHT, "TEST3", new Field("TEST2.ID"), new Field("TEST3.TEST2")));
+		assertEquals("SELECT * FROM TEST LEFT JOIN TEST2 ON (TEST.ID = TEST2.TEST) RIGHT JOIN TEST3 ON (TEST2.ID = TEST3.TEST2)", query);
 	}
 
 	//
