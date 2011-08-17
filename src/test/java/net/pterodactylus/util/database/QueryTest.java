@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
+import net.pterodactylus.util.database.OrderField.Order;
 import net.pterodactylus.util.database.Query.Type;
 import net.pterodactylus.util.io.Closer;
 
@@ -48,6 +49,24 @@ public class QueryTest extends TestCase {
 
 		query.addField(new Field("DATA D"));
 		assertEquals("SELECT ID, TYPE, DATA D FROM TEST", query);
+	}
+
+	/**
+	 * Tests SELECT queries with ORDER BY clauses.
+	 */
+	public void testSelectWithOrderBy() {
+		Query query = new Query(Type.SELECT, "TEST");
+		query.addOrderField(new OrderField(new Field("CRIT")));
+		assertEquals("SELECT * FROM TEST ORDER BY CRIT ASC", query);
+
+		query.addOrderField(new OrderField(new Field("CRIT2"), Order.DESCENDING));
+		assertEquals("SELECT * FROM TEST ORDER BY CRIT ASC, CRIT2 DESC", query);
+
+		query.addOrderField(new OrderField(new Field("CRIT3"), Order.ASCENDING));
+		assertEquals("SELECT * FROM TEST ORDER BY CRIT ASC, CRIT2 DESC, CRIT3 ASC", query);
+
+		query.addField(new Field("T"));
+		assertEquals("SELECT T FROM TEST ORDER BY CRIT ASC, CRIT2 DESC, CRIT3 ASC", query);
 	}
 
 	//
