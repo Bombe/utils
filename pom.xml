@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.9.7-SNAPSHOT</version>
+	<version>0.10.0</version>
 	<name>utils</name>
 	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
