@@ -162,7 +162,7 @@ public class TemplateNotification extends AbstractNotification implements Part {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
-		template.render(new TemplateContext().mergeContext(template.getInitialContext()).mergeContext(mergeContext).mergeContext(templateContext), writer);
+		template.render(new TemplateContext().mergeContext(templateContext).mergeContext(template.getInitialContext()).mergeContext(mergeContext), writer);
 	}
 
 }
