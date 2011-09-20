@@ -131,6 +131,7 @@ public class Response {
 	 *
 	 * @param text
 	 *            The text to write
+	 * @return This response
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
