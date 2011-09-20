@@ -148,6 +148,21 @@ public class Response {
 	}
 
 	/**
+	 * Writes the given data to this response’s {@link #getContent() content
+	 * output stream}.
+	 *
+	 * @param data
+	 *            The data to write
+	 * @return This response
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public Response write(byte[] data) throws IOException {
+		content.write(data);
+		return this;
+	}
+
+	/**
 	 * Returns HTTP headers of the response. May be {@code null} if no headers
 	 * are returned.
 	 *
