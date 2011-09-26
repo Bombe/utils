@@ -20,34 +20,76 @@ package net.pterodactylus.util.template;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.pterodactylus.util.object.Classes;
+
 /**
- * {@link Filter} that can sort a {@link Collection} or {@link Map}. A
- * {@code Collection} is sorted using {@link Collections#sort(List)}, and
- * {@link Map}s are sorted by inserting all items into a {@link TreeMap}. The
- * sorted items have to implement the {@link Comparable} interface or using this
- * will filter will result in a {@link ClassCastException}!
+ * {@link Filter} that can sort a {@link Collection} or {@link Map}. A {@code
+ * Collection} is sorted using {@link Collections#sort(List)}, and {@link Map}s
+ * are sorted by inserting all items into a {@link TreeMap}. It is possible to
+ * use comparators for certain classes; in order for those to be used, the
+ * collection must return an object of a matching type as the first item of its
+ * iterator. If comparators are not used, the sorted items have to implement the
+ * {@link Comparable} interface or using this will filter will result in a
+ * {@link ClassCastException}!
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CollectionSortFilter implements Filter {
 
+	/** Comparators. */
+	private final Map<Class<?>, Comparator<?>> comparators = new HashMap<Class<?>, Comparator<?>>();
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Adds a comparator to use when an object of the given class is found as
+	 * first item in a collection’s iterator.
+	 *
+	 * @param clazz
+	 *            The class to use the comparator for
+	 * @param comparator
+	 *            The comparator to use
+	 * @param <T>
+	 *            The type of the object to compare
+	 */
+	public <T> void addComparator(Class<T> clazz, Comparator<? super T> comparator) {
+		comparators.put(clazz, comparator);
+	}
+
+	//
+	// FILTER METHODS
+	//
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("unchecked")
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		if (data instanceof Collection<?>) {
 			List list = new ArrayList((Collection<?>) data);
-			Collections.sort(list);
+			if (!list.isEmpty()) {
+				Class<?> firstElementClass = list.get(0).getClass();
+				Class<?> comparatorClass = Classes.closest(firstElementClass, comparators.keySet());
+				if (comparatorClass != null) {
+					Comparator comparator = comparators.get(comparatorClass);
+					Collections.sort(list, comparator);
+				} else {
+					Collections.sort(list);
+				}
+			}
 			return list;
 		}
 		if (data instanceof Map<?, ?>) {
-			return new TreeMap((Map) data);
+			return new TreeMap((Map<?, ?>) data);
 		}
 		return data;
 	}

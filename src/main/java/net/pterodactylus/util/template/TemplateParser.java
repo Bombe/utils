@@ -211,7 +211,7 @@ public class TemplateParser {
 						partsStack.peek().add(parts);
 						parts = new EmptyLoopPart(startOfTagLine, startOfTagColumn, lastCollectionName.peek());
 					} else if (function.equals("first")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "first is only allowed in foreach");
 						}
 						partsStack.push(parts);
@@ -219,7 +219,7 @@ public class TemplateParser {
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, new ConditionalPart.DataCondition(loopName + ".first"));
 						commandStack.push("first");
 					} else if (function.equals("notfirst")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "notfirst is only allowed in foreach");
 						}
 						partsStack.push(parts);
@@ -227,7 +227,7 @@ public class TemplateParser {
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, new ConditionalPart.DataCondition(loopName + ".first", true));
 						commandStack.push("notfirst");
 					} else if (function.equals("last")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "last is only allowed in foreach");
 						}
 						partsStack.push(parts);
@@ -235,7 +235,7 @@ public class TemplateParser {
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, new ConditionalPart.DataCondition(loopName + ".last"));
 						commandStack.push("last");
 					} else if (function.equals("notlast")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "notlast is only allowed in foreach");
 						}
 						partsStack.push(parts);
@@ -243,7 +243,7 @@ public class TemplateParser {
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, new ConditionalPart.DataCondition(loopName + ".last", true));
 						commandStack.push("notlast");
 					} else if (function.equals("odd")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "odd is only allowed in foreach");
 						}
 						partsStack.push(parts);
@@ -251,7 +251,7 @@ public class TemplateParser {
 						parts = new ConditionalPart(startOfTagLine, startOfTagColumn, new ConditionalPart.DataCondition(loopName + ".odd"));
 						commandStack.push("odd");
 					} else if (function.equals("even")) {
-						if (!"foreach".equals(commandStack.peek())) {
+						if (!commandStack.contains("foreach")) {
 							throw new TemplateException(startOfTagLine, startOfTagColumn, "even is only allowed in foreach");
 						}
 						partsStack.push(parts);

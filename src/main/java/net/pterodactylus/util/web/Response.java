@@ -17,9 +17,13 @@
 
 package net.pterodactylus.util.web;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.pterodactylus.util.io.Closer;
 
 /**
  * Container for the HTTP response of a {@link Page}.
@@ -118,6 +122,43 @@ public class Response {
 	 */
 	public Response setContentType(String contentType) {
 		this.contentType = contentType;
+		return this;
+	}
+
+	/**
+	 * Writes the text to this response’s {@link #getContent() content output
+	 * stream}.
+	 *
+	 * @param text
+	 *            The text to write
+	 * @return This response
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public Response write(String text) throws IOException {
+		OutputStreamWriter outputStreamWriter = null;
+		try {
+			outputStreamWriter = new OutputStreamWriter(content, "UTF-8");
+			outputStreamWriter.write(text);
+			outputStreamWriter.flush();
+		} finally {
+			Closer.close(outputStreamWriter);
+		}
+		return this;
+	}
+
+	/**
+	 * Writes the given data to this response’s {@link #getContent() content
+	 * output stream}.
+	 *
+	 * @param data
+	 *            The data to write
+	 * @return This response
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public Response write(byte[] data) throws IOException {
+		content.write(data);
 		return this;
 	}
 

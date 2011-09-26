@@ -48,7 +48,7 @@ public class EqualityValidator<T> implements Validator<T> {
 	 * {@inheritDoc}
 	 */
 	public boolean validate(T value) {
-		return value.equals(expectedValue);
+		return (value == null) ? (expectedValue == null) : value.equals(expectedValue);
 	}
 
 	//
