@@ -30,6 +30,9 @@ public class MemoryItemCache<T> extends AbstractItemCache<T> {
 	/** Object used for synchronization. */
 	private final Object syncObject = new Object();
 
+	/** Whether an object has been retrieved. */
+	private boolean set;
+
 	/** The cached value. */
 	private T cachedValue;
 
@@ -49,10 +52,10 @@ public class MemoryItemCache<T> extends AbstractItemCache<T> {
 	@Override
 	public T get() throws CacheException {
 		synchronized (syncObject) {
-			if (cachedValue != null) {
-				return cachedValue;
+			if (!set) {
+				cachedValue = retrieveValue();
+				set = true;
 			}
-			cachedValue = retrieveValue();
 			return cachedValue;
 		}
 	}
@@ -64,6 +67,7 @@ public class MemoryItemCache<T> extends AbstractItemCache<T> {
 	public void clear() {
 		synchronized (syncObject) {
 			cachedValue = null;
+			set = false;
 		}
 	}
 
