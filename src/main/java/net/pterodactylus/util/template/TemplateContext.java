@@ -216,6 +216,9 @@ public class TemplateContext {
 	 * @return The object, or {@code null} if no object could be found
 	 */
 	public Object get(String name) {
+		if (name == null) {
+			return null;
+		}
 		StringTokenizer nameTokens = new StringTokenizer(name, ".");
 		Object object = null;
 		while (nameTokens.hasMoreTokens()) {
