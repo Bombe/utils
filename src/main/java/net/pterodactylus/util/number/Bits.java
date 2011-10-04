@@ -25,6 +25,19 @@ package net.pterodactylus.util.number;
 public class Bits {
 
 	/**
+	 * Decodes a single bit from the given value.
+	 *
+	 * @param value
+	 *            The value to decode the bit from
+	 * @param bitIndex
+	 *            The number of the bit (0 being the LSB, 31 the MSB)
+	 * @return The single decoded bit
+	 */
+	public static boolean decodeBit(int value, int bitIndex) {
+		return decodeBits(value, bitIndex, 1) == 1;
+	}
+
+	/**
 	 * Decodes <code>numberOfBits</code> bits from the specified start index.
 	 * The resulting value has the range <code>0</code> to
 	 * <code>2 ^ numberOfBits - 1</code>.
