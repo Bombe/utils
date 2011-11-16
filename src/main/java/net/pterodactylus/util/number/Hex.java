@@ -199,7 +199,8 @@ public class Hex {
 	}
 
 	/**
-	 * Decodes a hexadecimal string into a byte array.
+	 * Decodes a hexadecimal string into a byte array. The given string is first
+	 * cleaned by removing all characters that are not hexadecimal digits.
 	 *
 	 * @param hexString
 	 *            The hexadecimal representation to decode
@@ -207,13 +208,15 @@ public class Hex {
 	 * @see Integer#parseInt(java.lang.String, int)
 	 */
 	public static byte[] toByte(String hexString) {
-		if ((hexString.length() & 0x01) == 0x01) {
+		/* remove all characters that are not hexadecimal digits. */
+		String cleanedHexString = hexString.replaceAll("[^0-9A-Fa-f]", "");
+		if ((cleanedHexString.length() & 0x01) == 0x01) {
 			/* odd length, this is not correct. */
 			throw new IllegalArgumentException("hex string must have even length.");
 		}
-		byte[] dataBytes = new byte[hexString.length() / 2];
-		for (int stringIndex = 0; stringIndex < hexString.length(); stringIndex += 2) {
-			String hexNumber = hexString.substring(stringIndex, stringIndex + 2);
+		byte[] dataBytes = new byte[cleanedHexString.length() / 2];
+		for (int stringIndex = 0; stringIndex < cleanedHexString.length(); stringIndex += 2) {
+			String hexNumber = cleanedHexString.substring(stringIndex, stringIndex + 2);
 			byte dataByte = (byte) Integer.parseInt(hexNumber, 16);
 			dataBytes[stringIndex / 2] = dataByte;
 		}
