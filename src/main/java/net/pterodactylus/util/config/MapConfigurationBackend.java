@@ -150,8 +150,11 @@ public class MapConfigurationBackend implements ConfigurationBackend {
 	 * @see net.pterodactylus.util.config.ConfigurationBackend#getValue(java.lang.String)
 	 */
 	@Override
-	public String getValue(String attribute) {
+	public String getValue(String attribute) throws ConfigurationException {
 		synchronized (values) {
+			if (!values.containsKey(attribute)) {
+				throw new ConfigurationException("Attribute “" + attribute + "” missing.");
+			}
 			return values.get(attribute);
 		}
 	}
