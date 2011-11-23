@@ -246,6 +246,34 @@ public class TemplateContext {
 	}
 
 	/**
+	 * Returns the object with the given name, if its class is assignable to the
+	 * given class. Properties of an object can be accessed by a “.” in the
+	 * name. If this context does not have an object with the given name, the
+	 * parent context is asked.
+	 *
+	 * @param <T>
+	 *            The requested type of the object
+	 * @param name
+	 *            The name of the object to get
+	 * @param requestedClass
+	 *            The requested class
+	 * @return The object, or {@code null} if no object could be found, or if
+	 *         the real class of the object can not be assigned to the requested
+	 *         class
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T get(String name, Class<?> requestedClass) {
+		Object value = get(name);
+		if (value == null) {
+			return null;
+		}
+		if (requestedClass.isAssignableFrom(value.getClass())) {
+			return (T) value;
+		}
+		return null;
+	}
+
+	/**
 	 * Sets the object with the given name to the given value.
 	 *
 	 * @param name
