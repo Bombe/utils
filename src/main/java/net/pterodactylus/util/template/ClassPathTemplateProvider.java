@@ -46,6 +46,9 @@ public class ClassPathTemplateProvider implements Provider {
 	/** The class used to locate resources. */
 	private final Class<?> resourceClass;
 
+	/** The path to prepend to all requested resources. */
+	private final String resourcePath;
+
 	/** Cache for templates. */
 	private final Cache<String, Template> templateCache = new MemoryCache<String, Template>(new ValueRetriever<String, Template>() {
 
@@ -67,7 +70,20 @@ public class ClassPathTemplateProvider implements Provider {
 	 *            The class used to locate resources
 	 */
 	public ClassPathTemplateProvider(Class<?> resourceClass) {
+		this(resourceClass, "/");
+	}
+
+	/**
+	 * Creates a new class path template provider.
+	 *
+	 * @param resourceClass
+	 *            The class used to locate resources
+	 * @param resourcePath
+	 *            The path to prepend to all requested names
+	 */
+	public ClassPathTemplateProvider(Class<?> resourceClass, String resourcePath) {
 		this.resourceClass = resourceClass;
+		this.resourcePath = resourcePath;
 	}
 
 	//
@@ -100,7 +116,7 @@ public class ClassPathTemplateProvider implements Provider {
 	 *         found
 	 */
 	private Template findTemplate(String templateName) {
-		Reader templateReader = createReader("/templates/" + templateName);
+		Reader templateReader = createReader(resourcePath + templateName);
 		if (templateReader == null) {
 			return null;
 		}
