@@ -206,4 +206,40 @@ public abstract class AbstractNotification implements Notification {
 		setLastUpdateTime(System.currentTimeMillis());
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return id.hashCode() ^ (int) (getCreatedTime() | (getCreatedTime() >>> 32)) ^ (int) (getLastUpdatedTime() | (getLastUpdatedTime() >>> 32)) ^ (dismissable ? 1 : 0);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Notification)) {
+			return false;
+		}
+		Notification notification = (Notification) object;
+		if (!id.equals(notification.getId())) {
+			return false;
+		}
+		if (createdTime != notification.getCreatedTime()) {
+			return false;
+		}
+		if (lastUpdatedTime != notification.getLastUpdatedTime()) {
+			return false;
+		}
+		if (dismissable != notification.isDismissable()) {
+			return false;
+		}
+		return true;
+	}
+
 }
