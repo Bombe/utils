@@ -87,6 +87,19 @@ public class Bits {
 	}
 
 	/**
+	 * Rotates the bits in the given value to the left.
+	 *
+	 * @param value
+	 *            The value to rotate
+	 * @param distance
+	 *            The distance of the rotation, in bits
+	 * @return The rotated value
+	 */
+	public static long rotateLeft(long value, int distance) {
+		return (value << distance) | (value >>> (64 - (distance & 0x3f)));
+	}
+
+	/**
 	 * Rotates the bits in the given value to the right.
 	 *
 	 * @param value
@@ -97,6 +110,19 @@ public class Bits {
 	 */
 	public static int rotateRight(int value, int distance) {
 		return (value >>> (distance & 0x1f)) | (value << ((32 - distance) & 0x1f));
+	}
+
+	/**
+	 * Rotates the bits in the given value to the right.
+	 *
+	 * @param value
+	 *            The value to rotate
+	 * @param distance
+	 *            The distance of the rotation, in bits
+	 * @return The rotated value
+	 */
+	public static long rotateRight(long value, int distance) {
+		return (value >>> distance) | (value << (64 - (distance & 0x1f)));
 	}
 
 }
