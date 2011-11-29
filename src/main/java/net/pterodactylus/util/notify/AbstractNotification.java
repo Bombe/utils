@@ -215,7 +215,7 @@ public abstract class AbstractNotification implements Notification {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode() ^ (int) (getCreatedTime() | (getCreatedTime() >>> 32)) ^ (int) (getLastUpdatedTime() | (getLastUpdatedTime() >>> 32)) ^ (dismissable ? 1 : 0);
+		return id.hashCode() ^ (int) (getCreatedTime() ^ (getCreatedTime() >>> 32)) ^ (int) (getLastUpdatedTime() ^ (getLastUpdatedTime() >>> 32)) ^ (dismissable ? 1 : 0);
 	}
 
 	/**
