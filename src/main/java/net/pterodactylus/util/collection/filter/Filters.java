@@ -1,5 +1,5 @@
 /*
- * utils - Filters.java - Copyright © 2009 David Roden
+ * utils - Filters.java - Copyright © 2009–2012 David Roden
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-package net.pterodactylus.util.filter;
+package net.pterodactylus.util.collection.filter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,9 +24,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Defines various methods to filter {@link Collection}s.
@@ -132,62 +131,7 @@ public class Filters {
 	 * @return The filtered iterator
 	 */
 	public static <E> Iterator<E> filteredIterator(final Iterator<E> iterator, final Filter<? super E> iteratorFilter) {
-		return new Iterator<E>() {
-
-			private boolean gotNextElement = false;
-
-			private E nextElement;
-
-			private void getNextElement() {
-				if (gotNextElement) {
-					return;
-				}
-				while (iterator.hasNext()) {
-					nextElement = iterator.next();
-					if (iteratorFilter.filterObject(nextElement)) {
-						gotNextElement = true;
-						break;
-					}
-				}
-			}
-
-			/**
-			 * {@inheritDoc}
-			 *
-			 * @see java.util.Iterator#hasNext()
-			 */
-			@Override
-			public boolean hasNext() {
-				getNextElement();
-				return gotNextElement;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 *
-			 * @see java.util.Iterator#next()
-			 */
-			@Override
-			public E next() {
-				getNextElement();
-				if (!gotNextElement) {
-					throw new NoSuchElementException("no more elements in iteration");
-				}
-				gotNextElement = false;
-				return nextElement;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 *
-			 * @see java.util.Iterator#remove()
-			 */
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException("remove() not supported on this iteration");
-			}
-
-		};
+		return new FilteredIterator<E>(iterator, iteratorFilter);
 	}
 
 }
