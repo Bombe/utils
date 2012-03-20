@@ -1,5 +1,5 @@
 /*
- * utils - Mapper.java - Copyright © 2011 David Roden
+ * utils - Mapper.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package net.pterodactylus.util.collection;
+package net.pterodactylus.util.collection.mapper;
 
 /**
  * Interface for objects that can map one object to another.

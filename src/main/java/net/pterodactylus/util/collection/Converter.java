@@ -17,6 +17,8 @@
 
 package net.pterodactylus.util.collection;
 
+import net.pterodactylus.util.collection.mapper.Mapper;
+
 /**
  * Interface for objects that can convert one object into another.
  *
