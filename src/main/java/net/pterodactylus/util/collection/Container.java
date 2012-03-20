@@ -27,6 +27,7 @@ import java.util.Map;
 
 import net.pterodactylus.util.collection.filter.Filter;
 import net.pterodactylus.util.collection.mapper.Mapper;
+import net.pterodactylus.util.collection.processor.Processor;
 import net.pterodactylus.util.validation.Validation;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * utils - Processor.java - Copyright © 2011 David Roden
+ * utils - Processor.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package net.pterodactylus.util.collection.processor;
 
-package net.pterodactylus.util.collection;
+import net.pterodactylus.util.collection.Container;
 
 /**
  * A processor is used to process all elements of a {@link Container}.
