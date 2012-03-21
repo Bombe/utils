@@ -77,6 +77,10 @@ public class RegularExpressionNumberFormat extends NumberFormat {
 			}
 			String regularExpression = pattern.substring(0, pattern.indexOf(separator));
 			String value = pattern.substring(pattern.indexOf(separator) + 1);
+			if (value.startsWith(String.valueOf(separator))) {
+				value = value.substring(1);
+				defaultValue = value;
+			}
 			patterns.add(new Pair<Pattern, String>(Pattern.compile(regularExpression), value));
 		}
 		this.defaultValue = defaultValue;
