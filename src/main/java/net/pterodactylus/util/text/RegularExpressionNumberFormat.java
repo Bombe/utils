@@ -87,17 +87,23 @@ public class RegularExpressionNumberFormat extends NumberFormat {
 	}
 
 	//
-	// NUMBERFORMAT METHODS
+	// PRIVATE METHODS
 	//
 
 	/**
-	 * {@inheritDoc}
+	 * Formats the given number.
+	 *
+	 * @param number
+	 *            The number to format
+	 * @param toAppendTo
+	 *            The buffer to append the number to
+	 * @param fieldPosition
+	 *            The current field position
+	 * @return The buffer the number was appended to
 	 */
-	@Override
-	public StringBuffer format(double number, StringBuffer toAppendTo, FieldPosition pos) {
-		String numberString = String.valueOf(number);
+	private StringBuffer format(String number, StringBuffer toAppendTo, FieldPosition fieldPosition) {
 		for (Pair<Pattern, String> pattern : patterns) {
-			if (pattern.getLeft().matcher(numberString).matches()) {
+			if (pattern.getLeft().matcher(number).matches()) {
 				toAppendTo.append(pattern.getRight());
 				return toAppendTo;
 			}
@@ -108,22 +114,24 @@ public class RegularExpressionNumberFormat extends NumberFormat {
 		return toAppendTo;
 	}
 
+	//
+	// NUMBERFORMAT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public StringBuffer format(double number, StringBuffer toAppendTo, FieldPosition pos) {
+		return format(String.valueOf(number), toAppendTo, pos);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
-		String numberString = String.valueOf(number);
-		for (Pair<Pattern, String> pattern : patterns) {
-			if (pattern.getLeft().matcher(numberString).matches()) {
-				toAppendTo.append(pattern.getRight());
-				return toAppendTo;
-			}
-		}
-		if (defaultValue != null) {
-			toAppendTo.append(defaultValue);
-		}
-		return toAppendTo;
+		return format(String.valueOf(number), toAppendTo, pos);
 	}
 
 	/**
