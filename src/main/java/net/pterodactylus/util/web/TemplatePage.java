@@ -98,13 +98,31 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 			responseWriter = new OutputStreamWriter(response.getContent(), "UTF-8");
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("request", request);
+			processTemplate(templateContext, request);
 			template.render(templateContext, responseWriter);
+		} catch (RedirectException re1) {
+			return new RedirectResponse(re1.getTarget());
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", ioe1);
 		} finally {
 			Closer.close(responseWriter);
 		}
 		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType);
+	}
+
+	/**
+	 * Allows subclasses to manipulate the template context in dependency of the
+	 * request being served before the template itself is rendered.
+	 *
+	 * @param templateContext
+	 *            The template context
+	 * @param request
+	 *            The request being served
+	 * @throws RedirectException
+	 *             if a redirect should be performed
+	 */
+	protected void processTemplate(TemplateContext templateContext, REQ request) throws RedirectException {
+		/* do nothing. */
 	}
 
 }
