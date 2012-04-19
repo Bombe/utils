@@ -92,7 +92,7 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(REQ request, Response response) {
+	public Response handleRequest(REQ request, Response response) throws IOException {
 		OutputStreamWriter responseWriter = null;
 		try {
 			responseWriter = new OutputStreamWriter(response.getContent(), "UTF-8");
@@ -104,6 +104,7 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 			return new RedirectResponse(re1.getTarget());
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", ioe1);
+			throw ioe1;
 		} finally {
 			Closer.close(responseWriter);
 		}
