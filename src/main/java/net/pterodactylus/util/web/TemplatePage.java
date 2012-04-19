@@ -27,6 +27,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateException;
 
 /**
  * A template page is a single page that is created from a {@link Template} but
@@ -105,6 +106,9 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", ioe1);
 			throw ioe1;
+		} catch (TemplateException te1) {
+			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", te1);
+			throw new IOException(te1);
 		} finally {
 			Closer.close(responseWriter);
 		}
