@@ -58,9 +58,9 @@ public class PaginationFilter implements Filter {
 		}
 		int pageSize = Numbers.safeParseInteger(parameters.get("pageSize"), 25);
 		int page = Numbers.safeParseInteger(parameters.get("page"), 0);
-		String paginationName = String.valueOf(parameters.get("pagination"));
-		if (paginationName == null) {
-			paginationName = "pagination";
+		String paginationName = "pagination";
+		if (parameters.containsKey("pagination")) {
+			paginationName = String.valueOf(parameters.get("pagination"));
 		}
 		Pagination<Object> pagination = new Pagination<Object>(list, pageSize).setPage(page);
 		templateContext.set(paginationName, pagination, true);
