@@ -50,6 +50,9 @@ public class TemplateContext {
 	/** The parent context. */
 	private final TemplateContext parentContext;
 
+	/** Whether this context is temporary. */
+	private final boolean temporary;
+
 	/** Merged contexts. */
 	private final List<TemplateContext> mergedContexts = new ArrayList<TemplateContext>();
 
@@ -67,7 +70,18 @@ public class TemplateContext {
 	 *            The parent context
 	 */
 	public TemplateContext(TemplateContext parentContext) {
+		this(parentContext, false);
+	}
+
+	/**
+	 * Creates a new template context with the given parent context.
+	 *
+	 * @param parentContext
+	 *            The parent context
+	 */
+	public TemplateContext(TemplateContext parentContext, boolean temporary) {
 		this.parentContext = parentContext;
+		this.temporary = temporary;
 		accessors.put(Map.class, Accessor.MAP_ACCESSOR);
 	}
 
@@ -283,6 +297,9 @@ public class TemplateContext {
 	 */
 	public void set(String name, Object value) {
 		objects.put(name, value);
+		if (temporary && (parentContext != null)) {
+			parentContext.set(name, value);
+		}
 	}
 
 	/**
@@ -300,7 +317,9 @@ public class TemplateContext {
 	 */
 	public void set(String name, Object value, boolean setInParent) {
 		objects.put(name, value);
-		if (setInParent && (parentContext != null)) {
+		if (temporary && (parentContext != null)) {
+			parentContext.set(name, value, setInParent);
+		} else if (setInParent && (parentContext != null)) {
 			parentContext.set(name, value);
 		}
 	}
