@@ -959,7 +959,7 @@ public class TemplateTest extends TestCase {
 		filter = new Filter() {
 
 			@Override
-			public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+			public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 				return ((Integer) data) > 1;
 			}
 		};
@@ -1364,7 +1364,7 @@ public class TemplateTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+		public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
 		}
 

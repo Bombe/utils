@@ -35,7 +35,7 @@ public class ModFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		Long dividend = Numbers.safeParseLong(data);
 		Long divisor = Numbers.safeParseLong(parameters.get("divisor"));
 		long offset = Numbers.safeParseLong(parameters.get("offset"), 0L);

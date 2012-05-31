@@ -33,8 +33,8 @@ public class MatchFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String key = parameters.get("key");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String key = String.valueOf(parameters.get("key"));
 		Object value = parameters.get("value");
 		if (value == null) {
 			value = templateContext.get(key);

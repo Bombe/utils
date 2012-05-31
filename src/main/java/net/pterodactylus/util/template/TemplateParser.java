@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import net.pterodactylus.util.template.ConditionalPart.AndCondition;
@@ -630,8 +631,17 @@ public class TemplateParser {
 				if (filter == null) {
 					throw new TemplateException(line, column, "Filter “" + filterDefinition.getName() + "” not found.");
 				}
+				TemplateContext filterTemplateContext = new TemplateContext(templateContext, true);
+				Map<String, Object> parameters = new HashMap<String, Object>();
+				for (Entry<String, String> parameter : filterDefinition.getParameters().entrySet()) {
+					if (parameter.getValue().startsWith("=")) {
+						parameters.put(parameter.getKey(), parameter.getValue().substring(1));
+					} else {
+						parameters.put(parameter.getKey(), templateContext.get(parameter.getValue()));
+					}
+				}
 				try {
-					output = filter.format(templateContext, output, filterDefinition.getParameters());
+					output = filter.format(filterTemplateContext, output, parameters);
 				} catch (Exception e1) {
 					throw new TemplateException(line, column, "Error while applying filter.", e1);
 				}

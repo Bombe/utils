@@ -32,8 +32,8 @@ public class FormatFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String format = parameters.get("format");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String format = String.valueOf(parameters.get("format"));
 		return String.format(format, data);
 	}
 

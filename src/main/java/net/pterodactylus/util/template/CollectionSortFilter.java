@@ -73,7 +73,7 @@ public class CollectionSortFilter implements Filter {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		if (data instanceof Collection<?>) {
 			List list = new ArrayList((Collection<?>) data);
 			if (!list.isEmpty()) {

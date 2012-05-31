@@ -37,8 +37,8 @@ public class ContainsFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String collectionName = parameters.get("collection");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String collectionName = String.valueOf(parameters.get("collection"));
 		Object collection = templateContext.get(collectionName);
 		if (!(collection instanceof Collection<?>)) {
 			return false;

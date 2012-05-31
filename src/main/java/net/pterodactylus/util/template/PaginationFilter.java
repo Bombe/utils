@@ -43,7 +43,7 @@ public class PaginationFilter implements Filter {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		List<Object> list = null;
 		if (data instanceof List<?>) {
 			list = (List<Object>) data;
@@ -58,7 +58,7 @@ public class PaginationFilter implements Filter {
 		}
 		int pageSize = Numbers.safeParseInteger(parameters.get("pageSize"), 25);
 		int page = Numbers.safeParseInteger(parameters.get("page"), 0);
-		String paginationName = parameters.get("pagination");
+		String paginationName = String.valueOf(parameters.get("pagination"));
 		if (paginationName == null) {
 			paginationName = "pagination";
 		}

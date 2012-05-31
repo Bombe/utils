@@ -31,10 +31,10 @@ public class StoreFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String key = parameters.get("key");
-		boolean setInParent = Boolean.valueOf(parameters.get("parent"));
-		boolean convertToText = Boolean.valueOf(parameters.get("text"));
+	public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String key = String.valueOf(parameters.get("key"));
+		boolean setInParent = Boolean.valueOf(String.valueOf(parameters.get("parent")));
+		boolean convertToText = Boolean.valueOf(String.valueOf(parameters.get("text")));
 		templateContext.set(key, convertToText ? String.valueOf(data) : data, setInParent);
 		return "";
 	}

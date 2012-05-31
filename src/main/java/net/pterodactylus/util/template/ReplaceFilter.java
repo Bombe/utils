@@ -30,11 +30,11 @@ public class ReplaceFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		String input = String.valueOf(data);
-		String needle = parameters.get("needle");
-		String replacementKey = parameters.get("replacementKey");
-		String replacement = parameters.get("replacement");
+		String needle = String.valueOf(parameters.get("needle"));
+		String replacementKey = String.valueOf(parameters.get("replacementKey"));
+		String replacement = String.valueOf(parameters.get("replacement"));
 		if (replacement == null) {
 			replacement = String.valueOf(templateContext.get(replacementKey));
 		}

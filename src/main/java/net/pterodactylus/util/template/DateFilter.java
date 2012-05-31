@@ -41,10 +41,10 @@ public class DateFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String format = parameters.get("format");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String format = String.valueOf(parameters.get("format"));
 		TimeZone timezone = TimeZone.getDefault();
-		String timezoneName = parameters.get("timezone");
+		String timezoneName = String.valueOf(parameters.get("timezone"));
 		if (timezoneName != null) {
 			Object timezoneObject = templateContext.get(timezoneName);
 			if (timezoneObject == null) {
