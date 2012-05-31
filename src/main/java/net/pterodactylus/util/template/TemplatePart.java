@@ -61,7 +61,7 @@ public class TemplatePart extends AbstractPart {
 		if (template == null) {
 			throw new TemplateException(getLine(), getColumn(), "Template “" + templateName + "” not found.");
 		}
-		TemplateContext includedContext = new TemplateContext(templateContext).mergeContext(template.getInitialContext());
+		TemplateContext includedContext = new TemplateContext(templateContext);
 		for (Entry<String, String> parameter : parameters.entrySet()) {
 			if (parameter.getValue().startsWith("=")) {
 				includedContext.set(parameter.getKey(), parameter.getValue().substring(1));
