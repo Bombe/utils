@@ -1004,6 +1004,15 @@ public class TemplateTest extends TestCase {
 		assertEquals("equal", stringWriter.toString());
 
 		stringWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader("<%if a|match value=b>equal<%else>not equal<%/if>"));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("match", new MatchFilter());
+		templateContext.set("a", "This is a string.");
+		templateContext.set("b", "This is a string.");
+		template.render(templateContext, stringWriter);
+		assertEquals("equal", stringWriter.toString());
+
+		stringWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader("<%if ! a|match key==b>not equal<%else>equal<%/if>"));
 		templateContext = new TemplateContext();
 		templateContext.addFilter("match", new MatchFilter());
