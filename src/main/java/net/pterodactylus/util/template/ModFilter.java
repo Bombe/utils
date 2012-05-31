@@ -22,7 +22,7 @@ import java.util.Map;
 import net.pterodactylus.util.number.Numbers;
 
 /**
- * The mod filter performs a module operation on the given number and the
+ * The mod filter performs a modulo operation on the given number and the
  * parameter “divisor,” adding the optional parameter “offset” to the dividend,
  * and returns {@code true} if the module operation did not return a rest, i.e.
  * if {@code dividend + offset mod divisor} equals {@code 0}.
