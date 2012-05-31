@@ -63,7 +63,7 @@ public class PaginationFilter implements Filter {
 			paginationName = "pagination";
 		}
 		Pagination<Object> pagination = new Pagination<Object>(list, pageSize).setPage(page);
-		templateContext.set(paginationName, pagination);
+		templateContext.set(paginationName, pagination, true);
 		return pagination.getItems();
 	}
 

@@ -91,6 +91,7 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		TemplateContext outerLoopContext = new TemplateContext(templateContext, true);
 		Object collectionObject = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(collectionName));
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
@@ -106,7 +107,7 @@ class LoopPart extends ContainerPart {
 		}
 		LoopStructure loopStructure = new LoopStructure(collection.size());
 		for (Object object : collection) {
-			TemplateContext loopContext = new TemplateContext(templateContext);
+			TemplateContext loopContext = new TemplateContext(outerLoopContext);
 			loopContext.addAccessor(LoopStructure.class, REFLECTION_ACCESSOR);
 			loopContext.set(loopName, loopStructure);
 			loopContext.set(itemName, object);
