@@ -1,5 +1,5 @@
 /*
- * utils - Filter.java - Copyright © 2010 David Roden
+ * utils - Processor.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,30 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package net.pterodactylus.util.collection.processor;
 
-package net.pterodactylus.util.template;
-
-import java.util.Map;
+import net.pterodactylus.util.collection.Container;
 
 /**
- * Filters can be used to transform the contents of a variable into some other
- * representation.
+ * A processor is used to process all elements of a {@link Container}.
  *
+ * @see Container#process(Processor)
+ * @param <T>
+ *            The type of the elements to process
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Filter {
+public interface Processor<T> {
 
 	/**
-	 * Formats the given data object.
+	 * Processes the given object.
 	 *
-	 * @param templateContext
-	 *            The current template context
-	 * @param data
-	 *            The data to format
-	 * @param parameters
-	 *            Parameters for the filter
-	 * @return The formatted data
+	 * @param object
+	 *            The object to process
 	 */
-	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters);
+	public void process(T object);
 
 }

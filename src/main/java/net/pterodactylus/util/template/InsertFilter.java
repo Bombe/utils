@@ -33,8 +33,8 @@ public class InsertFilter extends ReplaceFilter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		parameters.put("replacement", String.valueOf(templateContext.get(parameters.get("key"))));
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		parameters.put("replacement", String.valueOf(templateContext.get(String.valueOf(parameters.get("key")))));
 		return super.format(templateContext, data, parameters);
 	}
 

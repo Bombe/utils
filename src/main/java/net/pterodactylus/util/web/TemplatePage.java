@@ -27,6 +27,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateException;
 
 /**
  * A template page is a single page that is created from a {@link Template} but
@@ -92,19 +93,41 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(REQ request, Response response) {
+	public Response handleRequest(REQ request, Response response) throws IOException {
 		OutputStreamWriter responseWriter = null;
 		try {
 			responseWriter = new OutputStreamWriter(response.getContent(), "UTF-8");
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("request", request);
+			processTemplate(templateContext, request);
 			template.render(templateContext, responseWriter);
+		} catch (RedirectException re1) {
+			return new RedirectResponse(re1.getTarget());
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", ioe1);
+			throw ioe1;
+		} catch (TemplateException te1) {
+			logger.log(Level.WARNING, "Could not render template for path “" + path + "”!", te1);
+			throw new IOException(te1);
 		} finally {
 			Closer.close(responseWriter);
 		}
 		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType);
+	}
+
+	/**
+	 * Allows subclasses to manipulate the template context in dependency of the
+	 * request being served before the template itself is rendered.
+	 *
+	 * @param templateContext
+	 *            The template context
+	 * @param request
+	 *            The request being served
+	 * @throws RedirectException
+	 *             if a redirect should be performed
+	 */
+	protected void processTemplate(TemplateContext templateContext, REQ request) throws RedirectException {
+		/* do nothing. */
 	}
 
 }

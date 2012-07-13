@@ -1,5 +1,5 @@
 /*
- * utils - Processor.java - Copyright © 2011 David Roden
+ * utils - NotNullFilter.java - Copyright © 2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package net.pterodactylus.util.collection.filter;
 
-package net.pterodactylus.util.collection;
+import net.pterodactylus.util.collection.IterableWrapper;
 
 /**
- * A processor is used to process all elements of a {@link Container}.
+ * {@link Filter} implementation that removes all {@code null} objects from a
+ * collection.
  *
- * @see Container#process(Processor)
- * @param <T>
- *            The type of the elements to process
+ * @see IterableWrapper#filter(Filter)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Processor<T> {
+public class NotNullFilter implements Filter<Object> {
 
 	/**
-	 * Processes the given object.
-	 *
-	 * @param object
-	 *            The object to process
+	 * {@inheritDoc}
 	 */
-	public void process(T object);
+	@Override
+	public boolean filterObject(Object object) {
+		return object != null;
+	}
 
 }

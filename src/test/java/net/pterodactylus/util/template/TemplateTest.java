@@ -910,7 +910,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("[java.lang.String@101574]", output);
 
-		templateString = "<%= foo |replace needle=foo replacement=bar>";
+		templateString = "<%= foo |replace needle==foo replacement==bar>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -920,7 +920,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("bar", output);
 
-		templateString = "<%= foo |replace needle=foo replacement='<bar>'>";
+		templateString = "<%= foo |replace needle==foo replacement=='<bar>'>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -929,7 +929,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("<bar>", output);
 
-		templateString = "test <%= test | replace needle='t' replacement='b' | replace needle='sb' replacement='ao'> test";
+		templateString = "test <%= test | replace needle=='t' replacement=='b' | replace needle=='sb' replacement=='ao'> test";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -939,7 +939,7 @@ public class TemplateTest extends TestCase {
 		assertEquals("test beao test", output);
 
 		template = TemplateParser.parse(new StringReader("<%include t>"));
-		innerTemplate = TemplateParser.parse(new StringReader("<%=abc|replace needle=b replacement=d>"));
+		innerTemplate = TemplateParser.parse(new StringReader("<%=abc|replace needle==b replacement==d>"));
 		outputWriter = new StringWriter();
 		templateContext = new TemplateContext();
 		templateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
@@ -959,7 +959,7 @@ public class TemplateTest extends TestCase {
 		filter = new Filter() {
 
 			@Override
-			public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+			public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 				return ((Integer) data) > 1;
 			}
 		};
@@ -979,7 +979,7 @@ public class TemplateTest extends TestCase {
 		assertEquals("> 1", stringWriter.toString());
 
 		stringWriter = new StringWriter();
-		template = TemplateParser.parse(new StringReader("<%if a|match value=0>is 0<%else>is something<%/if>"));
+		template = TemplateParser.parse(new StringReader("<%if a|match value==0>is 0<%else>is something<%/if>"));
 		templateContext = new TemplateContext();
 		templateContext.addFilter("match", new MatchFilter());
 		templateContext.set("a", 0);
@@ -987,7 +987,7 @@ public class TemplateTest extends TestCase {
 		assertEquals("is 0", stringWriter.toString());
 
 		stringWriter = new StringWriter();
-		template = TemplateParser.parse(new StringReader("<%if ! a|match value=0>is 0<%else>is something<%/if>"));
+		template = TemplateParser.parse(new StringReader("<%if ! a|match value==0>is 0<%else>is something<%/if>"));
 		templateContext = new TemplateContext();
 		templateContext.addFilter("match", new MatchFilter());
 		templateContext.set("a", 0);
@@ -995,7 +995,7 @@ public class TemplateTest extends TestCase {
 		assertEquals("is something", stringWriter.toString());
 
 		stringWriter = new StringWriter();
-		template = TemplateParser.parse(new StringReader("<%if a|match key=b>equal<%else>not equal<%/if>"));
+		template = TemplateParser.parse(new StringReader("<%if a|match key==b>equal<%else>not equal<%/if>"));
 		templateContext = new TemplateContext();
 		templateContext.addFilter("match", new MatchFilter());
 		templateContext.set("a", "This is a string.");
@@ -1004,7 +1004,16 @@ public class TemplateTest extends TestCase {
 		assertEquals("equal", stringWriter.toString());
 
 		stringWriter = new StringWriter();
-		template = TemplateParser.parse(new StringReader("<%if ! a|match key=b>not equal<%else>equal<%/if>"));
+		template = TemplateParser.parse(new StringReader("<%if a|match value=b>equal<%else>not equal<%/if>"));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("match", new MatchFilter());
+		templateContext.set("a", "This is a string.");
+		templateContext.set("b", "This is a string.");
+		template.render(templateContext, stringWriter);
+		assertEquals("equal", stringWriter.toString());
+
+		stringWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader("<%if ! a|match key==b>not equal<%else>equal<%/if>"));
 		templateContext = new TemplateContext();
 		templateContext.addFilter("match", new MatchFilter());
 		templateContext.set("a", "This is a string.");
@@ -1020,7 +1029,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "<% name | store key='foo'>Hello, <% foo>!";
+		templateString = "<% name | store key=='foo'>Hello, <% foo>!";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1038,7 +1047,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "<% name | store key='foo'>Hello, <%= ${name} | insert needle='${name}' key='foo'>!";
+		templateString = "<% name | store key=='foo'>Hello, <%= ${name} | insert needle=='${name}' key=='foo'>!";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1060,7 +1069,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "<%foreach list item><%= true|store key=shown><%/foreach><%if shown>true<%else>false<%/if>";
+		templateString = "<%foreach list item><%= true|store key==shown><%/foreach><%if shown>true<%else>false<%/if>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1070,7 +1079,7 @@ public class TemplateTest extends TestCase {
 		output = outputWriter.toString();
 		assertEquals("false", output);
 
-		templateString = "<%foreach list item><%= true|store key=shown parent=true><%/foreach><%if shown>true<%else>false<%/if>";
+		templateString = "<%foreach list item><%= true|store key==shown parent==true><%/foreach><%if shown>true<%else>false<%/if>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1088,7 +1097,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "Hello, <%= ${name} | insert needle='${name}' key='map.a'>!";
+		templateString = "Hello, <%= ${name} | insert needle=='${name}' key=='map.a'>!";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1109,7 +1118,7 @@ public class TemplateTest extends TestCase {
 		StringWriter outputWriter;
 		String output;
 
-		templateString = "Test: <% value | default value='0'><% noValue | default value='1'>";
+		templateString = "Test: <% value | default value=='0'><% noValue | default value=='1'>";
 		outputWriter = new StringWriter();
 		template = TemplateParser.parse(new StringReader(templateString));
 		templateContext = new TemplateContext();
@@ -1187,7 +1196,7 @@ public class TemplateTest extends TestCase {
 		outerTemplate.render(innerTemplateContext, stringWriter);
 		assertEquals("a: a", stringWriter.toString());
 
-		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
@@ -1199,7 +1208,7 @@ public class TemplateTest extends TestCase {
 		outerTemplate.render(outerTemplateContext, stringWriter);
 		assertEquals("a: a", stringWriter.toString());
 
-		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
@@ -1213,11 +1222,11 @@ public class TemplateTest extends TestCase {
 		outerTemplate.render(innerTemplateContext, stringWriter);
 //		assertEquals("a: b", stringWriter.toString());
 
-		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key=b><%include inner>"));
+		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
-		innerTemplate = TemplateParser.parse(new StringReader("<% b|store key=c><%include innerst>"));
+		innerTemplate = TemplateParser.parse(new StringReader("<% b|store key==c><%include innerst>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
 		innerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplateContext.addFilter("store", new StoreFilter());
@@ -1245,11 +1254,11 @@ public class TemplateTest extends TestCase {
 		outerTemplate.render(innerTemplateContext, stringWriter);
 		assertEquals("items: foobar", stringWriter.toString());
 
-		outerTemplate = TemplateParser.parse(new StringReader("<%=1|store key=a><%include t><%a>"));
+		outerTemplate = TemplateParser.parse(new StringReader("<%=1|store key==a><%include t><%a>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addFilter("store", new StoreFilter());
 		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
-		innerTemplate = TemplateParser.parse(new StringReader("<%=2|store key=a>"));
+		innerTemplate = TemplateParser.parse(new StringReader("<%=2|store key==a>"));
 		outerTemplateContext.set("t", innerTemplate);
 		stringWriter = new StringWriter();
 		outerTemplate.render(outerTemplateContext, stringWriter);
@@ -1364,7 +1373,7 @@ public class TemplateTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+		public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 			return "[" + data.getClass().getName() + "@" + data.hashCode() + "]";
 		}
 

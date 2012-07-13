@@ -22,7 +22,7 @@ import java.util.Map;
 import net.pterodactylus.util.number.Numbers;
 
 /**
- * The mod filter performs a module operation on the given number and the
+ * The mod filter performs a modulo operation on the given number and the
  * parameter “divisor,” adding the optional parameter “offset” to the dividend,
  * and returns {@code true} if the module operation did not return a rest, i.e.
  * if {@code dividend + offset mod divisor} equals {@code 0}.
@@ -35,7 +35,7 @@ public class ModFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		Long dividend = Numbers.safeParseLong(data);
 		Long divisor = Numbers.safeParseLong(parameters.get("divisor"));
 		long offset = Numbers.safeParseLong(parameters.get("offset"), 0L);

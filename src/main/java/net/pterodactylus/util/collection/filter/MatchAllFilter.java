@@ -1,5 +1,5 @@
 /*
- * utils - Mapper.java - Copyright © 2011 David Roden
+ * utils - MatchAllFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.util.collection;
+package net.pterodactylus.util.collection.filter;
 
 /**
- * Interface for objects that can map one object to another.
+ * {@link Filter} implementation that matches all objects.
  *
- * @param <I>
- *            The type of the input object
- * @param <O>
- *            The type of the output object
+ * @param <T>
+ *            The type of object to filter
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Mapper<I, O> {
+public class MatchAllFilter<T> implements Filter<T> {
 
 	/**
-	 * Maps the given input object to another object.
-	 *
-	 * @param input
-	 *            The object to map
-	 * @return The mapped object
+	 * {@inheritDoc}
 	 */
-	public O map(I input);
+	@Override
+	public boolean filterObject(T object) {
+		return true;
+	}
 
 }

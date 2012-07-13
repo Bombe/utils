@@ -60,8 +60,9 @@ public class PaginationPlugin implements Plugin {
 			/* ignore. */
 		}
 		List<?> list = (List<?>) templateContext.get(listKey);
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings("unchecked")
 		Pagination<?> pagination = new Pagination((list == null) ? Collections.emptyList() : list, pageSize).setPage(page);
 		templateContext.set(paginationKey, pagination);
 	}
+
 }

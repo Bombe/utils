@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.11.4</version>
+	<version>0.12</version>
 	<name>utils</name>
 	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
@@ -40,7 +40,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<links>
-						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://docs.oracle.com/javase/6/docs/api/</link>
 					</links>
 				</configuration>
 				<executions>

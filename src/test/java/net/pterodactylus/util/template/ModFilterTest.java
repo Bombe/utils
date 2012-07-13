@@ -35,22 +35,22 @@ public class ModFilterTest extends TestCase {
 	 */
 	public void test() {
 		ModFilter modFilter = new ModFilter();
-		Map<String, String> parameters;
+		Map<String, Object> parameters;
 
-		parameters = new HashMap<String, String>();
+		parameters = new HashMap<String, Object>();
 		assertBoolean(modFilter.format(null, "14", parameters), false);
 		assertBoolean(modFilter.format(null, "a", parameters), false);
 
-		parameters = new MapBuilder<String, String>().put("divisor", "3").get();
+		parameters = new MapBuilder<String, Object>().put("divisor", "3").get();
 		assertBoolean(modFilter.format(null, "14", parameters), false);
 		assertBoolean(modFilter.format(null, "15", parameters), true);
 
-		parameters = new MapBuilder<String, String>().put("divisor", "3").put("offset", "2").get();
+		parameters = new MapBuilder<String, Object>().put("divisor", "3").put("offset", "2").get();
 		assertBoolean(modFilter.format(null, "14", parameters), false);
 		assertBoolean(modFilter.format(null, "15", parameters), false);
 		assertBoolean(modFilter.format(null, "16", parameters), true);
 
-		parameters = new MapBuilder<String, String>().put("divisor", "3").put("offset", "a").get();
+		parameters = new MapBuilder<String, Object>().put("divisor", "3").put("offset", "a").get();
 		assertBoolean(modFilter.format(null, "14", parameters), false);
 		assertBoolean(modFilter.format(null, "15", parameters), true);
 		assertBoolean(modFilter.format(null, "16", parameters), false);

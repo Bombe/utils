@@ -20,7 +20,6 @@ package net.pterodactylus.util.template;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.pterodactylus.util.template.TemplateParser.Filters;
@@ -92,6 +91,7 @@ class LoopPart extends ContainerPart {
 	 */
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		TemplateContext outerLoopContext = new TemplateContext(templateContext, true);
 		Object collectionObject = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(collectionName));
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
@@ -106,10 +106,8 @@ class LoopPart extends ContainerPart {
 			collection = Arrays.asList(collectionObject);
 		}
 		LoopStructure loopStructure = new LoopStructure(collection.size());
-		Map<String, Object> overrideObjects = new HashMap<String, Object>();
-		overrideObjects.put(loopName, loopStructure);
 		for (Object object : collection) {
-			TemplateContext loopContext = new TemplateContext(templateContext);
+			TemplateContext loopContext = new TemplateContext(outerLoopContext);
 			loopContext.addAccessor(LoopStructure.class, REFLECTION_ACCESSOR);
 			loopContext.set(loopName, loopStructure);
 			loopContext.set(itemName, object);

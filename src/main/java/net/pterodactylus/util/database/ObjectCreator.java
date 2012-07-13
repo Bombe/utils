@@ -103,6 +103,9 @@ public interface ObjectCreator<T> {
 		/** The index of the value. */
 		private final int index;
 
+		/** The name of the field. */
+		private final String fieldName;
+
 		/**
 		 * Creates a new object creator that returns the value of the result
 		 * set’s first column as a {@link String}.
@@ -119,7 +122,31 @@ public interface ObjectCreator<T> {
 		 *            The index of the column
 		 */
 		public StringCreator(int index) {
+			this(index, null);
+		}
+
+		/**
+		 * Creates a new object creator that returns the value of the column
+		 * with the given name as a {@link String}.
+		 *
+		 * @param fieldName
+		 *            The name of the column
+		 */
+		public StringCreator(String fieldName) {
+			this(-1, fieldName);
+		}
+
+		/**
+		 * Creates a new object creator.
+		 *
+		 * @param index
+		 *            The index of the column
+		 * @param fieldName
+		 *            The name of the column
+		 */
+		private StringCreator(int index, String fieldName) {
 			this.index = index;
+			this.fieldName = fieldName;
 		}
 
 		/**
@@ -127,7 +154,7 @@ public interface ObjectCreator<T> {
 		 */
 		@Override
 		public String createObject(ResultSet resultSet) throws SQLException {
-			return resultSet.getString(index);
+			return (fieldName == null) ? resultSet.getString(index) : resultSet.getString(fieldName);
 		}
 	}
 

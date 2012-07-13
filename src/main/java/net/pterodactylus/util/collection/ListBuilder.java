@@ -97,7 +97,7 @@ public class ListBuilder<T> {
 	 *             if the list contains elements that are not <i>mutually
 	 *             comparable</i> (for example, strings and integers).
 	 */
-	@SuppressWarnings( { "unchecked" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ListBuilder<T> sort() throws ClassCastException {
 		Collections.sort((List) list);
 		return this;

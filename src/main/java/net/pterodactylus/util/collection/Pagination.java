@@ -17,18 +17,23 @@
 
 package net.pterodactylus.util.collection;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Helper class for lists that need pagination. Setting the page or the page
  * size will automatically recalculate all other parameters, and the next call
  * to {@link #getItems()} retrieves all items on the current page.
+ * <p>
+ * A pagination object can be used as an {@link Iterable}. When the
+ * {@link Iterator} from {@link #iterator()} is requested, the iterator over
+ * {@link #getItems()} is returned.
  *
  * @param <T>
  *            The type of the list elements
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Pagination<T> {
+public class Pagination<T> implements Iterable<T> {
 
 	/** The list to paginate. */
 	private final List<T> list;
@@ -211,6 +216,18 @@ public class Pagination<T> {
 	 */
 	public int getLastPage() {
 		return pageCount - 1;
+	}
+
+	//
+	// ITERABLE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterator<T> iterator() {
+		return getItems().iterator();
 	}
 
 }

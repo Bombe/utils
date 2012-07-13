@@ -44,7 +44,7 @@ public class XmlFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		StringBuilder xmlOutput = new StringBuilder();
 		for (char c : (data != null) ? String.valueOf(data).toCharArray() : new char[0]) {
 			if (xmlEntities.containsKey(c)) {

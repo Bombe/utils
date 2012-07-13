@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.pterodactylus.util.collection.mapper.Mappers;
+
 /**
  * Helper methods for using the {@link Converter} interface with {@link Set}s
  * and {@link List}s.
