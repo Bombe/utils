@@ -18,6 +18,7 @@
 package net.pterodactylus.util.template;
 
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -90,6 +91,7 @@ class LoopPart extends ContainerPart {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		TemplateContext outerLoopContext = new TemplateContext(templateContext, true);
 		Object collectionObject = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(collectionName));
@@ -102,6 +104,11 @@ class LoopPart extends ContainerPart {
 		} else if (collectionObject instanceof Map<?, ?>) {
 			Map<?, ?> map = (Map<?, ?>) collectionObject;
 			collection = map.entrySet();
+		} else if (collectionObject instanceof Iterable<?>) {
+			collection = new ArrayList<Object>();
+			for (Object object : (Iterable<?>) collectionObject) {
+				((Collection<Object>) collection).add(object);
+			}
 		} else {
 			collection = Arrays.asList(collectionObject);
 		}
