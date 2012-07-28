@@ -17,6 +17,7 @@
 
 package net.pterodactylus.util.template;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -62,6 +63,31 @@ public class ReflectionAccessor implements Accessor {
 				/* TODO - logging. */
 			} catch (NoSuchMethodException e) {
 				/* swallow, method just doesn’t exist. */
+			}
+		}
+		if (method == null) {
+			/* look for a field. */
+			Field field = null;
+			try {
+				field = object.getClass().getField(member);
+				return field.get(object);
+			} catch (SecurityException se1) {
+				/* TODO - logging. */
+			} catch (NoSuchFieldException nsfe1) {
+				/* swallow, field just doesn’t exist. */
+			} catch (IllegalArgumentException iae1) {
+				/* TODO - logging. */
+			} catch (IllegalAccessException iae1) {
+				if (Modifier.isPublic(field.getModifiers()) && !Modifier.isPublic(object.getClass().getModifiers())) {
+					field.setAccessible(true);
+					try {
+						return field.get(object);
+					} catch (IllegalArgumentException iae2) {
+						/* TODO - logging. */
+					} catch (IllegalAccessException iae2) {
+						/* TODO - logging. */
+					}
+				}
 			}
 		}
 		if (method != null) {
