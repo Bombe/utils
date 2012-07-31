@@ -23,8 +23,9 @@ import java.util.Map;
 import net.pterodactylus.util.collection.filter.Filters;
 
 /**
- * {@link Filter} implementation that can remove a single element from a
- * {@link Collection}. The element is given as parameter “value.”
+ * {@link Filter} implementation that can remove elements from a
+ * {@link Collection}. The elements are given as parameter “value” and can
+ * either be a single object or a {@link Collection}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -36,6 +37,16 @@ public class RemoveFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		final Object value = parameters.get("value");
+
+		if (value instanceof Collection<?>) {
+			return Filters.filteredCollection((Collection<?>) data, Filters.reverseFilter(new net.pterodactylus.util.collection.filter.Filter<Object>() {
+
+				@Override
+				public boolean filterObject(Object object) {
+					return ((Collection<?>) value).contains(object);
+				}
+			}));
+		}
 
 		return Filters.filteredCollection((Collection<?>) data, Filters.reverseFilter(new net.pterodactylus.util.collection.filter.Filter<Object>() {
 
