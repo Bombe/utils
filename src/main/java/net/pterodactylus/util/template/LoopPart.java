@@ -95,6 +95,9 @@ class LoopPart extends ContainerPart {
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		TemplateContext outerLoopContext = new TemplateContext(templateContext, true);
 		Object collectionObject = filters.filter(getLine(), getColumn(), templateContext, templateContext.get(collectionName));
+		if (collectionObject == null) {
+			return;
+		}
 		Collection<?> collection;
 		if (collectionObject instanceof Collection<?>) {
 			collection = (Collection<?>) collectionObject;
