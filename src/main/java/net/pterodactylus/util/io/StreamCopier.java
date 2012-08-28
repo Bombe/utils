@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.EventListener;
 
 /**
  * Helper class that copies bytes from an {@link InputStream} to an
@@ -57,6 +58,9 @@ public class StreamCopier {
 	 *            The input stream to read from
 	 * @param destination
 	 *            The output stream to write to
+	 * @param progressListener
+	 *            A progress listener that is notified during copying (may be
+	 *            {@code null})
 	 * @param length
 	 *            The number of bytes to copy
 	 * @return The number of bytes that have been read from the input stream and
@@ -64,7 +68,7 @@ public class StreamCopier {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	public static long copy(InputStream source, OutputStream destination, long length) throws IOException {
+	public static long copy(InputStream source, OutputStream destination, ProgressListener progressListener, long length) throws IOException {
 		long remaining = length;
 		byte[] buffer = new byte[bufferSize];
 		long total = 0;
@@ -82,12 +86,58 @@ public class StreamCopier {
 				remaining -= read;
 			}
 			total += read;
+			if (progressListener != null) {
+				progressListener.onProgress(length - remaining, length);
+			}
 		}
 		return total;
 	}
 
 	/**
-	 * Copies as much bytes as possible (i.e. until {@link InputStream#read()}
+	 * Copies <code>length</code> bytes from the source input stream to the
+	 * destination output stream. If <code>length</code> is <code>-1</code> as
+	 * much bytes as possible will be copied (i.e. until
+	 * {@link InputStream#read()} returns <code>-1</code> to signal the end of
+	 * the stream).
+	 *
+	 * @param source
+	 *            The input stream to read from
+	 * @param destination
+	 *            The output stream to write to
+	 * @param length
+	 *            The number of bytes to copy
+	 * @return The number of bytes that have been read from the input stream and
+	 *         written to the output stream
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public static long copy(InputStream source, OutputStream destination, long length) throws IOException {
+		return copy(source, destination, null, length);
+	}
+
+	/**
+	 * Copies as many bytes as possible (i.e. until {@link InputStream#read()}
+	 * returns <code>-1</code>) from the source input stream to the destination
+	 * output stream.
+	 *
+	 * @param source
+	 *            The input stream to read from
+	 * @param destination
+	 *            The output stream to write to
+	 * @param progressListener
+	 *            A progress listener that is notified during copying (may be
+	 *            {@code null})
+	 * @return The number of bytes that have been read from the input stream and
+	 *         written to the output stream
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public static long copy(InputStream source, OutputStream destination, ProgressListener progressListener) throws IOException {
+		return copy(source, destination, progressListener, -1);
+	}
+
+	/**
+	 * Copies as many bytes as possible (i.e. until {@link InputStream#read()}
 	 * returns <code>-1</code>) from the source input stream to the destination
 	 * output stream.
 	 *
@@ -125,6 +175,27 @@ public class StreamCopier {
 			}
 		}
 		return length;
+	}
+
+	/**
+	 * Interface for objects that want to be notified about the progress of a
+	 * {@link StreamCopier#copy(InputStream, OutputStream, ProgressListener)}
+	 * operation.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static interface ProgressListener extends EventListener {
+
+		/**
+		 * Notifiies a listener that a copy process made some progress.
+		 *
+		 * @param copied
+		 *            The number of bytes that have already been copied
+		 * @param length
+		 *            The total number of bytes that will be copied
+		 */
+		public void onProgress(long copied, long length);
+
 	}
 
 }
