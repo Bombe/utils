@@ -1,5 +1,5 @@
 /*
- * utils - DelayedNotification.java - Copyright © 2012 David Roden
+ * utils - StoppableDelay.java - Copyright © 2012 David Roden
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-package net.pterodactylus.util.swing;
-
-import javax.swing.JDialog;
+package net.pterodactylus.util.thread;
 
 /**
- * Shows a dialog after a certain time of a potentially longer-running operation
- * has elapsed, until said operation is finished.
+ * Runs a runnable after a certain time of a potentially longer-running
+ * operation has elapsed, until said operation is finished.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class DelayedNotification implements Runnable {
+public class StoppableDelay implements Runnable {
 
 	/** The start time of the operation. */
 	private final long startTime = System.currentTimeMillis();
@@ -34,34 +32,41 @@ public class DelayedNotification implements Runnable {
 	/** The delay after which to show the dialog. */
 	private final long delay;
 
-	/** The dialog to display. */
-	private final JDialog notificationDialog;
+	/** The runnable that is run after the delay. */
+	private final Runnable startRunnable;
+
+	/** The runnable that is run when the job finishes. */
+	private final Runnable stopRunnable;
 
 	/** If the operation is finished. */
 	private volatile boolean finished;
 
 	/**
-	 * Creates a new delayed notification that shows the given dialog after 500
-	 * milliseconds.
+	 * Creates a new delay that runs the given runnable after 500 milliseconds.
 	 *
-	 * @param notificationDialog
-	 *            The dialog to display
+	 * @param startRunnable
+	 *            The runnable that is run after the delay
+	 * @param stopRunnable
+	 *            The runnable that is run when the job finishes
 	 */
-	public DelayedNotification(JDialog notificationDialog) {
-		this(notificationDialog, 500);
+	public StoppableDelay(Runnable startRunnable, Runnable stopRunnable) {
+		this(startRunnable, stopRunnable, 500);
 	}
 
 	/**
-	 * Creates a new delayed notification that shows the given dialog after the
-	 * given number of milliseconds.
+	 * Creates a new delay that runs the given runnable after the given number
+	 * of milliseconds.
 	 *
-	 * @param notificationDialog
-	 *            The dialog to display
+	 * @param startRunnable
+	 *            The runnable that is run after the delay
+	 * @param stopRunnable
+	 *            The runnable that is run when the job finishes
 	 * @param delay
 	 *            The delay after which to display the dialog (in milliseconds)
 	 */
-	public DelayedNotification(JDialog notificationDialog, long delay) {
-		this.notificationDialog = notificationDialog;
+	public StoppableDelay(Runnable startRunnable, Runnable stopRunnable, long delay) {
+		this.startRunnable = startRunnable;
+		this.stopRunnable = stopRunnable;
 		this.delay = delay;
 	}
 
@@ -83,12 +88,13 @@ public class DelayedNotification implements Runnable {
 	//
 
 	/**
-	 * Marks the long-running operation as finished and hides the dialog. If the
-	 * dialog was not yet shown it will not be shown at all.
+	 * Marks the long-running operation as finished and runs the appropriate
+	 * runnable. If the {@link #startRunnable} was not started yet, it will not
+	 * be started at all.
 	 */
 	public void finish() {
 		finished = true;
-		notificationDialog.setVisible(false);
+		stopRunnable.run();
 	}
 
 	//
@@ -110,7 +116,7 @@ public class DelayedNotification implements Runnable {
 		if (finished) {
 			return;
 		}
-		notificationDialog.setVisible(true);
+		startRunnable.run();
 	}
 
 }
