@@ -38,7 +38,7 @@ import net.pterodactylus.util.logging.Logging;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ClassPathTemplateProvider implements Provider {
+public class ClassPathTemplateProvider implements TemplateProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(ClassPathTemplateProvider.class);

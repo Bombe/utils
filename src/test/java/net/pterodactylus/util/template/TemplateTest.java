@@ -942,7 +942,7 @@ public class TemplateTest extends TestCase {
 		innerTemplate = TemplateParser.parse(new StringReader("<%=abc|replace needle==b replacement==d>"));
 		outputWriter = new StringWriter();
 		templateContext = new TemplateContext();
-		templateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		templateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContext.addFilter("replace", new ReplaceFilter());
 		templateContext.set("t", innerTemplate);
 		template.render(templateContext, outputWriter);
@@ -1146,14 +1146,14 @@ public class TemplateTest extends TestCase {
 		stringWriter = new StringWriter();
 
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.set("test", innerTemplate);
 		outerTemplate.render(outerTemplateContext, stringWriter);
 		assertEquals("Line.\nSentence!\nLine.", stringWriter.toString());
 
 		outerTemplate = TemplateParser.parse(new StringReader("Line.\n<%include test>\nLine."));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<% a>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
 		stringWriter = new StringWriter();
@@ -1165,7 +1165,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("Line.\n<%include test>\nLine."));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<% a>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
 		stringWriter = new StringWriter();
@@ -1178,7 +1178,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("a: <%include inner>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<% b.test>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
 		stringWriter = new StringWriter();
@@ -1198,7 +1198,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
 		innerTemplate = TemplateParser.parse(new StringReader("<% b>"));
 		stringWriter = new StringWriter();
@@ -1210,7 +1210,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
 		innerTemplate = TemplateParser.parse(new StringReader("<% b>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
@@ -1224,11 +1224,11 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("a: <% a|store key==b><%include inner>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.addFilter("store", new StoreFilter());
 		innerTemplate = TemplateParser.parse(new StringReader("<% b|store key==c><%include innerst>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
-		innerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		innerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplateContext.addFilter("store", new StoreFilter());
 		innerstTemplate = TemplateParser.parse(new StringReader("<% c>"));
 		stringWriter = new StringWriter();
@@ -1241,7 +1241,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("items: <%include itemTemplate>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<%foreach items item><%item.name><%/foreach>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
 		outerTemplateContext.set("itemTemplate", innerTemplate);
@@ -1257,7 +1257,7 @@ public class TemplateTest extends TestCase {
 		outerTemplate = TemplateParser.parse(new StringReader("<%=1|store key==a><%include t><%a>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addFilter("store", new StoreFilter());
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<%=2|store key==a>"));
 		outerTemplateContext.set("t", innerTemplate);
 		stringWriter = new StringWriter();
@@ -1269,7 +1269,7 @@ public class TemplateTest extends TestCase {
 		innerstTemplate = TemplateParser.parse(new StringReader("<%=ä|html>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addFilter("html", new HtmlFilter());
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		outerTemplateContext.set("t", innerTemplate);
 		outerTemplateContext.set("u", innerstTemplate);
 		stringWriter = new StringWriter();
@@ -1287,7 +1287,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("<%include t a=b>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<%a>"));
 		outerTemplateContext.set("a", "1");
 		outerTemplateContext.set("b", "2");
@@ -1299,7 +1299,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("<%include t a==2>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<%a>"));
 		outerTemplateContext.set("a", "1");
 		outerTemplateContext.set("b", "2");
@@ -1311,10 +1311,10 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("<%include t a==2>"));
 		outerTemplateContext = new TemplateContext();
-		outerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerTemplate = TemplateParser.parse(new StringReader("<%include t a==1>"));
 		innerTemplateContext = new TemplateContext(outerTemplateContext);
-		innerTemplateContext.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		innerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
 		innerstTemplate = TemplateParser.parse(new StringReader("<%a>"));
 		outerTemplateContext.set("a", "1");
 		outerTemplateContext.set("b", "2");

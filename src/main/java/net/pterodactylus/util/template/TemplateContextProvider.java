@@ -18,13 +18,13 @@
 package net.pterodactylus.util.template;
 
 /**
- * {@link Provider} implementation that returns a {@link Template} from a
- * {@link TemplateContext}. If the object in the context is a {@link Part}, a
+ * {@link TemplateProvider} implementation that returns a {@link Template} from
+ * a {@link TemplateContext}. If the object in the context is a {@link Part}, a
  * {@link Template} will be wrapped around it.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplateContextProvider implements Provider {
+public class TemplateContextProvider implements TemplateProvider {
 
 	/**
 	 * {@inheritDoc}

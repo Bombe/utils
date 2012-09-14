@@ -1,5 +1,5 @@
 /*
- * utils - Provider.java - Copyright © 2010 David Roden
+ * utils - TemplateProvider.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@ package net.pterodactylus.util.template;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Provider {
+public interface TemplateProvider {
 
 	/**
-	 * Provider that gets a {@link Template} from the {@link TemplateContext}.
+	 * TemplateProvider that gets a {@link Template} from the {@link TemplateContext}.
 	 */
-	public static final Provider TEMPLATE_CONTEXT_PROVIDER = new TemplateContextProvider();
+	public static final TemplateProvider TEMPLATE_CONTEXT_PROVIDER = new TemplateContextProvider();
 
 	/**
 	 * Retrieves the template with the given name.

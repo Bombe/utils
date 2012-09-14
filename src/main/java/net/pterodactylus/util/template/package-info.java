@@ -64,7 +64,7 @@
  * {@link net.pterodactylus.util.template.Filter}s,
  * {@link net.pterodactylus.util.template.Plugin}s,
  * {@link net.pterodactylus.util.template.Accessor}s,
- * {@link net.pterodactylus.util.template.Provider}s, and objects. Template
+ * {@link net.pterodactylus.util.template.TemplateProvider}s, and objects. Template
  * contexts can have parent contexts and use those recursively when any kind
  * of data is requested.
  * </p>
