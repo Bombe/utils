@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 /**
  * Default {@link TemplateContext} factory implementation that creates
  * {@link TemplateContext}s with {@link Accessor}s, {@link Filter}s,
- * {@link Plugin}s, {@link Provider}s, and arbitrary objects that are set on all
- * created {@link TemplateContext}s.
+ * {@link Plugin}s, {@link TemplateProvider}s, and arbitrary objects that are
+ * set on all created {@link TemplateContext}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -46,8 +46,8 @@ public class TemplateContextFactory {
 	/** Accessors that will be added to all created templates. */
 	private final Map<Class<?>, Accessor> accessors = Collections.synchronizedMap(new HashMap<Class<?>, Accessor>());
 
-	/** The provider for all created templates. */
-	private List<Provider> providers = Collections.synchronizedList(new ArrayList<Provider>());
+	/** The template provider for all created templates. */
+	private List<TemplateProvider> templateProviders = Collections.synchronizedList(new ArrayList<TemplateProvider>());
 
 	/** Additional objects to set in all templates. */
 	private final Map<String, Object> templateObjects = Collections.synchronizedMap(new HashMap<String, Object>());
@@ -89,13 +89,13 @@ public class TemplateContextFactory {
 	}
 
 	/**
-	 * Sets the provider that is set on all created templates.
+	 * Sets the template provider that is set on all created templates.
 	 *
-	 * @param provider
-	 *            The provider to set
+	 * @param templateProvider
+	 *            The template provider to set
 	 */
-	public void addProvider(Provider provider) {
-		providers.add(provider);
+	public void addProvider(TemplateProvider templateProvider) {
+		templateProviders.add(templateProvider);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class TemplateContextFactory {
 
 	/**
 	 * Creates a new template context that contains the accessors, filters,
-	 * plugins, providers, and objects set in this factory.
+	 * plugins, template providers, and objects set in this factory.
 	 *
 	 * @return The new context
 	 */
@@ -139,8 +139,8 @@ public class TemplateContextFactory {
 		for (Entry<Class<?>, Accessor> accessorEntry : accessors.entrySet()) {
 			templateContext.addAccessor(accessorEntry.getKey(), accessorEntry.getValue());
 		}
-		for (Provider provider : providers) {
-			templateContext.addProvider(provider);
+		for (TemplateProvider templateProvider : templateProviders) {
+			templateContext.addTemplateProvider(templateProvider);
 		}
 		for (Entry<String, Object> objectEntry : templateObjects.entrySet()) {
 			templateContext.set(objectEntry.getKey(), objectEntry.getValue());

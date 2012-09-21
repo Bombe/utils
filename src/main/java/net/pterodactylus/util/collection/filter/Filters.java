@@ -134,4 +134,24 @@ public class Filters {
 		return new FilteredIterator<E>(iterator, iteratorFilter);
 	}
 
+	/**
+	 * Returns a filter that reverses the given filter.
+	 *
+	 * @param <E>
+	 *            The type of the elements to filter
+	 * @param filter
+	 *            The original filter
+	 * @return The original filter reversed
+	 */
+	public static <E> Filter<E> reverseFilter(final Filter<E> filter) {
+		return new Filter<E>() {
+
+			@Override
+			public boolean filterObject(E object) {
+				return !filter.filterObject(object);
+			}
+
+		};
+	}
+
 }

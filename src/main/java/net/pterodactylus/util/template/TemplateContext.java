@@ -41,8 +41,8 @@ public class TemplateContext {
 	/** The plugins for this context. */
 	private final Map<String, Plugin> plugins = Collections.synchronizedMap(new HashMap<String, Plugin>());
 
-	/** The providers for this context. */
-	private final List<Provider> providers = Collections.synchronizedList(new ArrayList<Provider>());
+	/** The template providers for this context. */
+	private final List<TemplateProvider> templateProviders = Collections.synchronizedList(new ArrayList<TemplateProvider>());
 
 	/** The template objects for this context. */
 	private final Map<String, Object> objects = Collections.synchronizedMap(new HashMap<String, Object>());
@@ -132,14 +132,27 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Adds a provider to this context.
+	 * Adds a template provider to this context.
 	 *
-	 * @param provider
-	 *            The provider to add
+	 * @param templateProvider
+	 *            The template provider to add
+	 * @return This template context
+	 * @deprecated Use {@link #addTemplateProvider(TemplateProvider)} instead
+	 */
+	@Deprecated
+	public TemplateContext addProvider(TemplateProvider templateProvider) {
+		return addTemplateProvider(templateProvider);
+	}
+
+	/**
+	 * Adds a template provider to this context.
+	 *
+	 * @param templateProvider
+	 *            The template provider to add
 	 * @return This template context
 	 */
-	public TemplateContext addProvider(Provider provider) {
-		providers.add(provider);
+	public TemplateContext addTemplateProvider(TemplateProvider templateProvider) {
+		templateProviders.add(templateProvider);
 		return this;
 	}
 
@@ -325,9 +338,9 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Returns the template with the given name. If the providers of this
-	 * context can not find a template with the given name, the parent context
-	 * is asked.
+	 * Returns the template with the given name. If the template providers of
+	 * this context can not find a template with the given name, the parent
+	 * context is asked.
 	 *
 	 * @param name
 	 *            The name of the template
@@ -336,8 +349,8 @@ public class TemplateContext {
 	public Template getTemplate(String name) {
 		Template template = null;
 		for (TemplateContext context : getAllTemplateContexts()) {
-			for (Provider provider : context.providers) {
-				template = provider.getTemplate(this, name);
+			for (TemplateProvider templateProvider : context.templateProviders) {
+				template = templateProvider.getTemplate(this, name);
 				if (template != null) {
 					break;
 				}
@@ -350,8 +363,8 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Merges the accessors, filters, plugins, providers, and template objects
-	 * into this context.
+	 * Merges the accessors, filters, plugins, template providers, and template
+	 * objects into this context.
 	 *
 	 * @param templateContext
 	 *            The context to merge

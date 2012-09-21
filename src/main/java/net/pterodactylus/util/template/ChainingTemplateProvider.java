@@ -1,5 +1,5 @@
 /*
- * utils - TemplateContextProvider.java - Copyright © 2011 David Roden
+ * utils - ChainingTemplateProvider.java - Copyright © 2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,46 @@
 
 package net.pterodactylus.util.template;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * {@link TemplateProvider} implementation that returns a {@link Template} from
- * a {@link TemplateContext}. If the object in the context is a {@link Part}, a
- * {@link Template} will be wrapped around it.
+ * {@link TemplateProvider} that delegates requests for a {@link Template} to
+ * several other {@link TemplateProvider}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplateContextProvider implements TemplateProvider {
+public class ChainingTemplateProvider implements TemplateProvider {
+
+	/** The delegate template providers. */
+	private final List<TemplateProvider> providers = new ArrayList<TemplateProvider>();
+
+	/**
+	 * Creates a new chaining template provider.
+	 *
+	 * @param providers
+	 *            The delegate template providers
+	 */
+	public ChainingTemplateProvider(TemplateProvider... providers) {
+		for (TemplateProvider provider : providers) {
+			this.providers.add(provider);
+		}
+	}
+
+	//
+	// TEMPLATEPROVIDER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Template getTemplate(TemplateContext templateContext, String templateName) {
-		Object templateObject = templateContext.get(templateName);
-		if (templateObject instanceof Template) {
-			return (Template) templateObject;
-		} else if (templateObject instanceof Part) {
-			Part part = (Part) templateObject;
-			Template template = new Template();
-			template.add(part);
-			return template;
+		for (TemplateProvider provider : providers) {
+			Template template = provider.getTemplate(templateContext, templateName);
+			if (template != null) {
+				return template;
+			}
 		}
 		return null;
 	}
