@@ -1276,7 +1276,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("<%include t>"));
 		innerTemplate = TemplateParser.parse(new StringReader("<%include u>"));
-		innerstTemplate = TemplateParser.parse(new StringReader("<%=ä|html>"));
+		innerstTemplate = TemplateParser.parse(new StringReader("<%=äb|html><% no|html>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addFilter("html", new HtmlFilter());
 		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
@@ -1284,7 +1284,7 @@ public class TemplateTest extends TestCase {
 		outerTemplateContext.set("u", innerstTemplate);
 		stringWriter = new StringWriter();
 		outerTemplate.render(outerTemplateContext, stringWriter);
-		assertEquals("&auml;", stringWriter.toString());
+		assertEquals("&auml;b", stringWriter.toString());
 	}
 
 	public void testTemplateInclusionWithParameters() {
