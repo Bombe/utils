@@ -1375,6 +1375,15 @@ public class TemplateTest extends TestCase {
 
 		template.render(templateContext, stringWriter);
 		assertEquals("a", stringWriter.toString());
+
+		template = TemplateParser.parse(new StringReader("<%a><%:delete><%a>"));
+		templateContext = new TemplateContext();
+		templateContext.addPlugin("delete", new DeletePlugin());
+		templateContext.set("a", "a");
+		stringWriter = new StringWriter();
+
+		template.render(templateContext, stringWriter);
+		assertEquals("aa", stringWriter.toString());
 	}
 
 	private static class TestFilter implements Filter {
