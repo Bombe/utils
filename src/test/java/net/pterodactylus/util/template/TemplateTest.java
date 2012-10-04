@@ -1038,6 +1038,16 @@ public class TemplateTest extends TestCase {
 		template.render(templateContext, outputWriter);
 		output = outputWriter.toString();
 		assertEquals("Hello, User!", output);
+
+		templateString = "<% name | store key=='foo' text==true>Hello, <% foo>!";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("store", new StoreFilter());
+		templateContext.set("name", "User");
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Hello, User!", output);
 	}
 
 	public void testStoreAndInsertFilter() {
