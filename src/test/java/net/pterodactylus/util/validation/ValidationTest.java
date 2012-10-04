@@ -401,4 +401,22 @@ public class ValidationTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Tests {@link Validation#isAll(String, Object, Object...)}.
+	 */
+	public void testIsAll() {
+		Validation.begin().isAll("Test Object", "a", "a").check();
+		Validation.begin().isAll("Test Object", "a", "a", "a").check();
+		try {
+			Validation.begin().isAll("Test Object", "a", "b").check();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+		try {
+			Validation.begin().isAll("Test Object", "a", "b", "c").check();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
 }
