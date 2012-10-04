@@ -27,6 +27,19 @@ import junit.framework.TestCase;
 public class ValidationTest extends TestCase {
 
 	/**
+	 * Tests {@link Validation#is(String, boolean)}.
+	 */
+	public void testIs() {
+		Validation.begin().is("true", true).check();
+		try {
+			Validation.begin().is("false", false).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
+	/**
 	 * Tests {@link Validation#isNotNull(String, Object)}.
 	 */
 	public void testIsNotNull() {
