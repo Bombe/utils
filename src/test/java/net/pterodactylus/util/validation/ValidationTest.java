@@ -418,7 +418,8 @@ public class ValidationTest extends TestCase {
 	 * Tests {@link Validation#isEither(String, Object, Object...)}.
 	 */
 	public void testIsEither() {
-		Validation.begin().isEither("Test Object", "a", "a", "b", "c").check();
+		Validation.begin().isEither("Test Object", "a", null, "a", "b", "c").check();
+		Validation.begin().isEither("Test Object", null, "a", "b", "c", null).check();
 		try {
 			Validation.begin().isEither("Test Object", "a", "b", "c", "d").check();
 			fail();
