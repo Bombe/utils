@@ -40,6 +40,19 @@ public class ValidationTest extends TestCase {
 	}
 
 	/**
+	 * Tests {@link Validation#is(String, boolean)}.
+	 */
+	public void testIsNot() {
+		Validation.begin().isNot("false", false).check();
+		try {
+			Validation.begin().isNot("true", true).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
+	/**
 	 * Tests {@link Validation#isNotNull(String, Object)}.
 	 */
 	public void testIsNotNull() {
