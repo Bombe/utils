@@ -60,6 +60,9 @@ public class TypeSafe {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T ensureType(Object object, Class<T> clazz, T defaultValue) {
+		if (object == null) {
+			return null;
+		}
 		if (clazz.isAssignableFrom(object.getClass())) {
 			return (T) object;
 		}

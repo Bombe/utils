@@ -16,7 +16,6 @@
  */
 package net.pterodactylus.util.collection;
 
-import java.util.Enumeration;
 import java.util.Iterator;
 
 import net.pterodactylus.util.collection.filter.Filter;
@@ -98,33 +97,15 @@ public class IteratorWrapper<T> implements Iterator<T> {
 	}
 
 	/**
-	 * Returns an iterator wrapper around the given enumeration. The
-	 * {@link Iterator#remove()} does not do anything.
+	 * Convenience method that creates a new {@link IteratorWrapper} around the
+	 * given iterator.
 	 *
-	 * @param <T>
-	 *            The type of the elements to enumerate
-	 * @param enumeration
-	 *            The enumeration to wrap
-	 * @return The iterator wrapper around the given enumeration
+	 * @param iterator
+	 *            The iterator to wrap
+	 * @return The wrapped iterator
 	 */
-	public static <T> IteratorWrapper<T> wrap(final Enumeration<T> enumeration) {
-		return new IteratorWrapper<T>(new Iterator<T>() {
-
-			@Override
-			public boolean hasNext() {
-				return enumeration.hasMoreElements();
-			}
-
-			@Override
-			public T next() {
-				return enumeration.nextElement();
-			}
-
-			@Override
-			public void remove() {
-				/* ignore. */
-			}
-		});
+	public static <T> IteratorWrapper<T> wrap(Iterator<T> iterator) {
+		return new IteratorWrapper<T>(iterator);
 	}
 
 	//

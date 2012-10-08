@@ -27,6 +27,32 @@ import junit.framework.TestCase;
 public class ValidationTest extends TestCase {
 
 	/**
+	 * Tests {@link Validation#is(String, boolean)}.
+	 */
+	public void testIs() {
+		Validation.begin().is("true", true).check();
+		try {
+			Validation.begin().is("false", false).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
+	/**
+	 * Tests {@link Validation#is(String, boolean)}.
+	 */
+	public void testIsNot() {
+		Validation.begin().isNot("false", false).check();
+		try {
+			Validation.begin().isNot("true", true).check();
+			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
+	/**
 	 * Tests {@link Validation#isNotNull(String, Object)}.
 	 */
 	public void testIsNotNull() {
@@ -392,10 +418,29 @@ public class ValidationTest extends TestCase {
 	 * Tests {@link Validation#isEither(String, Object, Object...)}.
 	 */
 	public void testIsEither() {
-		Validation.begin().isEither("Test Object", "a", "a", "b", "c").check();
+		Validation.begin().isEither("Test Object", "a", null, "a", "b", "c").check();
+		Validation.begin().isEither("Test Object", null, "a", "b", "c", null).check();
 		try {
 			Validation.begin().isEither("Test Object", "a", "b", "c", "d").check();
 			fail();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+	}
+
+	/**
+	 * Tests {@link Validation#isAll(String, Object, Object...)}.
+	 */
+	public void testIsAll() {
+		Validation.begin().isAll("Test Object", "a", "a").check();
+		Validation.begin().isAll("Test Object", "a", "a", "a").check();
+		try {
+			Validation.begin().isAll("Test Object", "a", "b").check();
+		} catch (IllegalArgumentException iae1) {
+			/* expected. */
+		}
+		try {
+			Validation.begin().isAll("Test Object", "a", "b", "c").check();
 		} catch (IllegalArgumentException iae1) {
 			/* expected. */
 		}

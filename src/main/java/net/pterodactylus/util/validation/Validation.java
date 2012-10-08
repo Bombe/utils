@@ -191,6 +191,29 @@ public class Validation {
 	}
 
 	/**
+	 * Checks whether the given {@code object} matches all of the
+	 * {@code expecteds} values.
+	 *
+	 * @param <T>
+	 *            The type of object being validated
+	 * @param objectName
+	 *            The name of the object
+	 * @param object
+	 *            The object to check
+	 * @param expecteds
+	 *            The values that have to be {@link Object#equals(Object) equal}
+	 * @return This {@link Validation} object to allow method chaining
+	 */
+	public <T> Validation isAll(String objectName, T object, T... expecteds) {
+		AndValidator<T> andValidator = new AndValidator<T>();
+		for (T expected : expecteds) {
+			andValidator.addValidator(new EqualityValidator<T>(expected));
+		}
+		validationRunners.add(new ValidationRunner<T>(objectName, object, andValidator));
+		return this;
+	}
+
+	/**
 	 * Checks if <code>value</code> is less than <code>upperBound</code>.
 	 *
 	 * @param objectName

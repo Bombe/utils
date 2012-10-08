@@ -72,7 +72,7 @@ public class OrValidator<T> extends ValidatorContainer<T> {
 	public String toString() {
 		StringBuffer string = new StringBuffer().append('(');
 		for (Validator<T> validator : getValidators()) {
-			if (string.length() > 0) {
+			if (string.length() > 1) {
 				string.append(" || ");
 			}
 			string.append(validator);

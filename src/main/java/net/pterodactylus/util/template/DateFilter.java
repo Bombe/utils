@@ -44,7 +44,7 @@ public class DateFilter implements Filter {
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		String format = String.valueOf(parameters.get("format"));
 		TimeZone timezone = TimeZone.getDefault();
-		String timezoneName = String.valueOf(parameters.get("timezone"));
+		String timezoneName = (parameters.get("timezone") == null) ? null : String.valueOf(parameters.get("timezone"));
 		if (timezoneName != null) {
 			Object timezoneObject = templateContext.get(timezoneName);
 			if (timezoneObject == null) {

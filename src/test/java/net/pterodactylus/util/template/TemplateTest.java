@@ -1038,6 +1038,16 @@ public class TemplateTest extends TestCase {
 		template.render(templateContext, outputWriter);
 		output = outputWriter.toString();
 		assertEquals("Hello, User!", output);
+
+		templateString = "<% name | store key=='foo' text==true>Hello, <% foo>!";
+		outputWriter = new StringWriter();
+		template = TemplateParser.parse(new StringReader(templateString));
+		templateContext = new TemplateContext();
+		templateContext.addFilter("store", new StoreFilter());
+		templateContext.set("name", "User");
+		template.render(templateContext, outputWriter);
+		output = outputWriter.toString();
+		assertEquals("Hello, User!", output);
 	}
 
 	public void testStoreAndInsertFilter() {
@@ -1266,7 +1276,7 @@ public class TemplateTest extends TestCase {
 
 		outerTemplate = TemplateParser.parse(new StringReader("<%include t>"));
 		innerTemplate = TemplateParser.parse(new StringReader("<%include u>"));
-		innerstTemplate = TemplateParser.parse(new StringReader("<%=ä|html>"));
+		innerstTemplate = TemplateParser.parse(new StringReader("<%=äb|html><% no|html>"));
 		outerTemplateContext = new TemplateContext();
 		outerTemplateContext.addFilter("html", new HtmlFilter());
 		outerTemplateContext.addTemplateProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
@@ -1274,7 +1284,7 @@ public class TemplateTest extends TestCase {
 		outerTemplateContext.set("u", innerstTemplate);
 		stringWriter = new StringWriter();
 		outerTemplate.render(outerTemplateContext, stringWriter);
-		assertEquals("&auml;", stringWriter.toString());
+		assertEquals("&auml;b", stringWriter.toString());
 	}
 
 	public void testTemplateInclusionWithParameters() {
@@ -1365,6 +1375,15 @@ public class TemplateTest extends TestCase {
 
 		template.render(templateContext, stringWriter);
 		assertEquals("a", stringWriter.toString());
+
+		template = TemplateParser.parse(new StringReader("<%a><%:delete><%a>"));
+		templateContext = new TemplateContext();
+		templateContext.addPlugin("delete", new DeletePlugin());
+		templateContext.set("a", "a");
+		stringWriter = new StringWriter();
+
+		template.render(templateContext, stringWriter);
+		assertEquals("aa", stringWriter.toString());
 	}
 
 	private static class TestFilter implements Filter {
