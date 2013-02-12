@@ -18,6 +18,7 @@
 package net.pterodactylus.util.template;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -180,11 +181,18 @@ public class TemplateContext {
 					accessor = context.accessors.get(classToCheck);
 					break;
 				}
-				for (Class<?> interfaceClass : classToCheck.getInterfaces()) {
-					if (context.accessors.containsKey(interfaceClass)) {
-						accessor = context.accessors.get(interfaceClass);
+				List<Class<?>> interfaceClasses = new ArrayList<Class<?>>();
+				interfaceClasses.addAll(Arrays.asList(classToCheck.getInterfaces()));
+				/*
+				 * deliberately using an index, we’re adding to it during the
+				 * loop.
+				 */
+				for (int interfaceIndex = 0; interfaceIndex < interfaceClasses.size(); ++interfaceIndex) {
+					if (context.accessors.containsKey(interfaceClasses.get(interfaceIndex))) {
+						accessor = context.accessors.get(interfaceClasses.get(interfaceIndex));
 						break;
 					}
+					interfaceClasses.addAll(Arrays.asList(interfaceClasses.get(interfaceIndex).getInterfaces()));
 				}
 				classToCheck = classToCheck.getSuperclass();
 			}
