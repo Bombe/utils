@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.12.2</version>
+	<version>0.12.3</version>
 	<name>utils</name>
 	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
@@ -25,6 +25,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
