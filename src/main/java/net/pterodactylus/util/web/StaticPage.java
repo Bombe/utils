@@ -19,7 +19,9 @@ package net.pterodactylus.util.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
+import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.io.StreamCopier;
 
 /**
@@ -84,7 +86,13 @@ public class StaticPage<REQ extends Request> implements Page<REQ> {
 		if (fileInputStream == null) {
 			return response.setStatusCode(404).setStatusText("Not found.");
 		}
-		StreamCopier.copy(fileInputStream, response.getContent());
+		OutputStream contentOutputStream = response.getContent();
+		try {
+			StreamCopier.copy(fileInputStream, contentOutputStream);
+		} finally {
+			Closer.close(fileInputStream);
+			Closer.close(contentOutputStream);
+		}
 		return response.setStatusCode(200).setStatusText("OK").setContentType(mimeType);
 	}
 }
