@@ -45,8 +45,10 @@ import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 
 import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Contains method to transform DOM XML trees to byte arrays and vice versa.
@@ -233,6 +235,22 @@ public class XML {
 	public static Document transformToDocument(InputSource inputSource) {
 		try {
 			DocumentBuilder documentBuilder = getDocumentBuilder();
+			documentBuilder.setErrorHandler(new ErrorHandler() {
+				@Override
+				public void warning(SAXParseException exception) {
+					/* ignore. */
+				}
+
+				@Override
+				public void error(SAXParseException exception) {
+					/* ignore. */
+				}
+
+				@Override
+				public void fatalError(SAXParseException exception) {
+					/* ignore. */
+				}
+			});
 			return documentBuilder.parse(inputSource);
 		} catch (SAXException saxe1) {
 			logger.log(Level.WARNING, "Could not parse InputSource.", saxe1);
