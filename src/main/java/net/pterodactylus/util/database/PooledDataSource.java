@@ -28,6 +28,7 @@ import java.sql.NClob;
 import java.sql.PreparedStatement;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLWarning;
 import java.sql.SQLXML;
 import java.sql.Savepoint;
@@ -38,6 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
@@ -160,6 +163,11 @@ public class PooledDataSource implements DataSource {
 	@Override
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		return originalDataSource.unwrap(iface);
+	}
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		return originalDataSource.getParentLogger();
 	}
 
 	/**
@@ -607,6 +615,30 @@ public class PooledDataSource implements DataSource {
 			return originalConnection.unwrap(iface);
 		}
 
+		@Override
+		public void setSchema(String schema) throws SQLException {
+			originalConnection.setSchema(schema);
+		}
+
+		@Override
+		public String getSchema() throws SQLException {
+			return originalConnection.getSchema();
+		}
+
+		@Override
+		public void abort(Executor executor) throws SQLException {
+			originalConnection.abort(executor);
+		}
+
+		@Override
+		public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+			originalConnection.setNetworkTimeout(executor, milliseconds);
+		}
+
+		@Override
+		public int getNetworkTimeout() throws SQLException {
+			return originalConnection.getNetworkTimeout();
+		}
 	}
 
 	/**

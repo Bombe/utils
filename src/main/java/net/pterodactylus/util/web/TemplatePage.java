@@ -18,6 +18,7 @@
 package net.pterodactylus.util.web;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,9 +95,11 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 	 */
 	@Override
 	public Response handleRequest(REQ request, Response response) throws IOException {
+		OutputStream contentOutputStream = null;
 		OutputStreamWriter responseWriter = null;
 		try {
-			responseWriter = new OutputStreamWriter(response.getContent(), "UTF-8");
+			contentOutputStream = response.getContent();
+			responseWriter = new OutputStreamWriter(contentOutputStream, "UTF-8");
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("request", request);
 			processTemplate(templateContext, request);
@@ -111,6 +114,7 @@ public class TemplatePage<REQ extends Request> implements Page<REQ> {
 			throw new IOException(te1);
 		} finally {
 			Closer.close(responseWriter);
+			Closer.close(contentOutputStream);
 		}
 		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType);
 	}

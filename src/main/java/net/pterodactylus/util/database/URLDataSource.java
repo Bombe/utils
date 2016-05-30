@@ -21,8 +21,9 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
-
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
@@ -122,6 +123,11 @@ public class URLDataSource implements DataSource {
 		userProperties.setProperty("user", username);
 		userProperties.setProperty("password", password);
 		return DriverManager.getConnection(connectionUrl, username, password);
+	}
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		return Logger.getLogger(getClass().getName());
 	}
 
 }
