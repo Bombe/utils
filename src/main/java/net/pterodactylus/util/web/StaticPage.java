@@ -33,6 +33,9 @@ import net.pterodactylus.util.io.StreamCopier;
  */
 public class StaticPage<REQ extends Request> implements Page<REQ> {
 
+	/** The class whose class loader will be used to load resources. */
+	private final Class<?> resourceClass;
+
 	/** The prefix for {@link #getPath()}. */
 	private final String pathPrefix;
 
@@ -53,6 +56,11 @@ public class StaticPage<REQ extends Request> implements Page<REQ> {
 	 *            The MIME type of the files this path contains
 	 */
 	public StaticPage(String pathPrefix, String resourcePathPrefix, String mimeType) {
+		this(StaticPage.class, pathPrefix, resourcePathPrefix, mimeType);
+	}
+
+	public StaticPage(Class<?> resourceClass, String pathPrefix, String resourcePathPrefix, String mimeType) {
+		this.resourceClass = resourceClass;
 		this.pathPrefix = pathPrefix;
 		this.resourcePathPrefix = resourcePathPrefix;
 		this.mimeType = mimeType;
@@ -82,7 +90,7 @@ public class StaticPage<REQ extends Request> implements Page<REQ> {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);
-		InputStream fileInputStream = getClass().getResourceAsStream(resourcePathPrefix + filename);
+		InputStream fileInputStream = resourceClass.getResourceAsStream(resourcePathPrefix + filename);
 		if (fileInputStream == null) {
 			return response.setStatusCode(404).setStatusText("Not found.");
 		}
