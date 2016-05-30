@@ -399,7 +399,7 @@ public class MimeTypes {
 		addMimeType("application/x-gnumeric", "gnumeric");
 		addMimeType("application/x-go-sgf", "sgf");
 		addMimeType("application/x-graphing-calculator", "gcf");
-		addMimeType("application/x-gtar", "gtar", "tgz", "taz");
+		addMimeType("application/x-gtar", "gtar", "tgz", "taz", "tar.bz2");
 		addMimeType("application/x-hdf", "hdf");
 		addMimeType("application/x-ica", "ica");
 		addMimeType("application/x-internet-signup", "ins", "isp");
