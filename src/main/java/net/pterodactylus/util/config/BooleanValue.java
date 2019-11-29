@@ -1,5 +1,5 @@
 /*
- * utils - BooleanValue.java - Copyright © 2007-2009 David Roden
+ * utils - BooleanValue.java - Copyright © 2007–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,10 @@ public class BooleanValue extends AbstractValue<Boolean> {
 			return ((ExtendedConfigurationBackend) configuration.configurationBackend).getBooleanValue(attribute);
 		}
 		String value = configuration.configurationBackend.getValue(attribute);
-		return Boolean.valueOf(("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value)));
+		if (value == null) {
+			return null;
+		}
+		return ("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value));
 	}
 
 	/**
@@ -63,7 +66,10 @@ public class BooleanValue extends AbstractValue<Boolean> {
 				return ((ExtendedConfigurationBackend) configuration.configurationBackend).getBooleanValue(attribute);
 			}
 			String value = configuration.configurationBackend.getValue(attribute);
-			return Boolean.valueOf(("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value)));
+			if (value == null) {
+				return defaultValue;
+			}
+			return ("true".equalsIgnoreCase(value)) || ("yes".equalsIgnoreCase(value)) || ("1".equalsIgnoreCase(value)) || ("on".equalsIgnoreCase(value));
 		} catch (ConfigurationException ce1) {
 			return defaultValue;
 		}

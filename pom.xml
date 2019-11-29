@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>utils</artifactId>
-	<version>0.13</version>
+	<version>0.13.1</version>
 	<name>utils</name>
 	<url>http://java.pterodactylus.net/utils</url>
 	<description>Utility Library</description>
@@ -35,7 +35,7 @@
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ssh</artifactId>
-				<version>2.4</version>
+				<version>2.10</version>
 			</extension>
 		</extensions>
 		<plugins>
@@ -55,6 +55,7 @@
 					<links>
 						<link>http://docs.oracle.com/javase/6/docs/api/</link>
 					</links>
+					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>

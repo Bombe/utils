@@ -1,5 +1,5 @@
 /*
- * utils - Digits.java - Copyright © 2006-2009 David Roden
+ * utils - Digits.java - Copyright © 2006–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
