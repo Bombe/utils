@@ -1,5 +1,5 @@
 /*
- * utils - ValueField.java - Copyright © 2010–2016 knorpelfisk.de
+ * utils - ValueField.java - Copyright © 2010–2019 knorpelfisk.de
  */
 
 package net.pterodactylus.util.database;
