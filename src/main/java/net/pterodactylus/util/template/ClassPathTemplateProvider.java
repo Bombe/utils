@@ -17,20 +17,20 @@
 
 package net.pterodactylus.util.template;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
-import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
-import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.logging.Logging;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Template provider implementation that uses
@@ -50,17 +50,12 @@ public class ClassPathTemplateProvider implements TemplateProvider {
 	private final String resourcePath;
 
 	/** Cache for templates. */
-	private final Cache<String, Template> templateCache = new MemoryCache<String, Template>(new ValueRetriever<String, Template>() {
-
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public CacheItem<Template> retrieve(String key) throws CacheException {
-			Template template = findTemplate(key);
-			if (template != null) {
-				return new DefaultCacheItem<Template>(template);
-			}
-			return null;
+	private final Cache<String, Template> templateCache = new MemoryCache<>(key -> {
+		Template template = findTemplate(key);
+		if (template != null) {
+			return new DefaultCacheItem<>(template);
 		}
+		return null;
 	});
 
 	/**
@@ -116,17 +111,19 @@ public class ClassPathTemplateProvider implements TemplateProvider {
 	 *         found
 	 */
 	private Template findTemplate(String templateName) {
-		Reader templateReader = createReader(resourcePath + templateName);
-		if (templateReader == null) {
-			return null;
+		try (Reader templateReader = createReader(resourcePath + templateName)) {
+			if (templateReader == null) {
+				return null;
+			}
+			try {
+				return TemplateParser.parse(templateReader);
+			} catch (TemplateException te1) {
+				logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
+			}
+		} catch (IOException e) {
+			/* ignore. */
 		}
-		Template template = null;
-		try {
-			template = TemplateParser.parse(templateReader);
-		} catch (TemplateException te1) {
-			logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
-		}
-		return template;
+		return null;
 	}
 
 	/**
@@ -138,11 +135,11 @@ public class ClassPathTemplateProvider implements TemplateProvider {
 	 * @return A {@link Reader} for the resource
 	 */
 	private Reader createReader(String resourceName) {
-		try {
-			return new InputStreamReader(resourceClass.getResourceAsStream(resourceName), "UTF-8");
-		} catch (UnsupportedEncodingException uee1) {
+		InputStream inputStream = resourceClass.getResourceAsStream(resourceName);
+		if (inputStream == null) {
 			return null;
 		}
+		return new InputStreamReader(inputStream, UTF_8);
 	}
 
 }
