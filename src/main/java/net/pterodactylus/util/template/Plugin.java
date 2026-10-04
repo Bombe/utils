@@ -21,8 +21,8 @@ import java.util.Map;
 
 /**
  * Defines a template plugin. A plugin can be called just like the built-in
- * functions, e.g. “<%:plugin>”. It also can have parameters just like a filter,
- * e.g. “<%:plugin parameter=value>”.
+ * functions, e.g. “&lt;%:plugin&gt;”. It also can have parameters just like a filter,
+ * e.g. “&lt;%:plugin parameter=value&gt;”.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */

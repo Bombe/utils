@@ -20,6 +20,8 @@ package net.pterodactylus.util.template;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+
 /**
  * {@link TemplateProvider} that delegates requests for a {@link Template} to
  * several other {@link TemplateProvider}s.
@@ -29,7 +31,7 @@ import java.util.List;
 public class ChainingTemplateProvider implements TemplateProvider {
 
 	/** The delegate template providers. */
-	private final List<TemplateProvider> providers = new ArrayList<TemplateProvider>();
+	private final List<TemplateProvider> providers = new ArrayList<>();
 
 	/**
 	 * Creates a new chaining template provider.
@@ -38,9 +40,7 @@ public class ChainingTemplateProvider implements TemplateProvider {
 	 *            The delegate template providers
 	 */
 	public ChainingTemplateProvider(TemplateProvider... providers) {
-		for (TemplateProvider provider : providers) {
-			this.providers.add(provider);
-		}
+		this.providers.addAll(asList(providers));
 	}
 
 	//

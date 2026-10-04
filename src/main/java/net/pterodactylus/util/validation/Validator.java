@@ -20,9 +20,9 @@ package net.pterodactylus.util.validation;
 /**
  * Interface for objects that can validate other objects.
  * <p>
- * It is recommend that {@link #toString()} is overridden to return a concise
- * representation of this validator so that the error messages in
- * {@link Validation} are useful.
+ * It is recommended that implemetations override {@link Object#toString()}
+ * to return a concise representation of this validator so that the error
+ * messages in {@link Validation} are useful.
  *
  * @param <T>
  *            The type of the object being validated

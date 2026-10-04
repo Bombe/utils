@@ -26,7 +26,7 @@ import java.util.Iterator;
  * </p>
  *
  * <pre>
- *   for (int index = 0; index < 10; ++index) {
+ *   for (int index = 0; index &lt; 10; ++index) {
  *     …
  *   }
  * </pre>
