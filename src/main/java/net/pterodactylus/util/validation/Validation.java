@@ -25,14 +25,14 @@ import java.util.List;
  * Helps with parameter validation. Parameters can be checked using a construct
  * like this:
  * </p>
- * <code><pre>
- * public void copy(Object[] object, int leftValue, int ríghtValue) {
+ * <code>
+ * public void copy(Object[] object, int leftValue, int rightValue) {
  *     Validation.begin().isNotNull(object, &quot;object&quot;).check()
  *         .isPositive(leftValue, &quot;leftValue&quot;).isLess(leftValue, object.length, &quot;leftValue&quot;).check()
  *         .isPositive(rightValue, &quot;rightValue&quot;).isLess(rightValue, object.length, &quot;rightValue&quot;).isGreater(rightValue, leftValue, &quot;rightValue&quot;).check();
  *     // do something with the values
  * }
- * </pre></code>
+ * </code>
  * <p>
  * This example will perform several checks. Only the {@link #check()} method
  * will throw an {@link IllegalArgumentException} if one of the previous checks

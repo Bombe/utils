@@ -35,6 +35,7 @@ public class Classes {
 	 * <li>Both checks are then repeated with the superclass of the target
 	 * class, until the top-most class (which is always {@link Object}) is
 	 * reached.</li>
+	 * </ul>
 	 *
 	 * @param targetClass
 	 *            The target class

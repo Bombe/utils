@@ -180,7 +180,7 @@
  * &lt;ul&gt;
  * &lt;%foreach itemCollection item&gt;
  * &lt;li&gt;
- * Item: &lt;a href="item?id=&lt;% item.id&gt;">&lt;% item.name&gt;&lt;/a&gt;
+ * Item: &lt;a href="item?id=&lt;% item.id&gt;"&gt;&lt;% item.name&gt;&lt;/a&gt;
  * &lt;/li&gt;
  * &lt;%/foreach&gt;
  * &lt;/ul&gt;
@@ -338,8 +338,8 @@
  * </p>
  *
  * <pre>
- * <% user | html | store key='htmlUser'>
- * <% HelloText | i18n | html | insert needle='${user}' key='htmlUser'>
+ * &lt;% user | html | store key='htmlUser'&gt;
+ * &lt;% HelloText | i18n | html | insert needle='${user}' key='htmlUser'&gt;
  * </pre>
  *
  * <p>
@@ -462,4 +462,3 @@
  */
 
 package net.pterodactylus.util.template;
-
