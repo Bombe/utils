@@ -508,8 +508,17 @@ public class SimpleXML {
 	 * @return The SimpleXML node created from the document's top-level node
 	 */
 	public static SimpleXML fromDocument(Document document) {
-		SimpleXML xmlDocument = new SimpleXML(document.getFirstChild().getNodeName());
-		NamedNodeMap attributes = document.getFirstChild().getAttributes();
+		Node rootChild = null;
+		NodeList children = document.getChildNodes();
+		for (int index = 0, count = children.getLength(); index < count; index++) {
+			Node child = children.item(index);
+			if ((child.getNodeType() != Node.COMMENT_NODE) && (child.getNodeType() != Node.PROCESSING_INSTRUCTION_NODE) && (child.getNodeType() != Node.DOCUMENT_TYPE_NODE)) {
+				rootChild = child;
+				break;
+			}
+		}
+		SimpleXML xmlDocument = new SimpleXML(rootChild.getNodeName());
+		NamedNodeMap attributes = rootChild.getAttributes();
 		for (int attributeIndex = 0, attributeCount = attributes.getLength(); attributeIndex < attributeCount; attributeIndex++) {
 			Node attribute = attributes.item(attributeIndex);
 			logger.log(Level.FINER, "adding attribute: " + attribute.getNodeName() + " = " + attribute.getNodeValue());
@@ -517,16 +526,7 @@ public class SimpleXML {
 		}
 		document.normalizeDocument();
 		/* look for first non-comment node */
-		Node firstChild = null;
-		NodeList children = document.getChildNodes();
-		for (int index = 0, count = children.getLength(); index < count; index++) {
-			Node child = children.item(index);
-			if ((child.getNodeType() != Node.COMMENT_NODE) && (child.getNodeType() != Node.PROCESSING_INSTRUCTION_NODE)) {
-				firstChild = child;
-				break;
-			}
-		}
-		return addDocumentChildren(xmlDocument, firstChild);
+		return addDocumentChildren(xmlDocument, rootChild);
 	}
 
 	/**
