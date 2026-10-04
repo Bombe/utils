@@ -83,6 +83,7 @@ public class XML {
 		documentBuilderFactory.setXIncludeAware(true);
 		documentBuilderFactory.setNamespaceAware(true);
 		try {
+			documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		} catch (ParserConfigurationException pce1) {
 			logger.log(Level.WARNING, "Could not disable external DTD loading.", pce1);
